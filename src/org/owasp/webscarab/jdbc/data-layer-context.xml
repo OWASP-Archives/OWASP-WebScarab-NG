@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>org.hsqldb.jdbcDriver</value>
+		</property>
+		<property name="url"
+			value="jdbc:hsqldb:file:c:/temp/webscarab/" />
+		<!-- <property name="url" value="jdbc:hsqldb:file:c:/temp/webscarab/"/> -->
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="urlDao" class="org.owasp.webscarab.jdbc.HsqlJdbcUrlDao"
+		lazy-init="true">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="namedValueDao" class="org.owasp.webscarab.jdbc.HsqlJdbcNamedValueDao"
+		lazy-init="true">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="versionDao" class="org.owasp.webscarab.jdbc.VersionDao"
+		lazy-init="true">
+	</bean>
+
+	<bean id="headersDao"
+		class="org.owasp.webscarab.jdbc.HsqlJdbcHeadersDao"
+		lazy-init="true">
+		<constructor-arg index="0">
+			<ref local="namedValueDao" />
+		</constructor-arg>
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="blobDao" class="org.owasp.webscarab.jdbc.HsqlJdbcBlobDao"
+		lazy-init="true">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="conversationDao"
+		class="org.owasp.webscarab.jdbc.HsqlJdbcConversationDao"
+		lazy-init="true">
+		<constructor-arg index="0">
+			<value>0</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<ref local="urlDao" />
+		</constructor-arg>
+		<constructor-arg index="2">
+			<ref local="versionDao" />
+		</constructor-arg>
+		<constructor-arg index="3">
+			<ref local="headersDao" />
+		</constructor-arg>
+		<constructor-arg index="4">
+			<ref local="blobDao" />
+		</constructor-arg>
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+</beans>

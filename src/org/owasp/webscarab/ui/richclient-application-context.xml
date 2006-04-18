@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+<!-- $Id: richclient-application-context.xml,v 1.30 2005/10/25 13:58:57 lstreepy Exp $ -->
+<beans>
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>org.springframework.richclient.application.messages</value>
+				<value>org.owasp.webscarab.ui.messages</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="imageResourcesFactory"
+		class="org.springframework.context.support.ResourceMapFactoryBean">
+		<property name="locations">
+			<list>
+				<value>
+					classpath:org/springframework/richclient/image/images.properties
+				</value>
+				<value>
+					classpath:org/owasp/webscarab/ui/images.properties
+				</value>
+			</list>
+		</property>
+		<property name="resourceBasePath">
+			<value>images/</value>
+		</property>
+	</bean>
+
+	<bean id="imageSource"
+		class="org.springframework.richclient.image.DefaultImageSource">
+		<constructor-arg index="0">
+			<ref bean="imageResourcesFactory" />
+		</constructor-arg>
+		<property name="brokenImageIndicator">
+			<value>images/alert/error_obj.gif</value>
+		</property>
+	</bean>
+
+	<bean id="iconSource"
+		class="org.springframework.richclient.image.DefaultIconSource">
+		<constructor-arg index="0">
+			<ref bean="imageSource" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="application"
+		class="org.springframework.richclient.application.Application">
+		<constructor-arg index="0">
+			<ref bean="applicationDescriptor" />
+		</constructor-arg>
+		<constructor-arg index="1">
+			<ref bean="lifecycleAdvisor" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="lifecycleAdvisor"
+		class="org.springframework.richclient.application.config.DefaultApplicationLifecycleAdvisor">
+		<property name="windowCommandBarDefinitions">
+			<value>org/owasp/webscarab/ui/commands-context.xml</value>
+		</property>
+		<property name="startingPageId">
+			<value>summaryView</value>
+		</property>
+	</bean>
+
+	<bean id="applicationDescriptor"
+		class="org.owasp.webscarab.util.ManifestApplicationDescriptor">
+		<constructor-arg index="0">
+			<value>org.owasp.webscarab.WebScarab</value>
+		</constructor-arg>
+		<property name="title">
+			<value>title</value>
+		</property>
+		<!--
+			<property name="version">
+			<value>0.1</value>
+			</property>
+			<property name="buildId">
+			<value>20041025001</value>
+			</property>
+			<property name="caption">
+			<value>caption</value>
+			</property>
+			<property name="description">
+			<value>description</value>
+			</property>
+		-->
+	</bean>
+
+	<bean id="applicationObjectConfigurer"
+		class="org.springframework.richclient.application.config.DefaultApplicationObjectConfigurer">
+		<constructor-arg index="0">
+			<ref bean="messageSource" />
+		</constructor-arg>
+		<constructor-arg index="1">
+			<ref bean="imageSource" />
+		</constructor-arg>
+		<constructor-arg index="2">
+			<ref bean="iconSource" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="applicationEventMulticaster"
+		class="org.springframework.context.event.SimpleApplicationEventMulticaster" />
+
+	<bean id="componentFactory"
+		class="org.springframework.richclient.factory.DefaultComponentFactory">
+		<property name="iconSource">
+			<ref bean="iconSource" />
+		</property>
+		<property name="messageSource">
+			<ref bean="messageSource" />
+		</property>
+	</bean>
+
+	<bean id="binderSelectionStrategy"
+		class="org.springframework.richclient.form.binding.swing.SwingBinderSelectionStrategy">
+		<property name="bindersForPropertyTypes">
+			<map>
+				<!--
+					<entry>
+					<key>
+					<value type="java.lang.Class">java.util.Date</value>
+					</key>
+					<bean 
+					class="org.petclinic.ui.binder.CustomDatePickerBinder"/>
+					</entry>
+					<entry>
+					<key>
+					<value type="java.lang.Class"> 
+					org.petclinic.PetType</value>
+					</key>
+					<bean 
+					class="org.petclinic.ui.binder.PetTypeBinder">
+					<property name="clinic">
+					<ref bean="clinic"/>
+					</property>
+					</bean>
+					</entry>
+				-->
+			</map>
+		</property>
+	</bean>
+
+	<bean id="lookAndFeelConfigurer"
+		class="org.springframework.richclient.application.config.JGoodiesLooksConfigurer">
+		<property name="popupDropShadowEnabled" value="false" />
+		<property name="theme">
+			<bean
+				class="com.jgoodies.looks.plastic.theme.ExperienceBlue" />
+		</property>
+	</bean>
+
+	<bean id="formComponentInterceptorFactory"
+		class="org.springframework.richclient.form.builder.support.ChainedInterceptorFactory">
+		<property name="interceptorFactories">
+			<list>
+				<bean
+					class="org.springframework.richclient.form.builder.support.ColorValidationInterceptorFactory">
+					<property name="errorColor">
+						<value>255,245,245</value>
+					</property>
+				</bean>
+				<bean
+					class="org.springframework.richclient.form.builder.support.OverlayValidationInterceptorFactory" />
+				<bean
+					class="org.springframework.richclient.text.TextComponentPopupInterceptorFactory" />
+				<bean
+					class="org.springframework.richclient.list.ComboBoxAutoCompletionInterceptorFactory">
+					<property name="messageSource">
+						<ref bean="messageSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!--
+		<bean id="rulesSource" 
+		class="org.petclinic.domain.PetClinicValidationRulesSource"/>
+		
+	-->
+	<bean id="formPropertyFaceDescriptorSource"
+		class="org.springframework.binding.form.support.MessageSourceFormPropertyFaceDescriptorSource" />
+
+	<bean id="basicConversationSummaryList"
+		class="ca.odell.glazedlists.BasicEventList">
+	</bean>
+
+	<bean id="conversationSummaryListBuilder"
+		class="org.owasp.webscarab.ui.ConversationSummaryListBuilder">
+		<property name="conversationService">
+			<ref bean="conversationService" />
+		</property>
+		<property name="eventService">
+			<ref bean="eventService" />
+		</property>
+		<property name="summaryList">
+			<ref bean="basicConversationSummaryList" />
+		</property>
+	</bean>
+
+	<bean id="conversationSummaryList"
+		class="ca.odell.glazedlists.SortedList">
+		<constructor-arg index="0">
+			<ref local="basicConversationSummaryList" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="summaryView"
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor">
+		<property name="viewClass">
+			<value>org.owasp.webscarab.ui.SummaryView</value>
+		</property>
+		<property name="title">
+			<value>SummaryView</value>
+		</property>
+		<property name="viewProperties">
+			<map>
+				<entry key="conversationService">
+					<ref bean="conversationService" />
+				</entry>
+				<entry key="conversationSummaryList">
+					<ref bean="conversationSummaryList" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

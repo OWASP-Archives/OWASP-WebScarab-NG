@@ -1,0 +1,149 @@
+/**
+ * 
+ */
+package org.owasp.webscarab.util;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.httpclient.ChunkedInputStream;
+import org.apache.commons.httpclient.ContentLengthInputStream;
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpVersion;
+import org.apache.commons.httpclient.ProtocolException;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.OptionsMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.TraceMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.owasp.webscarab.Conversation;
+import org.owasp.webscarab.NamedValue;
+
+/**
+ * @author rdawes
+ * 
+ */
+public class HttpMethodUtils {
+
+	public static HttpMethod constructMethod(Conversation conversation)
+			throws ProtocolException {
+		HttpMethod httpMethod = null;
+		PostMethod postMethod = null;
+		String method = conversation.getRequestMethod();
+		String url = conversation.getRequestUrl().toString();
+		if (method.equals("GET")) {
+			httpMethod = new GetMethod(url);
+		} else if (method.equals("POST")) {
+			postMethod = new PostMethod(url);
+			httpMethod = postMethod;
+		} else if (method.equals("OPTIONS")) {
+			httpMethod = new OptionsMethod(url);
+		} else if (method.equals("HEAD")) {
+			httpMethod = new HeadMethod(url);
+		} else if (method.equals("DELETE")) {
+			httpMethod = new DeleteMethod(url);
+		} else if (method.equals("PUT")) {
+			httpMethod = new PutMethod(url);
+		} else if (method.equals("TRACE")) {
+			httpMethod = new TraceMethod(url);
+		} else {
+			conversation.setResponseVersion("HTTP/1.0");
+			conversation.setResponseStatus("501");
+			conversation.setResponseMessage("Not implemented");
+			String error = "Method " + method + " not supported";
+			conversation.setResponseContent(error.getBytes());
+			return null;
+		}
+		httpMethod.getParams().setParameter(HttpMethodParams.PROTOCOL_VERSION,
+				HttpVersion.parse(conversation.getRequestVersion()));
+		NamedValue[] headers = conversation.getRequestHeaders();
+		for (int i = 0; headers != null && i < headers.length; i++) {
+			httpMethod.addRequestHeader(headers[i].getName(), headers[i]
+					.getValue());
+		}
+		if (postMethod != null) {
+			RequestEntity requestEntity = null;
+			byte[] bytes = conversation.getRequestContent();
+			if (bytes != null) {
+				// System.out.println("Creating a ByteArrayRequestEntity");
+				requestEntity = new ByteArrayRequestEntity(bytes);
+			}
+			postMethod.setRequestEntity(requestEntity);
+		}
+		httpMethod.setFollowRedirects(false);
+		// Provide custom retry handler if necessary
+		httpMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+				new DefaultHttpMethodRetryHandler(0, false));
+		return httpMethod;
+	}
+
+    public static void setRequestContent(Conversation conversation, InputStream is) throws IOException {
+    	if ("CONNECT".equals(conversation.getRequestMethod())) return;
+    	if ("HEAD".equals(conversation.getRequestMethod())) return;
+    	if ("GET".equals(conversation.getRequestMethod())) return;
+    	InputStream contentInputStream = null;
+    	if ("POST".equals(conversation.getRequestMethod())) {
+    		String te = conversation.getRequestHeader("Transfer-Encoding");
+    		String length = conversation.getRequestHeader("Content-Length");
+    		if ("chunked".equalsIgnoreCase(te)) {
+    			contentInputStream = new ChunkedInputStream(is);
+    		} else if (length != null) {
+    			try {
+    				long cl = Long.parseLong(length);
+    				contentInputStream = new ContentLengthInputStream(is, cl);
+    			} catch (NumberFormatException nfe) {
+    				IOException ioe = new IOException("Error parsing Content-Length header: " + length);
+    				ioe.initCause(nfe);
+    				throw ioe;
+    			}
+    		}
+    	} else {
+    		throw new IOException("Can " + conversation.getRequestMethod() + " have a body or not? Not implemented yet!");
+    	}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buff = new byte[4096];
+		int got;
+		while ((got = contentInputStream.read(buff)) > -1) {
+			baos.write(buff, 0, got);
+		}
+		conversation.setRequestContent(baos.toByteArray());
+    }
+    
+	public static void fillResponse(Conversation conversation,
+			HttpMethod httpMethod) throws IOException {
+		conversation.setResponseVersion(httpMethod.getStatusLine()
+				.getHttpVersion());
+		conversation.setResponseStatus(Integer.toString(httpMethod
+				.getStatusCode()));
+        conversation.setResponseMessage(httpMethod.getStatusLine().getReasonPhrase());
+        Header[] headers = httpMethod.getResponseHeaders();
+        conversation.setResponseHeaders(convert(headers));
+        	conversation.setResponseContentStream(httpMethod.getResponseBodyAsStream());
+	}
+	
+	public static void fillFooters(Conversation conversation, HttpMethod httpMethod) {
+        Header[] footers = httpMethod.getResponseFooters();
+        conversation.setResponseFooters(convert(footers));
+	}
+	
+    private static NamedValue[] convert(Header[] headers) {
+        NamedValue[] nv = null;
+        if (headers != null) {
+            nv = new NamedValue[headers.length];
+            for (int i = 0; i < headers.length; i++) {
+                Header header = headers[i];
+                nv[i] = new NamedValue(header.getName(), header.getValue());
+            }
+        }
+        return nv;
+    }
+
+}

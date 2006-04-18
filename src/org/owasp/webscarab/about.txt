@@ -1,0 +1,5 @@
+About WebScarab
+
+WebScarab is a product of the Open Web Application Security Project (OWASP)
+
+WebScarab was written by Rogan Dawes (rogan AT dawes.za.net)
