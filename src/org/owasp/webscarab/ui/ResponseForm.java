@@ -22,9 +22,9 @@ import org.springframework.richclient.form.AbstractForm;
  * @author rdawes
  * 
  */
-public class RequestForm extends AbstractForm {
+public class ResponseForm extends AbstractForm {
 
-	private static final String FORM_ID = "requestForm";
+	private static final String FORM_ID = "responseForm";
 
 	private JTree tree;
 
@@ -35,7 +35,7 @@ public class RequestForm extends AbstractForm {
 	/**
 	 * Constructor.
 	 */
-	public RequestForm(FormModel model) {
+	public ResponseForm(FormModel model) {
 		super(model, FORM_ID);
 		addFormObjectChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -78,17 +78,17 @@ public class RequestForm extends AbstractForm {
 	private void refresh() {
 		if (getConversation() != null) {
 			ConversationTreeModel treeModel = new ConversationTreeModel(
-					getConversation(), ConversationTreeModel.REQUEST);
+					getConversation(), ConversationTreeModel.RESPONSE);
 			tree.setModel(treeModel);
-			contentPanel.setContentType(getConversation().getRequestHeader(
+			contentPanel.setContentType(getConversation().getResponseHeader(
 					"Content-Type"));
-			contentPanel.setContent(getConversation().getRequestContent());
+			contentPanel.setContent(getConversation().getResponseContent());
 
 			StringBuffer buff = new StringBuffer();
-			buff.append(getConversation().getRequestMethod()).append(" ");
-			buff.append(getConversation().getRequestUrl()).append(" ");
-			buff.append(getConversation().getRequestVersion()).append("\n");
-			NamedValue[] headers = getConversation().getRequestHeaders();
+			buff.append(getConversation().getResponseVersion()).append(" ");
+			buff.append(getConversation().getResponseStatus()).append(" ");
+			buff.append(getConversation().getResponseMessage()).append("\n");
+			NamedValue[] headers = getConversation().getResponseHeaders();
 			if (headers != null) {
 				for (int i = 0; i < headers.length; i++) {
 					buff.append(headers[i].getName()).append(": ");
@@ -96,8 +96,8 @@ public class RequestForm extends AbstractForm {
 				}
 			}
 			buff.append("\n");
-			if (getConversation().getRequestContent() != null) {
-				buff.append(new String(getConversation().getRequestContent()));
+			if (getConversation().getResponseContent() != null) {
+				buff.append(new String(getConversation().getResponseContent()));
 			}
 			textArea.setText(buff.toString());
 		}
