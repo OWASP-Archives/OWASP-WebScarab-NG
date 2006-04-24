@@ -41,7 +41,29 @@ import java.util.zip.InflaterInputStream;
 
 public class Conversation extends BaseEntity {
 
-	private static String ENCODING = "Content-Encoding";
+    public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
+
+    public static final String PROPERTY_REQUEST_URL = "requestUrl";
+
+    public static final String PROPERTY_REQUEST_VERSION = "requestVersion";
+
+    public static final String PROPERTY_REQUEST_HEADERS = "requestHeaders";
+
+    public static final String PROPERTY_REQUEST_CONTENT = "requestContent";
+
+    public static final String PROPERTY_RESPONSE_VERSION = "responseVersion";
+
+    public static final String PROPERTY_RESPONSE_STATUS = "responseStatus";
+
+    public static final String PROPERTY_RESPONSE_MESSAGE = "responseMessage";
+
+    public static final String PROPERTY_RESPONSE_HEADERS = "responseHeaders";
+
+    public static final String PROPERTY_RESPONSE_CONTENT = "responseContent";
+
+    public static final String PROPERTY_RESPONSE_FOOTERS = "responseFooters";
+
+	private static final String ENCODING = "Content-Encoding";
 
 	private Date date = new Date();
 
