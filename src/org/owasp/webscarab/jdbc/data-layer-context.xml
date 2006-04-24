@@ -3,7 +3,7 @@
 
 <beans>
 	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
 		<property name="driverClassName">
 			<value>org.hsqldb.jdbcDriver</value>
 		</property>
@@ -15,7 +15,7 @@
 	</bean>
 
 	<bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
