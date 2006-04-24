@@ -16,7 +16,6 @@ import javax.swing.JTree;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.NamedValue;
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.form.AbstractForm;
 import org.springframework.richclient.form.FormModelHelper;
 
@@ -28,20 +27,17 @@ public class RequestForm extends AbstractForm {
 
 	private static final String FORM_ID = "requestForm";
 
-	private JTree requestTree;
+	private JTree tree;
 
 	private ContentPanel contentPanel;
 
-	private JTextArea requestTextArea;
+	private JTextArea textArea;
 
 	/**
 	 * Constructor.
 	 */
 	public RequestForm(FormModel model) {
 		super(model, FORM_ID);
-		setFormModel(FormModelHelper
-				.createUnbufferedFormModel(new Conversation()));
-
 		addFormObjectChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				refresh();
@@ -62,30 +58,30 @@ public class RequestForm extends AbstractForm {
 	 * Construct the form with the required fields.
 	 */
 	protected JComponent createFormControl() {
-		requestTextArea = new JTextArea();
-		requestTree = new JTree();
-		requestTree.setRootVisible(false);
-		requestTree.setShowsRootHandles(true);
-		requestTree.setEditable(getFormModel().isEnabled());
+		textArea = new JTextArea();
+		tree = new JTree();
+		tree.setRootVisible(false);
+		tree.setShowsRootHandles(true);
+		tree.setEditable(getFormModel().isEnabled());
 		contentPanel = new ContentPanel();
-		JSplitPane requestSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		requestSplitPane.setTopComponent(new JScrollPane(requestTree));
-		requestSplitPane.setBottomComponent(contentPanel);
-		requestSplitPane.setResizeWeight(0.1);
-		JTabbedPane requestTabbedPane = new JTabbedPane();
-		requestTabbedPane.addTab("Parsed", requestSplitPane);
-		requestTabbedPane.addTab("Raw", new JScrollPane(requestTextArea));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setTopComponent(new JScrollPane(tree));
+		splitPane.setBottomComponent(contentPanel);
+		splitPane.setResizeWeight(0.1);
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Parsed", splitPane);
+		tabbedPane.addTab("Raw", new JScrollPane(textArea));
 
 		refresh();
 
-		return requestTabbedPane;
+		return tabbedPane;
 	}
 
 	private void refresh() {
 		if (getConversation() != null) {
 			ConversationTreeModel treeModel = new ConversationTreeModel(
 					getConversation(), ConversationTreeModel.REQUEST);
-			requestTree.setModel(treeModel);
+			tree.setModel(treeModel);
 			contentPanel.setContentType(getConversation().getRequestHeader(
 					"Content-Type"));
 			contentPanel.setContent(getConversation().getRequestContent());
@@ -105,7 +101,7 @@ public class RequestForm extends AbstractForm {
 			if (getConversation().getRequestContent() != null) {
 				buff.append(new String(getConversation().getRequestContent()));
 			}
-			requestTextArea.setText(buff.toString());
+			textArea.setText(buff.toString());
 		}
 	}
 }
