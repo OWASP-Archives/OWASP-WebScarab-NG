@@ -47,6 +47,7 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
+				<bean class="org.owasp.webscarab.util.ui.SelectDatabaseCommand"/>
 				<!-- <ref bean="newMenu"/> 
 				<value>separator</value>
 				<ref bean="loginCommand"/> 
