@@ -33,8 +33,6 @@ import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
 import org.springframework.richclient.command.support.GlobalCommandIds;
-import org.springframework.richclient.dialog.FormBackedDialogPage;
-import org.springframework.richclient.dialog.TitledPageApplicationDialog;
 import org.springframework.richclient.form.FormModelHelper;
 import org.springframework.richclient.util.PopupMenuMouseListener;
 
@@ -115,15 +113,14 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 											.getSelectedRowCount() == 1);
 						}
 					});
-			 conversationTable.addMouseListener(new PopupMenuMouseListener() {
+			conversationTable.addMouseListener(new PopupMenuMouseListener() {
 				protected boolean onAboutToShow(MouseEvent e) {
 					return getSelectedConversation() != null;
 				}
 
 				protected JPopupMenu getPopupMenu() {
-					return getSelectedConversation() != null ?
-					 createConversationPopupContextMenu() :
-					 null;
+					return getSelectedConversation() != null ? createConversationPopupContextMenu()
+							: null;
 				}
 			});
 			conversationTable.addMouseListener(new MouseAdapter() {
@@ -152,7 +149,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	}
 
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
-		logger.info(applicationEvent);
+		// logger.info(applicationEvent);
 	}
 
 	public void setConversationService(ConversationService conversationService) {
@@ -167,13 +164,13 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return conversationService.getConversation(summary.getId());
 	}
 
-    private JPopupMenu createConversationPopupContextMenu() {
-        // rename, separator, delete, addPet separator, properties
-        CommandGroup group = getWindowCommandManager().createCommandGroup(
-                "conversationCommandGroup",
-                new Object[] {"propertiesCommand"});
-        return group.createPopupMenu();
-    }
+	private JPopupMenu createConversationPopupContextMenu() {
+		// rename, separator, delete, addPet separator, properties
+		CommandGroup group = getWindowCommandManager().createCommandGroup(
+				"conversationCommandGroup",
+				new Object[] { "propertiesCommand" });
+		return group.createPopupMenu();
+	}
 
 	private static class ConversationTableFormat implements TableFormat {
 
@@ -229,27 +226,17 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 			AbstractActionCommandExecutor {
 
 		public void execute() {
-			final Conversation conversation = getSelectedConversation();
-			final ConversationForm conversationForm = new ConversationForm(
+			Conversation conversation = getSelectedConversation();
+
+			ConversationForm conversationForm = new ConversationForm(
 					FormModelHelper.createFormModel(conversation));
-			final FormBackedDialogPage dialogPage = new FormBackedDialogPage(
-					conversationForm);
+			conversationForm.getFormModel().setEnabled(false);
+			
+			MinimalApplicationWindow maw = new MinimalApplicationWindow();
 
-			TitledPageApplicationDialog dialog = new TitledPageApplicationDialog(
-					dialogPage, getWindowControl()) {
-				protected void onAboutToShow() {
-					// conversationForm.requestFocusInWindow();
-					setEnabled(dialogPage.isPageComplete());
-				}
-
-				protected boolean onFinish() {
-					conversationForm.commit();
-					return true;
-				}
-			};
-			dialog.setModal(false);
-			dialog.setPreferredSize(new Dimension(1024, 768));
-			dialog.showDialog();
+			maw.showPage("conversationView");
+			ConversationView cv = (ConversationView) maw.getPage().getActiveComponent();
+			cv.setConversation(conversation);
 		}
 	}
 
