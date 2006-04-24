@@ -232,4 +232,14 @@
 		</property>
 	</bean>
 
+	<bean id="conversationView"
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor" singleton="false">
+		<property name="viewClass">
+			<value>org.owasp.webscarab.ui.ConversationView</value>
+		</property>
+		<property name="title">
+			<value>ConversationView</value>
+		</property>
+	</bean>
+	
 </beans>
