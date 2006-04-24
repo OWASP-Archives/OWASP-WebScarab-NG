@@ -269,7 +269,7 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
         int rownum) throws SQLException {
             ConversationSummary summary = new ConversationSummary();
             summary.setId(new Integer(rs.getInt("id")));
-            summary.setDate(rs.getDate("date"));
+            summary.setDate(rs.getTimestamp("date"));
             summary.setRequestMethod(rs.getString("request_method"));
             summary.setRequestUrl(urlDao.findUrl(new Integer(rs
                     .getInt("request_url"))));
