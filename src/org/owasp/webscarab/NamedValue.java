@@ -19,6 +19,9 @@ import java.util.List;
  */
 public class NamedValue extends BaseEntity {
     
+	public final static String PROPERTY_NAME = "name";
+	public final static String PROPERTY_VALUE = "value";
+	
     private String name;
     private String value;
     
