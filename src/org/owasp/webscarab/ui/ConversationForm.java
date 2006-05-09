@@ -25,7 +25,9 @@ public class ConversationForm extends AbstractForm {
 	public ConversationForm(FormModel model) {
 		super(model, "ConversationForm");
 		requestForm = new RequestForm(model);
+		addChildForm(requestForm);
 		responseForm = new ResponseForm(model);
+		addChildForm(responseForm);
 		addFormObjectChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				requestForm.setConversation((Conversation)evt.getNewValue());
