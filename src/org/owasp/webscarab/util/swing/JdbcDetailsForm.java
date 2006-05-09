@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.owasp.webscarab.util.ui;
+package org.owasp.webscarab.util.swing;
 
 import javax.swing.JComponent;
 
