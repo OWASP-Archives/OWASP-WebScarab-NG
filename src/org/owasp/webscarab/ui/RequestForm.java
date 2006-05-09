@@ -65,7 +65,7 @@ public class RequestForm extends AbstractForm {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setTopComponent(new JScrollPane(tree));
 		splitPane.setBottomComponent(contentPanel);
-		splitPane.setResizeWeight(0.1);
+		splitPane.setResizeWeight(0.5);
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Parsed", splitPane);
 		tabbedPane.addTab("Raw", new JScrollPane(textArea));
