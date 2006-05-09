@@ -10,7 +10,6 @@
 
 package org.owasp.webscarab.ui;
 
-import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -26,6 +25,7 @@ import javax.swing.table.TableModel;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
+import org.owasp.webscarab.util.swing.FormView;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.richclient.application.PageComponentContext;
@@ -231,6 +231,8 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 			ConversationForm conversationForm = new ConversationForm(
 					FormModelHelper.createFormModel(conversation));
 			conversationForm.getFormModel().setEnabled(false);
+			
+			FormView view = new FormView(conversationForm);
 			
 			MinimalApplicationWindow maw = new MinimalApplicationWindow();
 
