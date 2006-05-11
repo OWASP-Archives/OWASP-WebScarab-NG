@@ -51,6 +51,9 @@
 				<property name="dataSourceFactory">
 					<ref bean="&amp;dataSource"/>
 				</property>
+				<property name="displaySuccessMessage">
+					<value>false</value>
+				</property>
 				</bean>
 				<!-- <ref bean="newMenu"/> 
 				<value>separator</value>
