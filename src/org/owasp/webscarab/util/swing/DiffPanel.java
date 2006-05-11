@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -64,6 +65,8 @@ public class DiffPanel extends JPanel {
 
 	private List<Edit> edits = null;
 
+	private Color changedColor, addedColor, deletedColor;
+	
 	private SimpleAttributeSet unchanged, changed, added, deleted;
 
 	private CardLayout layout;
@@ -78,12 +81,33 @@ public class DiffPanel extends JPanel {
 
 	public DiffPanel(String displayLayout) {
 		super();
+		getPreferences();
 		createAttributes();
 		createComponents();
 		addKeyMappings();
 		setDisplayLayout(displayLayout);
 	}
 
+	private void getPreferences() {
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+		if (changedColor == null) {
+			int colorSpec = prefs.getInt("changed", Color.YELLOW.getRGB());
+			changedColor = new Color(colorSpec);
+		}
+		if (addedColor == null) {
+			int colorSpec = prefs.getInt("added", Color.GREEN.getRGB());
+			addedColor = new Color(colorSpec);
+		}
+		if (deletedColor == null) {
+			int colorSpec = prefs.getInt("deleted", Color.PINK.getRGB());
+			deletedColor = new Color(colorSpec);
+		}
+		System.out.println("changed : " + changedColor.getRGB());
+		System.out.println("added : " + addedColor.getRGB());
+		System.out.println("deleted : " + deletedColor.getRGB());
+		prefs.putInt("changed", changedColor.getRGB());
+	}
+	
 	private void addKeyMappings() {
 		getActionMap().put("TOGGLELAYOUT", new AbstractAction() {
 			private static final long serialVersionUID = 1558804946998494321L;
@@ -101,11 +125,11 @@ public class DiffPanel extends JPanel {
 	private void createAttributes() {
 		unchanged = new SimpleAttributeSet();
 		changed = new SimpleAttributeSet();
-		changed.addAttribute(StyleConstants.Background, Color.YELLOW);
+		changed.addAttribute(StyleConstants.Background, changedColor);
 		added = new SimpleAttributeSet();
-		added.addAttribute(StyleConstants.Background, Color.GREEN);
+		added.addAttribute(StyleConstants.Background, addedColor);
 		deleted = new SimpleAttributeSet();
-		deleted.addAttribute(StyleConstants.Background, Color.PINK);
+		deleted.addAttribute(StyleConstants.Background, deletedColor);
 	}
 
 	private void createComponents() {
@@ -300,7 +324,9 @@ public class DiffPanel extends JPanel {
 			reader.close();
 			dst = buff.toString();
 		}
-		List<Edit> edits = Diff.refine(src, dst, Diff.getEdits(src, dst, '\n'));
+		List<Edit> edits = Diff.getEdits(src, dst, '\n');
+		System.out.println("Distance: " + Diff.getDistance(edits));
+		edits = Diff.refine(src, dst, edits);
 		System.out.println("Distance: " + Diff.getDistance(edits));
 		panel.showDifferences(src, dst, edits);
 	}
