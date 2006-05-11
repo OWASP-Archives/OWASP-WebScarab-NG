@@ -213,7 +213,8 @@
 	</bean>
 
 	<bean id="conversationSummaryList"
-		class="ca.odell.glazedlists.SortedList" lazy-init="true">
+		class="ca.odell.glazedlists.SortedList" lazy-init="true"
+		depends-on="conversationSummaryListBuilder">
 		<constructor-arg index="0">
 			<ref local="basicConversationSummaryList" />
 		</constructor-arg>
