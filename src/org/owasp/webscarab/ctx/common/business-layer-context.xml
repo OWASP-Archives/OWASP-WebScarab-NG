@@ -5,7 +5,7 @@
 
 
 	<bean id="conversationServiceTarget"
-		class="org.owasp.webscarab.services.ConversationService">
+		class="org.owasp.webscarab.services.ConversationService" lazy-init="true">
 		<property name="conversationDao">
 			<ref bean="conversationDao" />
 		</property>
@@ -15,7 +15,8 @@
 	</bean>
 
 	<bean id="conversationService"
-		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		lazy-init="true">
 		<property name="transactionManager">
 			<ref bean="transactionManager" />
 		</property>
@@ -35,7 +36,7 @@
 	</bean>
 
 	<bean id="listener"
-		class="org.owasp.webscarab.plugins.proxy.Listener">
+		class="org.owasp.webscarab.plugins.proxy.Listener" lazy-init="true">
 		<constructor-arg index="0">
 			<bean class="java.net.InetSocketAddress">
 				<constructor-arg index="0"><value>localhost</value></constructor-arg>
@@ -50,17 +51,10 @@
 		<property name="keyPassword"><value>password</value></property>
 	</bean>
 
-	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy">
+	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
 		<property name="listener">
 			<ref local="listener" />
 		</property>
-	</bean>
-
-	<bean id="eventService"
-		class="org.bushe.swing.event.ThreadSafeEventService">
-		<constructor-arg index="0">
-			<null />
-		</constructor-arg>
 	</bean>
 
 </beans>

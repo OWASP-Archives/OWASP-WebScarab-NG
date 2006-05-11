@@ -64,8 +64,15 @@
 			<value>org/owasp/webscarab/ui/commands-context.xml</value>
 		</property>
 		<property name="startingPageId">
-			<value>summaryView</value>
+			<value>logoView</value>
 		</property>
+	</bean>
+
+	<bean id="eventService"
+		class="org.bushe.swing.event.ThreadSafeEventService">
+		<constructor-arg index="0">
+			<null />
+		</constructor-arg>
 	</bean>
 
 	<bean id="applicationDescriptor"
@@ -193,7 +200,7 @@
 	</bean>
 
 	<bean id="conversationSummaryListBuilder"
-		class="org.owasp.webscarab.ui.ConversationSummaryListBuilder">
+		class="org.owasp.webscarab.ui.ConversationSummaryListBuilder" lazy-init="true">
 		<property name="conversationService">
 			<ref bean="conversationService" />
 		</property>
@@ -206,14 +213,14 @@
 	</bean>
 
 	<bean id="conversationSummaryList"
-		class="ca.odell.glazedlists.SortedList">
+		class="ca.odell.glazedlists.SortedList" lazy-init="true">
 		<constructor-arg index="0">
 			<ref local="basicConversationSummaryList" />
 		</constructor-arg>
 	</bean>
 
 	<bean id="summaryView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor">
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
 		<property name="viewClass">
 			<value>org.owasp.webscarab.ui.SummaryView</value>
 		</property>
@@ -229,6 +236,16 @@
 					<ref bean="conversationSummaryList" />
 				</entry>
 			</map>
+		</property>
+	</bean>
+
+	<bean id="logoView"
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor">
+		<property name="viewClass">
+			<value>org.owasp.webscarab.ui.LogoView</value>
+		</property>
+		<property name="title">
+			<value>SummaryView</value>
 		</property>
 	</bean>
 

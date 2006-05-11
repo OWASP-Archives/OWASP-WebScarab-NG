@@ -47,7 +47,11 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<bean class="org.owasp.webscarab.util.ui.SelectDatabaseCommand"/>
+				<bean class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
+				<property name="dataSourceFactory">
+					<ref bean="&amp;dataSource"/>
+				</property>
+				</bean>
 				<!-- <ref bean="newMenu"/> 
 				<value>separator</value>
 				<ref bean="loginCommand"/> 
@@ -107,7 +111,7 @@
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
 				<value>separator</value>
-				<bean class="org.springframework.richclient.command.support.ShowViewMenu"/>
+				<!--  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  -->
 			</list>
 		</property>
 	</bean>

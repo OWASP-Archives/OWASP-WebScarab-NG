@@ -5,6 +5,7 @@ package org.owasp.webscarab.util.swing;
 
 import javax.swing.JOptionPane;
 
+import org.owasp.webscarab.jdbc.DataSourceFactory;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.richclient.application.Application;
@@ -61,6 +62,8 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	private ApplicationDialog dialog = null;
 
+	private DataSourceFactory dataSourceFactory = null;
+	
 	/**
 	 * Constructor.
 	 */
@@ -72,11 +75,11 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * Indicates whether an information message is displayed to the user upon
 	 * successful authentication. Defaults to true.
 	 * 
-	 * @param displaySuccess
+	 * @param displaySuccessMessage
 	 *            displays an information message upon successful login if true,
 	 *            otherwise false
 	 */
-	public void setDisplaySuccess(boolean displaySuccessMessage) {
+	public void setDisplaySuccessMessage(boolean displaySuccessMessage) {
 		this.displaySuccessMessage = displaySuccessMessage;
 	}
 
@@ -99,13 +102,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 						.getJdbcConnectionDetails();
 
 				try {
-					DriverManagerDataSource dataSource = new DriverManagerDataSource();
-					dataSource.setDriverClassName(jdbcDetails
-							.getDriverClassName());
-					dataSource.setUrl(jdbcDetails.getUrl());
-					dataSource.setUsername(jdbcDetails.getUsername());
-					dataSource.setPassword(jdbcDetails.getPassword());
-					dataSource.getConnection().close();
+					dataSourceFactory.createDataSource(jdbcDetails);
 					postSelection();
 				} catch (Exception e) {
 					logger.error("Error opening connection", e);
@@ -163,6 +160,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * Called to give subclasses control after a successful selection.
 	 */
 	protected void postSelection() {
+		getApplicationWindow().showPage("summaryView");
 	}
 
 	/**
@@ -202,6 +200,14 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 */
 	public void setCloseOnCancel(boolean closeOnCancel) {
 		this.closeOnCancel = closeOnCancel;
+	}
+
+	public DataSourceFactory getDataSourceFactory() {
+		return this.dataSourceFactory;
+	}
+
+	public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+		this.dataSourceFactory = dataSourceFactory;
 	}
 
 }

@@ -3,19 +3,12 @@
 
 <beans>
 	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
-		<property name="driverClassName">
-			<value>org.hsqldb.jdbcDriver</value>
-		</property>
-		<property name="url"
-			value="jdbc:hsqldb:file:c:/temp/webscarab/" />
-		<!-- <property name="url" value="jdbc:hsqldb:file:c:/temp/webscarab/"/> -->
-		<property name="username" value="sa" />
-		<property name="password" value="" />
+		class="org.owasp.webscarab.jdbc.DataSourceFactory" lazy-init="true">
 	</bean>
 
 	<bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
@@ -28,7 +21,8 @@
 		</property>
 	</bean>
 
-	<bean id="namedValueDao" class="org.owasp.webscarab.jdbc.HsqlJdbcNamedValueDao"
+	<bean id="namedValueDao"
+		class="org.owasp.webscarab.jdbc.HsqlJdbcNamedValueDao"
 		lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
