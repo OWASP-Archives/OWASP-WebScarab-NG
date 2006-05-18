@@ -6,8 +6,8 @@ package org.owasp.webscarab.util.swing;
 import javax.swing.JComponent;
 
 import org.owasp.webscarab.util.JdbcConnectionDetails;
+import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.form.AbstractForm;
-import org.springframework.richclient.form.FormModelHelper;
 import org.springframework.richclient.form.builder.TableFormBuilder;
 
 /**
@@ -33,77 +33,78 @@ public class JdbcDetailsForm extends AbstractForm {
     /**
      * Constructor.
      */
-    public JdbcDetailsForm() {
-        super( FORM_ID );
-
-        jdbcDetails = createJdbcConnectionDetails();
-        setFormModel( FormModelHelper.createUnbufferedFormModel( jdbcDetails ) );
-    }
-
-    /**
-     * Set the user name in the form.
-     * @param userName to install
-     */
-    public void setDriverClassName(String driverClassName) {
-        if( isControlCreated() ) {
-            getValueModel( JdbcConnectionDetails.PROPERTY_DRIVERCLASSNAME).setValue( driverClassName );
-        } else {
-            jdbcDetails.setDriverClassName( driverClassName );
-        }
-    }
-
-    /**
-     * Set the user name in the form.
-     * @param userName to install
-     */
-    public void setUrl(String url) {
-        if( isControlCreated() ) {
-            getValueModel( JdbcConnectionDetails.PROPERTY_URL).setValue( url );
-        } else {
-            jdbcDetails.setUrl( url );
-        }
-    }
-
-    /**
-     * Set the user name in the form.
-     * @param userName to install
-     */
-    public void setUserName(String userName) {
-        if( isControlCreated() ) {
-            getValueModel( JdbcConnectionDetails.PROPERTY_USERNAME ).setValue( userName );
-        } else {
-            jdbcDetails.setUsername( userName );
-        }
-    }
-
-    /**
-     * Set the password in the form.
-     * @param password to install
-     */
-    public void setPassword(String password) {
-        if( isControlCreated() ) {
-            getValueModel( JdbcConnectionDetails.PROPERTY_PASSWORD ).setValue( password );
-        } else {
-            jdbcDetails.setPassword( password );
-        }
-    }
-
-    public JdbcConnectionDetails getJdbcConnectionDetails() {
-    	return jdbcDetails;
+    public JdbcDetailsForm(ValidatingFormModel model) {
+    	super(model, FORM_ID);
+    	jdbcDetails = (JdbcConnectionDetails) model.getFormObject();
     }
     
-    /**
-     * Create the form object to hold our JDBC information.
-     * @return constructed form object
-     */
-    protected JdbcConnectionDetails createJdbcConnectionDetails() {
-    	JdbcConnectionDetails jcd = new JdbcConnectionDetails();
-    	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
-    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab/");
-    	jcd.setUsername("sa");
-    	return jcd;
-    }
-    
+//    public JdbcDetailsForm() {
+//        super( FORM_ID );
+//
+//        jdbcDetails = createJdbcConnectionDetails();
+//        setFormModel( FormModelHelper.createUnbufferedFormModel( jdbcDetails ) );
+//    }
+//
+//    /**
+//     * Set the user name in the form.
+//     * @param userName to install
+//     */
+//    public void setDriverClassName(String driverClassName) {
+//        if( isControlCreated() ) {
+//            getValueModel( JdbcConnectionDetails.PROPERTY_DRIVERCLASSNAME).setValue( driverClassName );
+//        } else {
+//            jdbcDetails.setDriverClassName( driverClassName );
+//        }
+//    }
+//
+//    /**
+//     * Set the user name in the form.
+//     * @param userName to install
+//     */
+//    public void setUrl(String url) {
+//        if( isControlCreated() ) {
+//            getValueModel( JdbcConnectionDetails.PROPERTY_URL).setValue( url );
+//        } else {
+//            jdbcDetails.setUrl( url );
+//        }
+//    }
+//
+//    /**
+//     * Set the user name in the form.
+//     * @param userName to install
+//     */
+//    public void setUserName(String userName) {
+//        if( isControlCreated() ) {
+//            getValueModel( JdbcConnectionDetails.PROPERTY_USERNAME ).setValue( userName );
+//        } else {
+//            jdbcDetails.setUsername( userName );
+//        }
+//    }
+//
+//    /**
+//     * Set the password in the form.
+//     * @param password to install
+//     */
+//    public void setPassword(String password) {
+//        if( isControlCreated() ) {
+//            getValueModel( JdbcConnectionDetails.PROPERTY_PASSWORD ).setValue( password );
+//        } else {
+//            jdbcDetails.setPassword( password );
+//        }
+//    }
+//
+//    /**
+//     * Create the form object to hold our JDBC information.
+//     * @return constructed form object
+//     */
+//    protected JdbcConnectionDetails createJdbcConnectionDetails() {
+//    	JdbcConnectionDetails jcd = new JdbcConnectionDetails();
+//    	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
+//    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab/");
+//    	jcd.setUsername("sa");
+//    	return jcd;
+//    }
+//    
     /**
      * Construct the form with the required fields.
      */

@@ -17,13 +17,15 @@ import org.springframework.jdbc.object.SqlUpdate;
  * @author rdawes
  *
  */
-public abstract class AbstractJdbcBlobDao extends AbstractJdbcIdentityDaoSupport implements BlobDao {
+public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
     private BlobQuery blobQuery;
     
     private BlobInsert blobInsert;
     
-    protected abstract void createTables();
+    private void createTables() throws SQLException {
+        getJdbcTemplate().execute(getProperty("createTable.blobs"));
+    }
     
     /* (non-Javadoc)
      * @see org.springframework.dao.support.DaoSupport#initDao()

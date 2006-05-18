@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 import org.owasp.webscarab.jdbc.DataSourceFactory;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.Application;
 import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.command.support.ApplicationWindowAwareCommand;
@@ -15,6 +15,7 @@ import org.springframework.richclient.dialog.ApplicationDialog;
 import org.springframework.richclient.dialog.CompositeDialogPage;
 import org.springframework.richclient.dialog.TabbedDialogPage;
 import org.springframework.richclient.dialog.TitledPageApplicationDialog;
+import org.springframework.richclient.form.FormModelHelper;
 
 /**
  * Provides an interface for selecting a database to use.
@@ -35,14 +36,14 @@ import org.springframework.richclient.dialog.TitledPageApplicationDialog;
  * A typical configuration for this component might look like this:
  * 
  * <pre>
- *          &lt;bean id=&quot;placeholderConfigurer&quot; 
- *               class=&quot;org.springframework.beans.factory.config.PropertiesPlaceholderConfigurer&quot;/&gt;
- *        
- *           &lt;bean id=&quot;selectDatabaseCommand&quot;
- *               class=&quot;org.owasp.webscarab.util.swing.SelectDatabaseCommand&quot;&gt;
- *               &lt;property name=&quot;displaySuccess&quot; value=&quot;false&quot;/&gt;
- *               &lt;property name=&quot;defaultUserName&quot; value=&quot;${user.name}&quot;/&gt;
- *           &lt;/bean&gt;
+ *           &lt;bean id=&quot;placeholderConfigurer&quot; 
+ *                class=&quot;org.springframework.beans.factory.config.PropertiesPlaceholderConfigurer&quot;/&gt;
+ *         
+ *            &lt;bean id=&quot;selectDatabaseCommand&quot;
+ *                class=&quot;org.owasp.webscarab.util.swing.SelectDatabaseCommand&quot;&gt;
+ *                &lt;property name=&quot;displaySuccess&quot; value=&quot;false&quot;/&gt;
+ *                &lt;property name=&quot;defaultUserName&quot; value=&quot;${user.name}&quot;/&gt;
+ *            &lt;/bean&gt;
  * </pre>
  * 
  * @author Ben Alex
@@ -63,6 +64,8 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	private ApplicationDialog dialog = null;
 
 	private DataSourceFactory dataSourceFactory = null;
+
+	private String postSelectionPageId = null;
 	
 	/**
 	 * Constructor.
@@ -98,11 +101,11 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 			protected boolean onFinish() {
 				jdbcDetailsForm.commit();
 
-				JdbcConnectionDetails jdbcDetails = jdbcDetailsForm
-						.getJdbcConnectionDetails();
+				JdbcConnectionDetails jdbcDetails = (JdbcConnectionDetails) jdbcDetailsForm
+						.getFormObject();
 
 				try {
-					dataSourceFactory.createDataSource(jdbcDetails);
+					dataSourceFactory.setJdbcConnectionDetails(jdbcDetails);
 					postSelection();
 				} catch (Exception e) {
 					logger.error("Error opening connection", e);
@@ -144,7 +147,12 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * @return form to use
 	 */
 	protected JdbcDetailsForm createJdbcDetailsForm() {
-		return new JdbcDetailsForm();
+		JdbcConnectionDetails jcd = new JdbcConnectionDetails();
+    	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
+    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab");
+    	jcd.setUsername("sa");
+		ValidatingFormModel model = FormModelHelper.createUnbufferedFormModel(jcd);
+		return new JdbcDetailsForm(model);
 	}
 
 	/**
@@ -160,7 +168,8 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * Called to give subclasses control after a successful selection.
 	 */
 	protected void postSelection() {
-		getApplicationWindow().showPage("summaryView");
+		if (postSelectionPageId != null)
+			getApplicationWindow().showPage(postSelectionPageId);
 	}
 
 	/**
@@ -208,6 +217,14 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
 		this.dataSourceFactory = dataSourceFactory;
+	}
+
+	public String getPostSelectionPageId() {
+		return this.postSelectionPageId;
+	}
+
+	public void setPostSelectionPageId(String postSelectionPageId) {
+		this.postSelectionPageId = postSelectionPageId;
 	}
 
 }

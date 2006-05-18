@@ -4,6 +4,7 @@
 package org.owasp.webscarab.ui;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import org.springframework.richclient.application.support.AbstractView;
 
@@ -15,7 +16,7 @@ public class LogoView extends AbstractView {
 
 	@Override
 	protected JComponent createControl() {
-		return getComponentFactory().createLabel("LogoView");
+		return new JLabel(getIconSource().getIcon("applicationInfo.image"));
 	}
 
 }

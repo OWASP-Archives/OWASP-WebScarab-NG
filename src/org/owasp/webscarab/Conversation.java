@@ -16,7 +16,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Date;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
@@ -43,7 +43,7 @@ public class Conversation extends BaseEntity {
 
     public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
 
-    public static final String PROPERTY_REQUEST_URL = "requestUrl";
+    public static final String PROPERTY_REQUEST_URI = "requestUri";
 
     public static final String PROPERTY_REQUEST_VERSION = "requestVersion";
 
@@ -69,7 +69,7 @@ public class Conversation extends BaseEntity {
 
 	private String requestMethod;
 
-	private URL requestUrl;
+	private URI requestUri;
 
 	private String requestVersion;
 
@@ -129,12 +129,12 @@ public class Conversation extends BaseEntity {
 		this.requestMethod = method;
 	}
 
-	public URL getRequestUrl() {
-		return this.requestUrl;
+	public URI getRequestUri() {
+		return this.requestUri;
 	}
 
-	public void setRequestUrl(URL url) {
-		this.requestUrl = url;
+	public void setRequestUri(URI uri) {
+		this.requestUri = uri;
 	}
 
 	public String getRequestVersion() {

@@ -1,6 +1,6 @@
 package org.owasp.webscarab;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Date;
 
 import com.twmacinta.util.MD5;
@@ -11,7 +11,7 @@ public class ConversationSummary extends BaseEntity implements Comparable {
 
     private String requestMethod = null;
 
-    private URL requestUrl = null;
+    private URI requestUri = null;
     
     private String requestVersion = null;
     
@@ -33,7 +33,7 @@ public class ConversationSummary extends BaseEntity implements Comparable {
     public ConversationSummary(Conversation conversation) {
         setDate(conversation.getDate());
         setRequestMethod(conversation.getRequestMethod());
-        setRequestUrl(conversation.getRequestUrl());
+        setRequestUri(conversation.getRequestUri());
         setRequestVersion(conversation.getRequestVersion());
         byte[] content = conversation.getRequestContent();
         if (content != null && content.length > 0) {
@@ -99,18 +99,18 @@ public class ConversationSummary extends BaseEntity implements Comparable {
     }
 
     /**
-     * @return Returns the requestUrl.
+     * @return Returns the requestUri.
      */
-    public URL getRequestUrl() {
-        return requestUrl;
+    public URI getRequestUri() {
+        return requestUri;
     }
 
     /**
-     * @param requestUrl
-     *            The requestUrl to set.
+     * @param requestUri
+     *            The requestUri to set.
      */
-    public void setRequestUrl(URL requestUrl) {
-        this.requestUrl = requestUrl;
+    public void setRequestUri(URI requestUri) {
+        this.requestUri = requestUri;
     }
 
     /**

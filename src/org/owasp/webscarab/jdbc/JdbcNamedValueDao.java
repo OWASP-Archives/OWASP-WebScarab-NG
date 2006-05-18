@@ -16,8 +16,8 @@ import org.springframework.jdbc.object.SqlUpdate;
  * @author rdawes
  * 
  */
-public abstract class AbstractJdbcNamedValueDao extends
-        AbstractJdbcIdentityDaoSupport implements NamedValueDao {
+public class JdbcNamedValueDao extends
+        PropertiesJdbcDaoSupport implements NamedValueDao {
 
     private NamedValueIdQuery namedValueIdQuery;
 
@@ -47,7 +47,9 @@ public abstract class AbstractJdbcNamedValueDao extends
         }
     }
 
-    protected abstract void createTables();
+    private void createTables() throws SQLException {
+        getJdbcTemplate().execute(getProperty("createTable.named_values"));
+    }
     
     public Integer findNamedValueId(NamedValue nv) {
         return namedValueIdQuery.getId(nv);

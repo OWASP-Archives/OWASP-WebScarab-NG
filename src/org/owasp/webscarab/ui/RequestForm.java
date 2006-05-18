@@ -86,7 +86,7 @@ public class RequestForm extends AbstractForm {
 
 			StringBuffer buff = new StringBuffer();
 			buff.append(getConversation().getRequestMethod()).append(" ");
-			buff.append(getConversation().getRequestUrl()).append(" ");
+			buff.append(getConversation().getRequestUri()).append(" ");
 			buff.append(getConversation().getRequestVersion()).append("\n");
 			NamedValue[] headers = getConversation().getRequestHeaders();
 			if (headers != null) {

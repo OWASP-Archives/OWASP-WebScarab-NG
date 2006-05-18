@@ -38,22 +38,22 @@ public class HttpMethodUtils {
 		HttpMethod httpMethod = null;
 		PostMethod postMethod = null;
 		String method = conversation.getRequestMethod();
-		String url = conversation.getRequestUrl().toString();
+		String uri = conversation.getRequestUri().toString();
 		if (method.equals("GET")) {
-			httpMethod = new GetMethod(url);
+			httpMethod = new GetMethod(uri);
 		} else if (method.equals("POST")) {
-			postMethod = new PostMethod(url);
+			postMethod = new PostMethod(uri);
 			httpMethod = postMethod;
 		} else if (method.equals("OPTIONS")) {
-			httpMethod = new OptionsMethod(url);
+			httpMethod = new OptionsMethod(uri);
 		} else if (method.equals("HEAD")) {
-			httpMethod = new HeadMethod(url);
+			httpMethod = new HeadMethod(uri);
 		} else if (method.equals("DELETE")) {
-			httpMethod = new DeleteMethod(url);
+			httpMethod = new DeleteMethod(uri);
 		} else if (method.equals("PUT")) {
-			httpMethod = new PutMethod(url);
+			httpMethod = new PutMethod(uri);
 		} else if (method.equals("TRACE")) {
-			httpMethod = new TraceMethod(url);
+			httpMethod = new TraceMethod(uri);
 		} else {
 			conversation.setResponseVersion("HTTP/1.0");
 			conversation.setResponseStatus("501");

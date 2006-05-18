@@ -18,19 +18,19 @@ import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.NamedValue;
 import org.owasp.webscarab.dao.BlobDao;
 import org.owasp.webscarab.dao.ConversationDao;
-import org.owasp.webscarab.dao.UrlDao;
+import org.owasp.webscarab.dao.UriDao;
 import org.owasp.webscarab.jdbc.VersionDao;
 
 /**
  * @author rdawes
  * 
  */
-public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
+public class JdbcConversationDao extends PropertiesJdbcDaoSupport
         implements ConversationDao {
 
     private Integer session;
 
-    private UrlDao urlDao;
+    private UriDao uriDao;
 
     private VersionDao versionDao;
 
@@ -56,10 +56,10 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
 
     private DescriptionInsert descriptionInsert;
 
-    protected AbstractJdbcConversationDao(Integer session, UrlDao urlDao,
+    protected JdbcConversationDao(Integer session, UriDao uriDao,
             VersionDao versionDao, HeadersDao headersDao, BlobDao blobDao) {
         this.session = session;
-        this.urlDao = urlDao;
+        this.uriDao = uriDao;
         this.versionDao = versionDao;
         this.headersDao = headersDao;
         this.blobDao = blobDao;
@@ -95,7 +95,13 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
         descriptionQuery.getDescription(id);
     }
 
-    protected abstract void createTables() throws SQLException;
+    protected void createTables() throws SQLException {
+        getJdbcTemplate().execute(getProperty("createTable.methods"));
+        getJdbcTemplate().execute(getProperty("createTable.conversations"));
+        getJdbcTemplate().execute(getProperty("createTable.messages"));
+        getJdbcTemplate().execute(getProperty("createTable.versions"));
+        getJdbcTemplate().execute(getProperty("createTable.descriptions"));
+    }
 
     /*
      * (non-Javadoc)
@@ -118,7 +124,7 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
         Conversation conversation = new Conversation();
         conversation.setId(summary.getId());
         conversation.setRequestMethod(summary.getRequestMethod());
-        conversation.setRequestUrl(summary.getRequestUrl());
+        conversation.setRequestUri(summary.getRequestUri());
         conversation.setRequestVersion(summary.getRequestVersion());
         conversation.setRequestHeaders(headersDao.findHeaders(id,
                 HeadersDao.REQUEST_HEADERS));
@@ -204,19 +210,6 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
         return messageInsert.insert(message);
     }
 
-    /**
-     * Return the identity query for the particular database: a query that can
-     * be used to retrieve the id of a row that has just been inserted.
-     * 
-     * @return the identity query
-     */
-    protected abstract String getIdentityQuery();
-
-    protected Integer retrieveIdentity() {
-        int identity = getJdbcTemplate().queryForInt(getIdentityQuery());
-        return new Integer(identity);
-    }
-
     private class ConversationIdQuery extends MappingSqlQuery {
 
         protected ConversationIdQuery() {
@@ -243,7 +236,7 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
             super(
                     getDataSource(),
                     "SELECT "
-                            + "id, date, methods.method as request_method, request_url, request_version, "
+                            + "id, date, methods.method as request_method, request_uri, request_version, "
                             + "request_content_checksum, response_version, "
                             + "response_status, messages.message as response_message, response_content_checksum, plugin "
                             + "FROM conversations, methods, messages "
@@ -271,8 +264,8 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
             summary.setId(new Integer(rs.getInt("id")));
             summary.setDate(rs.getTimestamp("date"));
             summary.setRequestMethod(rs.getString("request_method"));
-            summary.setRequestUrl(urlDao.findUrl(new Integer(rs
-                    .getInt("request_url"))));
+            summary.setRequestUri(uriDao.findUri(new Integer(rs
+                    .getInt("request_uri"))));
             Integer version = new Integer(rs.getInt("request_version"));
             summary.setRequestVersion(versionDao.getVersion(version));
             version = new Integer(rs.getInt("response_version"));
@@ -293,7 +286,7 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
             super(
                     getDataSource(),
                     "INSERT INTO conversations ("
-                            + "session, date, request_method, request_url, request_version, request_content_checksum, "
+                            + "session, date, request_method, request_uri, request_version, request_content_checksum, "
                             + "response_version, response_status, response_message, response_content_checksum, plugin) "
                             + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
             declareParameter(new SqlParameter(Types.INTEGER));
@@ -311,11 +304,11 @@ public abstract class AbstractJdbcConversationDao extends JdbcDaoSupport
         }
 
         protected Integer insert(ConversationSummary summary) {
-            Integer urlId = urlDao.findUrlId(summary.getRequestUrl());
-            if (urlId == null)
-                urlId = urlDao.saveUrl(summary.getRequestUrl());
+            Integer uriId = uriDao.findUriId(summary.getRequestUri());
+            if (uriId == null)
+                uriId = uriDao.saveUri(summary.getRequestUri());
             Object[] objs = new Object[] { session, summary.getDate(),
-                    getMethod(summary.getRequestMethod()), urlId,
+                    getMethod(summary.getRequestMethod()), uriId,
                     versionDao.getId(summary.getRequestVersion()),
                     summary.getRequestContentChecksum(),
                     versionDao.getId(summary.getResponseVersion()),

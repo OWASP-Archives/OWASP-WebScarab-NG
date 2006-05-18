@@ -8,7 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLSocket;
@@ -74,7 +75,7 @@ public class ConnectionHandler implements Runnable {
 						os.flush();
 						Socket ssl = negotiateSSL();
 						new ConnectionHandler(listener, ssl, conversation
-								.getRequestUrl().toString()).run();
+								.getRequestUri().toString()).run();
 						return;
 					}
 				}
@@ -162,13 +163,19 @@ public class ConnectionHandler implements Runnable {
 		if (conversation.getRequestMethod().equals("CONNECT"))
 			base = "https://";
 		conversation.setRequestVersion(requestLine.substring(last + 1));
-		URL url;
-		if (base == null) {
-			url = new URL(requestLine.substring(first + 1, last));
-		} else {
-			url = new URL(base + requestLine.substring(first + 1, last));
+		try {
+			URI uri;
+			if (base == null) {
+				uri = new URI(requestLine.substring(first + 1, last));
+			} else {
+				uri = new URI(base + requestLine.substring(first + 1, last));
+			}
+			conversation.setRequestUri(uri);
+		} catch (URISyntaxException use) {
+			IOException ioe = new IOException("URI Syntax exception parsing '" + base + "'");
+			ioe.initCause(use);
+			throw ioe;
 		}
-		conversation.setRequestUrl(url);
 
 		String previous = null;
 		String header = null;

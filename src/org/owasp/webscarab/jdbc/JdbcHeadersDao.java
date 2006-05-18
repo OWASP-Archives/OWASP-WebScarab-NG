@@ -17,8 +17,8 @@ import org.springframework.jdbc.object.SqlUpdate;
  * @author rdawes
  * 
  */
-public abstract class AbstractJdbcHeadersDao extends
-        AbstractJdbcIdentityDaoSupport implements HeadersDao {
+public class JdbcHeadersDao extends
+        PropertiesJdbcDaoSupport implements HeadersDao {
 
     private HeadersQuery headersQuery;
 
@@ -26,11 +26,13 @@ public abstract class AbstractJdbcHeadersDao extends
 
     private NamedValueDao namedValueDao;
 
-    public AbstractJdbcHeadersDao(NamedValueDao namedValueDao) {
+    public JdbcHeadersDao(NamedValueDao namedValueDao) {
         this.namedValueDao = namedValueDao;
     }
 
-    public abstract void createTables();
+    private void createTables() throws SQLException {
+        getJdbcTemplate().execute(getProperty("createTable.headers"));
+    }
 
     /*
      * (non-Javadoc)

@@ -33,7 +33,7 @@ public class DataSourceFactory implements FactoryBean {
 		return dataSource;
 	}
 
-	public void createDataSource(JdbcConnectionDetails jdbcConnectionDetails) throws SQLException {
+	public void setJdbcConnectionDetails(JdbcConnectionDetails jdbcConnectionDetails) throws SQLException {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(jdbcConnectionDetails.getDriverClassName());
 		dataSource.setUrl(jdbcConnectionDetails.getUrl());

@@ -2,8 +2,17 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
+
 	<bean id="dataSource"
 		class="org.owasp.webscarab.jdbc.DataSourceFactory" lazy-init="true">
+		<property name="jdbcConnectionDetails">
+			<bean class="org.owasp.webscarab.util.JdbcConnectionDetails">
+				<property name="driverClassName"><value>org.hsqldb.jdbcDriver</value></property>
+				<property name="url"><value>jdbc:hsqldb:file:c:/temp/webscarab</value></property>
+				<property name="username"><value>sa</value></property>
+				<property name="password"><value></value></property>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="transactionManager"
@@ -14,18 +23,28 @@
 		</property>
 	</bean>
 
-	<bean id="urlDao" class="org.owasp.webscarab.jdbc.HsqlJdbcUrlDao"
+	<bean id="jdbcProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location"><value>/org/owasp/webscarab/jdbc/database.properties</value></property>
+	</bean>
+	
+	<bean id="uriDao" class="org.owasp.webscarab.jdbc.JdbcUriDao"
 		lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
+		<property name="properties">
+			<ref local="jdbcProperties"/>
+		</property>
 	</bean>
 
 	<bean id="namedValueDao"
-		class="org.owasp.webscarab.jdbc.HsqlJdbcNamedValueDao"
+		class="org.owasp.webscarab.jdbc.JdbcNamedValueDao"
 		lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
+		</property>
+		<property name="properties">
+			<ref local="jdbcProperties"/>
 		</property>
 	</bean>
 
@@ -34,7 +53,7 @@
 	</bean>
 
 	<bean id="headersDao"
-		class="org.owasp.webscarab.jdbc.HsqlJdbcHeadersDao"
+		class="org.owasp.webscarab.jdbc.JdbcHeadersDao"
 		lazy-init="true">
 		<constructor-arg index="0">
 			<ref local="namedValueDao" />
@@ -42,23 +61,29 @@
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
+		<property name="properties">
+			<ref local="jdbcProperties"/>
+		</property>
 	</bean>
 
-	<bean id="blobDao" class="org.owasp.webscarab.jdbc.HsqlJdbcBlobDao"
+	<bean id="blobDao" class="org.owasp.webscarab.jdbc.JdbcBlobDao"
 		lazy-init="true">
 		<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
+		<property name="properties">
+			<ref local="jdbcProperties"/>
+		</property>
 	</bean>
 
 	<bean id="conversationDao"
-		class="org.owasp.webscarab.jdbc.HsqlJdbcConversationDao"
+		class="org.owasp.webscarab.jdbc.JdbcConversationDao"
 		lazy-init="true">
 		<constructor-arg index="0">
 			<value>0</value>
 		</constructor-arg>
 		<constructor-arg index="1">
-			<ref local="urlDao" />
+			<ref local="uriDao" />
 		</constructor-arg>
 		<constructor-arg index="2">
 			<ref local="versionDao" />
@@ -71,6 +96,9 @@
 		</constructor-arg>
 		<property name="dataSource">
 			<ref local="dataSource" />
+		</property>
+		<property name="properties">
+			<ref local="jdbcProperties"/>
 		</property>
 	</bean>
 

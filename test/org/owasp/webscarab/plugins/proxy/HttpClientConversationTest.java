@@ -6,7 +6,7 @@ package org.owasp.webscarab.plugins.proxy;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
@@ -34,7 +34,7 @@ public class HttpClientConversationTest extends TestCase {
     public void testConstructHttpMethod() throws Exception {
         Conversation c = new Conversation();
         c.setRequestMethod("GET");
-        c.setRequestUrl(new URL("http://localhost/WebScarab-test/TestGet.jsp"));
+        c.setRequestUri(new URI("http://localhost/WebScarab-test/TestGet.jsp"));
         c.setRequestVersion("HTTP/1.0");
         c.addRequestHeader(new NamedValue("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*"));
         c.addRequestHeader(new NamedValue("Accept-Language", "en-us"));
@@ -56,7 +56,7 @@ public class HttpClientConversationTest extends TestCase {
     public void btestWriteToBrowser() throws Exception {
         Conversation conversation = new Conversation();
         conversation.setRequestMethod("GET");
-        conversation.setRequestUrl(new URL("http://webmail.dawes.za.net/"));
+        conversation.setRequestUri(new URI("http://webmail.dawes.za.net/"));
         conversation.setRequestVersion("HTTP/1.0");
         conversation.addRequestHeader(new NamedValue("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*"));
         conversation.addRequestHeader(new NamedValue("Accept-Language", "en-us"));
@@ -96,7 +96,7 @@ public class HttpClientConversationTest extends TestCase {
     public void testPost() throws Exception {
         Conversation conversation = new Conversation();
         conversation.setRequestMethod("POST");
-        conversation.setRequestUrl(new URL("http://localhost/WebScarab-test/TestGet.jsp"));
+        conversation.setRequestUri(new URI("http://localhost/WebScarab-test/TestGet.jsp"));
         conversation.setRequestVersion("HTTP/1.0");
         conversation.addRequestHeader(new NamedValue("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*"));
         conversation.addRequestHeader(new NamedValue("Referer", "http://webmail.dawes.za.net/src/login.php"));

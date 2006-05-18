@@ -59,14 +59,27 @@
 	</bean>
 
 	<bean id="lifecycleAdvisor"
-		class="org.springframework.richclient.application.config.DefaultApplicationLifecycleAdvisor">
+		class="org.owasp.webscarab.ui.WebScarabLifecycleAdvisor">
 		<property name="windowCommandBarDefinitions">
 			<value>org/owasp/webscarab/ui/commands-context.xml</value>
 		</property>
 		<property name="startingPageId">
-			<value>logoView</value>
+			<value>summaryView</value>
+		</property><!--
+		<property name="introCommand">
+						<bean class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
+				<property name="dataSourceFactory">
+					<ref bean="&amp;dataSource"/>
+				</property>
+				<property name="displaySuccessMessage">
+					<value>false</value>
+				</property>
+				<property name="postSelectionPageId">
+					<value>summaryView</value>
+				</property>
+				</bean>
 		</property>
-	</bean>
+	--></bean>
 
 	<bean id="eventService"
 		class="org.bushe.swing.event.ThreadSafeEventService">
@@ -221,7 +234,8 @@
 	</bean>
 
 	<bean id="summaryView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor" 
+		depends-on="proxy" lazy-init="true">
 		<property name="viewClass">
 			<value>org.owasp.webscarab.ui.SummaryView</value>
 		</property>

@@ -47,14 +47,6 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<bean class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
-				<property name="dataSourceFactory">
-					<ref bean="&amp;dataSource"/>
-				</property>
-				<property name="displaySuccessMessage">
-					<value>false</value>
-				</property>
-				</bean>
 				<!-- <ref bean="newMenu"/> 
 				<value>separator</value>
 				<ref bean="loginCommand"/> 
@@ -86,10 +78,8 @@
 			<ref bean="newOwnerWizard"/>
 		</property>
 	</bean>
--->
+--><!--
 
-<!--
-	
 	<bean id="editMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
@@ -107,14 +97,13 @@
 		</property>
 	</bean>
 	
-	-->
-	<bean id="windowMenu" 
+	--><bean id="windowMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
 				<value>separator</value>
-				<!--  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  -->
+				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  
 			</list>
 		</property>
 	</bean>
@@ -140,14 +129,5 @@
 		</property>
 	</bean>
 		
-<!--	<bean id="loginCommand" 
-		class="org.springframework.richclient.security.LoginCommand">
-		<property name="closeOnCancel" value="false"/>
-	</bean>
--->
-	
-<!--	<bean id="logoutCommand" 
-		class="org.springframework.richclient.security.LogoutCommand"/>
--->
 
 </beans>

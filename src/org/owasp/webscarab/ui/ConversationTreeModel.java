@@ -3,7 +3,7 @@
  */
 package org.owasp.webscarab.ui;
 
-import java.net.URL;
+import java.net.URI;
 
 import javax.swing.tree.TreePath;
 
@@ -74,9 +74,9 @@ public class ConversationTreeModel extends AbstractTreeModel {
 					which == REQUEST ? getRequestHeaders(c)
 							: getResponseHeaders(c) };
 		} else if (parent == getRequestLine(c)) {
-			URL url = c.getRequestUrl();
-			if (url == null) return new Object[0];
-			return getQueryParameters(url.getQuery());
+			URI uri = c.getRequestUri();
+			if (uri == null) return new Object[0];
+			return getQueryParameters(uri.getQuery());
 		} else if (parent == getRequestHeaders(c)) {
 			return getRequestHeaders(c);
 		} else if ((cookies = c.getRequestHeaders("Cookie")) != null
@@ -90,7 +90,7 @@ public class ConversationTreeModel extends AbstractTreeModel {
 
 	private String getRequestLine(Conversation c) {
 		if (requestLine == null) {
-			requestLine = c.getRequestMethod() + " " + c.getRequestUrl() + " "
+			requestLine = c.getRequestMethod() + " " + c.getRequestUri() + " "
 					+ c.getRequestVersion();
 		}
 		return requestLine;
