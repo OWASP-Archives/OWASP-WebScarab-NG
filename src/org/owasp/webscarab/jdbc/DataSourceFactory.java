@@ -8,14 +8,16 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.owasp.webscarab.util.JdbcConnectionDetails;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
  * @author rdawes
  *
  */
-public class DataSourceFactory implements FactoryBean {
+public class DataSourceFactory implements FactoryBean, DisposableBean {
 
 	private DataSource dataSource = null;
 	
@@ -41,6 +43,15 @@ public class DataSourceFactory implements FactoryBean {
 		dataSource.setPassword(jdbcConnectionDetails.getPassword());
 		dataSource.getConnection().close();
 		this.dataSource = dataSource;
+	}
+
+	public void destroy() throws Exception {
+		if (dataSource != null) {
+			// FIXME: This is a bit of a hack still. We should probably only
+			// do this if the Driver IS actually HSQLDB. For the moment, it is Ok
+			JdbcTemplate jt = new JdbcTemplate(dataSource);
+			jt.execute("SHUTDOWN");
+		}
 	}
 	
 }

@@ -6,8 +6,14 @@
 
 	<bean id="conversationServiceTarget"
 		class="org.owasp.webscarab.services.ConversationService" lazy-init="true">
+		<property name="session">
+			<value>0</value>
+		</property>
 		<property name="conversationDao">
 			<ref bean="conversationDao" />
+		</property>
+		<property name="annotationDao">
+			<ref bean="annotationDao" />
 		</property>
 		<property name="eventService">
 			<ref bean="eventService" />

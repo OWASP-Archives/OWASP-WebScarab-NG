@@ -89,7 +89,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
         protected UriInsert() {
             super(getDataSource(), "INSERT INTO uris (id, uri) VALUES(?,?)");
             declareParameter(new SqlParameter(Types.INTEGER));
-            declareParameter(new SqlParameter(Types.VARCHAR));
+            declareParameter(new SqlParameter(Types.LONGVARCHAR));
             compile();
         }
 

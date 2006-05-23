@@ -18,9 +18,11 @@ import javax.net.ssl.SSLSocketFactory;
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.HttpMethodUtils;
 
 /**
@@ -29,11 +31,13 @@ import org.owasp.webscarab.util.HttpMethodUtils;
  */
 public class ConnectionHandler implements Runnable {
 
+	private ConversationService conversationService;
+
+	private Annotator annotator;
+
 	private final static String NO_CERTIFICATE = "HTTP/1.0 503 Service unavailable - SSL server certificate not available\r\n\r\n";
 
 	private final static String NO_CERTIFICATE_MESSAGE = "There is no SSL server certificate available for use";
-
-	private Listener listener;
 
 	private Socket socket;
 
@@ -45,9 +49,8 @@ public class ConnectionHandler implements Runnable {
 
 	private Logger logger = Logger.getLogger(getClass().getName());
 
-	public ConnectionHandler(Listener listener, Socket socket, String base) {
+	public ConnectionHandler(Socket socket, String base) {
 		this.socket = socket;
-		this.listener = listener;
 		this.base = base;
 	}
 
@@ -56,8 +59,9 @@ public class ConnectionHandler implements Runnable {
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 
-			boolean close = true;
+			boolean close;
 			do {
+				close = false;
 				Conversation conversation = readRequest(is);
 
 				// empty request line, connection closed?
@@ -73,12 +77,19 @@ public class ConnectionHandler implements Runnable {
 					} else {
 						os.write("HTTP/1.0 200 Ok\r\n\r\n".getBytes());
 						os.flush();
-						Socket ssl = negotiateSSL();
-						new ConnectionHandler(listener, ssl, conversation
-								.getRequestUri().toString()).run();
+						// start from the beginning to handle this connection
+						// over an SSL connection
+						this.socket = negotiateSSL();
+						this.base = conversation.getRequestUri().toString();
+						this.run();
 						return;
 					}
 				}
+
+				// see if we can get an annotation for this conversation
+				Annotation annotation = null;
+				if (getAnnotator() != null)
+					annotation = getAnnotator().getAnnotation();
 
 				HttpMethodUtils.setRequestContent(conversation, is);
 				if (client == null)
@@ -96,11 +107,16 @@ public class ConnectionHandler implements Runnable {
 				}
 				if (httpMethod != null)
 					httpMethod.releaseConnection();
-				if (listener != null) {
+				if (getConversationService() != null) {
 					ConversationSummary summary = new ConversationSummary(
 							conversation);
 					summary.setPlugin("Proxy");
-					listener.processedConversation(conversation, summary);
+					getConversationService().addConversation(conversation,
+							summary);
+					if (annotation != null && !"".equals(annotation.getAnnotation())) {
+						annotation.setId(summary.getId());
+						getConversationService().updateAnnotation(annotation);
+					}
 				}
 				String connection = conversation
 						.getResponseHeader("Connection");
@@ -172,7 +188,8 @@ public class ConnectionHandler implements Runnable {
 			}
 			conversation.setRequestUri(uri);
 		} catch (URISyntaxException use) {
-			IOException ioe = new IOException("URI Syntax exception parsing '" + base + "'");
+			IOException ioe = new IOException("URI Syntax exception parsing '"
+					+ base + "'");
 			ioe.initCause(use);
 			throw ioe;
 		}
@@ -259,5 +276,21 @@ public class ConnectionHandler implements Runnable {
 	 */
 	public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
 		this.sslSocketFactory = sslSocketFactory;
+	}
+
+	public Annotator getAnnotator() {
+		return this.annotator;
+	}
+
+	public void setAnnotator(Annotator annotator) {
+		this.annotator = annotator;
+	}
+
+	public ConversationService getConversationService() {
+		return this.conversationService;
+	}
+
+	public void setConversationService(ConversationService conversationService) {
+		this.conversationService = conversationService;
 	}
 }

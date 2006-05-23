@@ -6,8 +6,10 @@ package org.owasp.webscarab.services;
 import java.util.Collection;
 
 import org.bushe.swing.event.EventService;
+import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.ConversationSummary;
+import org.owasp.webscarab.dao.AnnotationDao;
 import org.owasp.webscarab.dao.ConversationDao;
 
 import java.util.concurrent.locks.Lock;
@@ -22,14 +24,26 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ConversationService {
 
+	private Integer session = null;
+	
     private ConversationDao conversationDao;
 
+    private AnnotationDao annotationDao;
+    
     private EventService eventService = null;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public ConversationService() {
     }
+
+	public Integer getSession() {
+		return this.session;
+	}
+
+	public void setSession(Integer session) {
+		this.session = session;
+	}
 
     /**
      * @return Returns the conversationDao.
@@ -46,6 +60,10 @@ public class ConversationService {
         this.conversationDao = conversationDao;
     }
 
+    public EventService getEventService() {
+    	return this.eventService;
+    }
+    
     public void setEventService(EventService eventService) {
         this.eventService = eventService;
     }
@@ -55,7 +73,10 @@ public class ConversationService {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            getConversationDao().getId(conversation, summary);
+            getConversationDao().update(session, conversation, summary);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return;
         } finally {
             writeLock.unlock();
         }
@@ -70,7 +91,10 @@ public class ConversationService {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {
-            return getConversationDao().getConversationIds();
+            return getConversationDao().getAllIds(session);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
         } finally {
             readLock.unlock();
         }
@@ -80,7 +104,10 @@ public class ConversationService {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {
-            return getConversationDao().getConversation(id);
+            return getConversationDao().get(id);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
         } finally {
             readLock.unlock();
         }
@@ -90,33 +117,48 @@ public class ConversationService {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {
-            return getConversationDao().getConversationSummary(id);
+            return getConversationDao().getSummary(id);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
         } finally {
             readLock.unlock();
         }
     }
 
-    public String getConversationDescription(Integer id) {
+	public AnnotationDao getAnnotationDao() {
+		return this.annotationDao;
+	}
+
+	public void setAnnotationDao(AnnotationDao annotationDao) {
+		this.annotationDao = annotationDao;
+	}
+	
+    public Annotation getAnnotation(Integer id) {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {
-            return getConversationDao().getConversationDescription(id);
+            return getAnnotationDao().get(id);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
         } finally {
             readLock.unlock();
         }
     }
 
-    public void updateConversationDescription(Integer id, String description) {
+    public void updateAnnotation(Annotation annotation) {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            getConversationDao().updateConversationDescription(id, description);
+            getAnnotationDao().update(annotation);
+        } catch (Exception e) {
+        	e.printStackTrace();
         } finally {
             writeLock.unlock();
         }
         if (eventService != null) {
-            ConversationEvent evt = new ConversationEvent(this, id, description);
-            eventService.publish(evt);
+            eventService.publish("annotation", annotation);
         }
     }
 

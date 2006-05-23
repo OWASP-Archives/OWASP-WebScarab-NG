@@ -201,7 +201,7 @@ public class ConversationSummary extends BaseEntity implements Comparable {
         this.responseVersion = responseVersion;
     }
 
-    /* (non-Javadoc)
+	/* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(T)
      */
     public int compareTo(Object o) {

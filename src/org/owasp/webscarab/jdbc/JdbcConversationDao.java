@@ -9,8 +9,9 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.jdbc.object.SqlUpdate;
 import org.owasp.webscarab.Conversation;
@@ -28,8 +29,6 @@ import org.owasp.webscarab.jdbc.VersionDao;
 public class JdbcConversationDao extends PropertiesJdbcDaoSupport
         implements ConversationDao {
 
-    private Integer session;
-
     private UriDao uriDao;
 
     private VersionDao versionDao;
@@ -38,27 +37,14 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
 
     private BlobDao blobDao;
 
-    private MethodQuery methodQuery;
-
-    private MethodInsert methodInsert;
-
-    private MessageQuery messageQuery;
-
-    private MessageInsert messageInsert;
-
     private ConversationIdQuery conversationIdQuery;
 
     private ConversationSummaryQuery conversationSummaryQuery;
 
     private ConversationSummaryInsert conversationSummaryInsert;
 
-    private DescriptionQuery descriptionQuery;
-
-    private DescriptionInsert descriptionInsert;
-
-    protected JdbcConversationDao(Integer session, UriDao uriDao,
+    protected JdbcConversationDao(UriDao uriDao,
             VersionDao versionDao, HeadersDao headersDao, BlobDao blobDao) {
-        this.session = session;
         this.uriDao = uriDao;
         this.versionDao = versionDao;
         this.headersDao = headersDao;
@@ -68,15 +54,9 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
     protected void initDao() throws Exception {
         super.initDao();
 
-        methodQuery = new MethodQuery();
-        methodInsert = new MethodInsert();
-        messageQuery = new MessageQuery();
-        messageInsert = new MessageInsert();
         conversationIdQuery = new ConversationIdQuery();
         conversationSummaryQuery = new ConversationSummaryQuery();
         conversationSummaryInsert = new ConversationSummaryInsert();
-        descriptionQuery = new DescriptionQuery();
-        descriptionInsert = new DescriptionInsert();
 
         try {
             checkTables();
@@ -88,11 +68,11 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
 
     protected void checkTables() throws SQLException {
         Integer id = new Integer(0);
-        methodQuery.getId("");
-        messageQuery.getId("");
-        conversationIdQuery.getConversationIds();
+        getMethod("GET");
+        getMessage("Ok");
+        getPlugin("Proxy");
+        conversationIdQuery.getConversationIds(id);
         conversationSummaryQuery.getSummary(id);
-        descriptionQuery.getDescription(id);
     }
 
     protected void createTables() throws SQLException {
@@ -100,7 +80,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
         getJdbcTemplate().execute(getProperty("createTable.conversations"));
         getJdbcTemplate().execute(getProperty("createTable.messages"));
         getJdbcTemplate().execute(getProperty("createTable.versions"));
-        getJdbcTemplate().execute(getProperty("createTable.descriptions"));
+        getJdbcTemplate().execute(getProperty("createTable.plugins"));
     }
 
     /*
@@ -108,8 +88,8 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
      * 
      * @see org.owasp.webscarab.dao.ConversationDao#getConversationIds()
      */
-    public Collection<Integer> getConversationIds() {
-        return conversationIdQuery.getConversationIds();
+    public Collection<Integer> getAllIds(Integer session) {
+        return conversationIdQuery.getConversationIds(session);
     }
 
     /*
@@ -117,8 +97,8 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
      * 
      * @see org.owasp.webscarab.dao.ConversationDao#getConversation(java.lang.Integer)
      */
-    public Conversation getConversation(Integer id) {
-        ConversationSummary summary = getConversationSummary(id);
+    public Conversation get(Integer id) {
+        ConversationSummary summary = getSummary(id);
         if (summary == null)
             return null;
         Conversation conversation = new Conversation();
@@ -153,7 +133,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
      * 
      * @see org.owasp.webscarab.dao.ConversationDao#getConversationSummary(java.lang.Integer)
      */
-    public ConversationSummary getConversationSummary(Integer id) {
+    public ConversationSummary getSummary(Integer id) {
         return conversationSummaryQuery.getSummary(id);
     }
 
@@ -162,8 +142,8 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
      * 
      * @see org.owasp.webscarab.dao.ConversationDao#getId(org.owasp.webscarab.Conversation)
      */
-    public void getId(Conversation conversation, ConversationSummary summary) {
-        Integer id = conversationSummaryInsert.insert(summary);
+    public void update(Integer session, Conversation conversation, ConversationSummary summary) {
+        Integer id = conversationSummaryInsert.insert(session, summary);
         conversation.setId(id);
         NamedValue[] nv = conversation.getRequestHeaders();
         headersDao.saveHeaders(id, HeadersDao.REQUEST_HEADERS, nv);
@@ -177,37 +157,46 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
         headersDao.saveHeaders(id, HeadersDao.RESPONSE_FOOTERS, nv);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.owasp.webscarab.dao.ConversationDao#getConversationDescription(java.lang.Integer)
-     */
-    public String getConversationDescription(Integer id) {
-        return descriptionQuery.getDescription(id);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.owasp.webscarab.dao.ConversationDao#updateConversationDescription(java.lang.Integer,
-     *      java.lang.String)
-     */
-    public void updateConversationDescription(Integer id, String description) {
-        descriptionInsert.insert(id, description);
-    }
-
     private Integer getMethod(String method) {
-        Integer id = methodQuery.getId(method);
-        if (id != null)
-            return id;
-        return methodInsert.insert(method);
+    	String query = "SELECT id FROM methods WHERE method = ?";
+    	Object[] args = new Object[] { method };
+		JdbcTemplate jt = getJdbcTemplate();
+		try {
+			return new Integer(jt.queryForInt(query, args));
+		} catch (IncorrectResultSizeDataAccessException irsdae) {
+			String insert = "INSERT INTO methods (id, method) VALUES (?,?)";
+			args = new Object[] { null, method };
+			jt.update(insert, args);
+			return retrieveIdentity();
+		}
     }
 
     private Integer getMessage(String message) {
-        Integer id = messageQuery.getId(message);
-        if (id != null)
-            return id;
-        return messageInsert.insert(message);
+    	String query = "SELECT id FROM messages WHERE message = ?";
+    	Object[] args = new Object[] { message };
+		JdbcTemplate jt = getJdbcTemplate();
+		try {
+			return new Integer(jt.queryForInt(query, args));
+		} catch (IncorrectResultSizeDataAccessException irsdae) {
+			String insert = "INSERT INTO messages (id, message) VALUES (?,?)";
+			args = new Object[] { null, message };
+			jt.update(insert, args);
+			return retrieveIdentity();
+		}
+    }
+
+    private Integer getPlugin(String plugin) {
+    	String query = "SELECT id FROM plugins WHERE plugin = ?";
+    	Object[] args = new Object[] { plugin };
+		JdbcTemplate jt = getJdbcTemplate();
+		try {
+			return new Integer(jt.queryForInt(query, args));
+		} catch (IncorrectResultSizeDataAccessException irsdae) {
+			String insert = "INSERT INTO plugins (id, plugin) VALUES (?,?)";
+			args = new Object[] { null, plugin};
+			jt.update(insert, args);
+			return retrieveIdentity();
+		}
     }
 
     private class ConversationIdQuery extends MappingSqlQuery {
@@ -220,7 +209,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
         }
 
         @SuppressWarnings("unchecked")
-        public List<Integer> getConversationIds() {
+        public List<Integer> getConversationIds(Integer session) {
             return execute(session);
         }
 
@@ -303,7 +292,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
             compile();
         }
 
-        protected Integer insert(ConversationSummary summary) {
+        protected Integer insert(Integer session, ConversationSummary summary) {
             Integer uriId = uriDao.findUriId(summary.getRequestUri());
             if (uriId == null)
                 uriId = uriDao.saveUri(summary.getRequestUri());
@@ -314,117 +303,12 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport
                     versionDao.getId(summary.getResponseVersion()),
                     summary.getResponseStatus(),
                     getMessage(summary.getResponseMessage()),
-                    summary.getResponseContentChecksum(), new Integer(0) };
+                    summary.getResponseContentChecksum(), 
+                    getPlugin(summary.getPlugin())};
             super.update(objs);
             Integer id = retrieveIdentity();
             summary.setId(id);
             return id;
-        }
-    }
-
-    private class MethodQuery extends MappingSqlQuery {
-
-        protected MethodQuery() {
-            super(getDataSource(), "SELECT id FROM methods WHERE method = ?");
-            declareParameter(new SqlParameter(Types.VARCHAR));
-            compile();
-        }
-
-        public Integer getId(String method) {
-            return (Integer) findObject(method);
-        }
-
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
-            return new Integer(rs.getInt("id"));
-        }
-    }
-
-    private class MethodInsert extends SqlUpdate {
-
-        protected MethodInsert() {
-            super(getDataSource(),
-                    "INSERT INTO methods (id, method) VALUES (?,?)");
-            declareParameter(new SqlParameter(Types.INTEGER));
-            declareParameter(new SqlParameter(Types.VARCHAR));
-            compile();
-        }
-
-        protected Integer insert(String method) {
-            Object[] objs = new Object[] { null, method };
-            super.update(objs);
-            return retrieveIdentity();
-        }
-    }
-
-    private class MessageQuery extends MappingSqlQuery {
-
-        protected MessageQuery() {
-            super(getDataSource(), "SELECT id FROM messages WHERE message = ?");
-            declareParameter(new SqlParameter(Types.VARCHAR));
-            compile();
-        }
-
-        public Integer getId(String message) {
-            return (Integer) findObject(message);
-        }
-
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
-            return new Integer(rs.getInt("id"));
-        }
-    }
-
-    private class MessageInsert extends SqlUpdate {
-
-        protected MessageInsert() {
-            super(getDataSource(),
-                    "INSERT INTO messages (id, message) VALUES (?,?)");
-            declareParameter(new SqlParameter(Types.INTEGER));
-            declareParameter(new SqlParameter(Types.VARCHAR));
-            compile();
-        }
-
-        protected Integer insert(String message) {
-            Object[] objs = new Object[] { null, message };
-            super.update(objs);
-            return retrieveIdentity();
-        }
-    }
-
-    private class DescriptionQuery extends MappingSqlQuery {
-
-        protected DescriptionQuery() {
-            super(getDataSource(),
-                    "SELECT description FROM descriptions WHERE id = ?");
-            declareParameter(new SqlParameter(Types.INTEGER));
-            compile();
-        }
-
-        public String getDescription(Integer conversation) {
-            return (String) findObject(conversation);
-        }
-
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
-            return rs.getString("description");
-        }
-    }
-
-    private class DescriptionInsert extends SqlUpdate {
-
-        protected DescriptionInsert() {
-            super(getDataSource(),
-                    "INSERT INTO descriptions (id, description) VALUES (?,?)");
-            declareParameter(new SqlParameter(Types.INTEGER));
-            declareParameter(new SqlParameter(Types.VARCHAR));
-            compile();
-        }
-
-        protected Integer insert(Integer conversation, String description) {
-            Object[] objs = new Object[] { conversation, description };
-            super.update(objs);
-            return retrieveIdentity();
         }
     }
 

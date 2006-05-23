@@ -6,16 +6,12 @@ import org.owasp.webscarab.ConversationSummary;
 
 public interface ConversationDao {
 	
-    Collection<Integer> getConversationIds();
+    Collection<Integer> getAllIds(Integer session);
     
-	Conversation getConversation(Integer id);
+	Conversation get(Integer id);
 	
-    ConversationSummary getConversationSummary(Integer id);
+    ConversationSummary getSummary(Integer id);
     
-	void getId(Conversation conversation, ConversationSummary summary);
+	void update(Integer session, Conversation conversation, ConversationSummary summary);
 	
-    String getConversationDescription(Integer id);
-    
-    void updateConversationDescription(Integer id, String description);
-    
 }

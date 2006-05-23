@@ -42,7 +42,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(null, socket, null);
+        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 477, os.size());
@@ -69,7 +69,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(null, socket, null);
+        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 482, os.size());
@@ -88,7 +88,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(null, socket, null);
+        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 482, os.size());

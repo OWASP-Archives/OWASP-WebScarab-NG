@@ -31,19 +31,21 @@
 		</property>
 	</bean>
 
-<!--	
+	<bean id="showProxyControlBar" 
+		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarCommand">
+		<property name="proxyControlBar" ref="proxyControlBar"/>
+	</bean><!--
+		
 	<bean id="toolBar" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="newMenu"/>
-				<value>saveAsCommand</value>
+				<ref bean="showProxyControlBar"/>
 			</list>
 		</property>
 	</bean>
--->
 	
-	<bean id="fileMenu" 
+	--><bean id="fileMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
@@ -102,6 +104,7 @@
 		<property name="members">
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
+				<ref bean="showProxyControlBar"/>
 				<value>separator</value>
 				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  
 			</list>

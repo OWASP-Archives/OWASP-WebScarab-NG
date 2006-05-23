@@ -17,8 +17,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
 
 /**
@@ -26,6 +24,8 @@ import org.owasp.webscarab.services.ConversationService;
  * 
  */
 public class Listener implements Runnable {
+
+	private Annotator annotator;
 
 	private ConversationService conversationService;
 
@@ -49,6 +49,10 @@ public class Listener implements Runnable {
 
 	public Listener(SocketAddress socketAddress) {
 		this.socketAddress = socketAddress;
+	}
+
+	public ConversationService getConversationService() {
+		return this.conversationService;
 	}
 
 	public void setConversationService(ConversationService conversationService) {
@@ -77,9 +81,11 @@ public class Listener implements Runnable {
 					Socket sock = serverSocket.accept();
 					logger.info("Connection from "
 							+ sock.getRemoteSocketAddress());
-					ConnectionHandler ch = new ConnectionHandler(this, sock,
+					ConnectionHandler ch = new ConnectionHandler(sock,
 							base);
 					ch.setSslSocketFactory(getSslSocketFactory());
+					ch.setConversationService(getConversationService());
+					ch.setAnnotator(getAnnotator());
 					Thread thread = new Thread(ch);
 					thread.setDaemon(true);
 					thread.start();
@@ -153,7 +159,7 @@ public class Listener implements Runnable {
 	/**
 	 * @return Returns the sslSocketFactory.
 	 */
-public SSLSocketFactory getSslSocketFactory() {
+	public SSLSocketFactory getSslSocketFactory() {
 		if (sslSocketFactory == null) {
 			if (getKeyStoreFile() != null) {
 				try {
@@ -163,7 +169,7 @@ public SSLSocketFactory getSslSocketFactory() {
 					if (is == null)
 						throw new NullPointerException("No keystore found!!");
 					char[] ksp = null;
-					if (getKeyStorePassword() != null) 
+					if (getKeyStorePassword() != null)
 						ksp = getKeyStorePassword().toCharArray();
 					ks.load(is, ksp);
 					KeyManagerFactory kmf = KeyManagerFactory
@@ -181,6 +187,7 @@ public SSLSocketFactory getSslSocketFactory() {
 		}
 		return sslSocketFactory;
 	}
+
 	/**
 	 * @param sslSocketFactory
 	 *            The sslSocketFactory to set.
@@ -189,10 +196,12 @@ public SSLSocketFactory getSslSocketFactory() {
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public void processedConversation(Conversation conversation,
-			ConversationSummary summary) {
-		if (conversationService != null)
-			conversationService.addConversation(conversation, summary);
+	public Annotator getAnnotator() {
+		return this.annotator;
+	}
+
+	public void setAnnotator(Annotator annotator) {
+		this.annotator = annotator;
 	}
 
 }
