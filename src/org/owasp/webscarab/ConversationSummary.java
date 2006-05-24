@@ -208,6 +208,6 @@ public class ConversationSummary extends BaseEntity implements Comparable {
         ConversationSummary that = (ConversationSummary) o;
         if (this.getId() == null || that.getId() == null)
             throw new NullPointerException("Id is null");
-        return this.getId().compareTo(that.getId());
+        return this.getDate().compareTo(that.getDate());
     }
 }
