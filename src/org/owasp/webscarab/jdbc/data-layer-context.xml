@@ -3,12 +3,15 @@
 
 <beans>
 
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	</bean>
+	
 	<bean id="dataSource"
 		class="org.owasp.webscarab.jdbc.DataSourceFactory" lazy-init="true">
 		<property name="jdbcConnectionDetails">
 			<bean class="org.owasp.webscarab.util.JdbcConnectionDetails">
 				<property name="driverClassName"><value>org.hsqldb.jdbcDriver</value></property>
-				<property name="url"><value>jdbc:hsqldb:file:c:/temp/webscarab/db</value></property>
+				<property name="url"><value>jdbc:hsqldb:file:${db.location}</value></property>
 				<property name="username"><value>sa</value></property>
 				<property name="password"><value></value></property>
 			</bean>
