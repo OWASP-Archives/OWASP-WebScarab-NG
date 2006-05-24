@@ -136,6 +136,9 @@
 		<property name="messageSource">
 			<ref bean="messageSource" />
 		</property>
+		<property name="tableFactory">
+			<bean class="org.owasp.webscarab.util.swing.SwingxTableFactory"/>
+		</property>
 	</bean>
 
 	<bean id="binderSelectionStrategy"
