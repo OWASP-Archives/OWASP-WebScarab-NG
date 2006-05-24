@@ -96,4 +96,19 @@ public class UrlUtils {
             return null;
         }
     }
+    
+    public static String getSchemeHostPort(URI uri) {
+    	StringBuilder sb = new StringBuilder();
+    	int port = uri.getPort();
+    	String scheme = uri.getScheme();
+    	if (port == -1) {
+    		if (scheme.equals("http")) port = 80;
+    		if (scheme.equals("https")) port = 443;
+    	}
+    	sb.append(scheme).append("://");
+    	sb.append(uri.getHost()).append(":");
+    	sb.append(port);
+    	return sb.toString();
+    }
+    
 }
