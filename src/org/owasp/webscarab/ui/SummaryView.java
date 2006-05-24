@@ -26,9 +26,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 
+import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
+import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.UriTreeModel;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -136,6 +138,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		if (conversationTable == null) {
 			conversationTable = getComponentFactory().createTable(
 					getTableModel());
+			conversationTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			conversationTable.getSelectionModel().addListSelectionListener(
 					new ListSelectionListener() {
 						public void valueChanged(ListSelectionEvent event) {
@@ -212,10 +215,10 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return group.createPopupMenu();
 	}
 
-	private static class ConversationTableFormat implements TableFormat {
+	private class ConversationTableFormat implements TableFormat {
 
 		private String[] columnNames = new String[]{"Id", "Date", "Method",
-				"Uri", "Status"};
+				"Host", "Path", "Parameters", "Status", "Annotation"};
 
 		/*
 		 * (non-Javadoc)
@@ -252,10 +255,18 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 				case 2 :
 					return summary.getRequestMethod();
 				case 3 :
-					return summary.getRequestUri();
+					return UrlUtils.getSchemeHostPort(summary.getRequestUri());
 				case 4 :
+					return summary.getRequestUri().getPath();
+				case 5 :
+					return summary.getRequestUri().getQuery();
+				case 6 :
 					return summary.getResponseStatus() + " "
 							+ summary.getResponseMessage();
+				case 7 : 
+					Annotation a = conversationService.getAnnotation(summary.getId());
+					if (a == null) return a;
+					return a.getAnnotation();
 			}
 			return "Error";
 		}
