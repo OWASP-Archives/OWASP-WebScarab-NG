@@ -24,6 +24,11 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.springframework.core.closure.Constraint;
+import org.springframework.rules.PropertyConstraintProvider;
+import org.springframework.rules.Rules;
+import org.springframework.rules.constraint.property.PropertyConstraint;
+
 /**
  * The <code>Conversation</code> is the basic element used by WebScarab. It
  * represents a request sent to the server, and the response that was returned
@@ -39,31 +44,32 @@ import java.util.zip.InflaterInputStream;
  * @author rdawes
  */
 
-public class Conversation extends BaseEntity {
+public class Conversation extends BaseEntity implements
+		PropertyConstraintProvider {
 
-    public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
+	public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
 
-    public static final String PROPERTY_REQUEST_URI = "requestUri";
+	public static final String PROPERTY_REQUEST_URI = "requestUri";
 
-    public static final String PROPERTY_REQUEST_VERSION = "requestVersion";
+	public static final String PROPERTY_REQUEST_VERSION = "requestVersion";
 
-    public static final String PROPERTY_REQUEST_HEADERS = "requestHeaders";
+	public static final String PROPERTY_REQUEST_HEADERS = "requestHeaders";
 
-    public static final String PROPERTY_REQUEST_CONTENT = "requestContent";
+	public static final String PROPERTY_REQUEST_CONTENT = "requestContent";
 
-    public static final String PROPERTY_RESPONSE_VERSION = "responseVersion";
+	public static final String PROPERTY_RESPONSE_VERSION = "responseVersion";
 
-    public static final String PROPERTY_RESPONSE_STATUS = "responseStatus";
+	public static final String PROPERTY_RESPONSE_STATUS = "responseStatus";
 
-    public static final String PROPERTY_RESPONSE_MESSAGE = "responseMessage";
+	public static final String PROPERTY_RESPONSE_MESSAGE = "responseMessage";
 
-    public static final String PROPERTY_RESPONSE_HEADERS = "responseHeaders";
+	public static final String PROPERTY_RESPONSE_HEADERS = "responseHeaders";
 
-    public static final String PROPERTY_RESPONSE_CONTENT = "responseContent";
+	public static final String PROPERTY_RESPONSE_CONTENT = "responseContent";
 
-    public static final String PROPERTY_RESPONSE_FOOTERS = "responseFooters";
+	public static final String PROPERTY_RESPONSE_FOOTERS = "responseFooters";
 
-	private static final String ENCODING = "Content-Encoding";
+	protected static final String ENCODING = "Content-Encoding";
 
 	private Date date = new Date();
 
@@ -77,21 +83,23 @@ public class Conversation extends BaseEntity {
 
 	private byte[] requestContent;
 
-	private String responseVersion;
+	protected String responseVersion;
 
-	private String responseStatus;
+	protected String responseStatus;
 
-	private String responseMessage;
+	protected String responseMessage;
 
-	private NamedValue[] responseHeaders;
+	protected NamedValue[] responseHeaders;
 
-	private CopyInputStream responseContentStream = null;
+	protected CopyInputStream responseContentStream = null;
 
-	private ByteArrayOutputStream responseContent = null;
+	protected ByteArrayOutputStream responseContent = null;
 
-	private NamedValue[] responseFooters;
+	protected NamedValue[] responseFooters;
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+	protected Logger logger = Logger.getLogger(getClass().getName());
+
+	private static Rules validationRules;
 
 	/** Creates a new instance of DefaultConversation */
 	public Conversation() {
@@ -446,7 +454,7 @@ public class Conversation extends BaseEntity {
 		return result;
 	}
 
-	private void flushContentStream(InputStream is) {
+	protected void flushContentStream(InputStream is) {
 		if (is != null) {
 			try {
 				byte[] buff = new byte[2048];
@@ -457,7 +465,7 @@ public class Conversation extends BaseEntity {
 		}
 	}
 
-	private class CopyInputStream extends FilterInputStream {
+	protected class CopyInputStream extends FilterInputStream {
 
 		private OutputStream os;
 
@@ -507,6 +515,35 @@ public class Conversation extends BaseEntity {
 			}
 			return num;
 		}
+	}
+
+	public PropertyConstraint getPropertyConstraint(String propertyName) {
+//		if (validationRules == null)
+//			validationRules = new Rules(getClass()) {
+//				protected void initRules() {
+//					add(PROPERTY_REQUEST_METHOD, any(new Constraint[] {
+//							eq("GET"), eq("POST"), eq("HEAD"), eq("TRACE"),
+//							eq("OPTIONS") }));
+//					add(PROPERTY_REQUEST_URI, new Constraint() {
+//						public boolean test(Object object) {
+//							if (object == null)
+//								return false;
+//							if (!(object instanceof URI))
+//								return false;
+//							URI uri = (URI) object;
+//							return uri.getScheme().startsWith("http")
+//									&& uri.getHost() != null;
+//						}
+//					});
+//					add(PROPERTY_REQUEST_VERSION, or(eq("HTTP/1.0"), eq("HTTP/1.1")));
+//					add(PROPERTY_REQUEST_CONTENT, any( new Constraint[] {
+//							and()
+//					}));
+//				}
+//
+//			};
+//		return validationRules.getPropertyConstraint(propertyName);
+		return null;
 	}
 
 }

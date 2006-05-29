@@ -29,7 +29,7 @@ public class ShowProxyControlBarCommand extends ToggleCommand {
 
 	@Override
 	public boolean isEnabled() {
-		return proxyControlBar != null;
+		return proxyControlBar != null && super.isEnabled();
 	}
 
 	public ProxyControlBar getProxyControlBar() {

@@ -208,9 +208,10 @@
 		class="org.petclinic.domain.PetClinicValidationRulesSource"/>
 		
 	-->
+	<!-- 
 	<bean id="formPropertyFaceDescriptorSource"
 		class="org.springframework.binding.form.support.MessageSourceFormPropertyFaceDescriptorSource" />
-
+ 	-->
 	<bean id="basicConversationSummaryList"
 		class="ca.odell.glazedlists.BasicEventList">
 	</bean>
@@ -257,20 +258,10 @@
 		</property>
 	</bean>
 
-	<bean id="conversationView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor" singleton="false">
-		<property name="viewClass">
-			<value>org.owasp.webscarab.ui.ConversationView</value>
-		</property>
-		<property name="title">
-			<value>ConversationView</value>
-		</property>
-	</bean>
-	
 	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar">
 		<property name="proxy" ref="proxy"></property>
 		<property name="annotationForm">
-			<bean class="org.owasp.webscarab.ui.AnnotationForm"/>
+			<bean class="org.owasp.webscarab.ui.forms.AnnotationForm"/>
 		</property>
 	</bean>
 	

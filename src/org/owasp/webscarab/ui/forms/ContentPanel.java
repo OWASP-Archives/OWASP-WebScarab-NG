@@ -37,7 +37,7 @@
  * Created on November 4, 2003, 8:06 AM
  */
 
-package org.owasp.webscarab.ui;
+package org.owasp.webscarab.ui.forms;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.owasp.webscarab.ui;
+package org.owasp.webscarab.ui.forms;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -22,9 +22,9 @@ import org.springframework.richclient.form.AbstractForm;
  * @author rdawes
  * 
  */
-public class RequestForm extends AbstractForm {
+public class ResponseForm extends AbstractForm {
 
-	private static final String FORM_ID = "requestForm";
+	private static final String FORM_ID = "responseForm";
 
 	private JTree tree;
 
@@ -35,7 +35,7 @@ public class RequestForm extends AbstractForm {
 	/**
 	 * Constructor.
 	 */
-	public RequestForm(FormModel model) {
+	public ResponseForm(FormModel model) {
 		super(model, FORM_ID);
 		addFormObjectChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -77,29 +77,36 @@ public class RequestForm extends AbstractForm {
 
 	private void refresh() {
 		if (getConversation() != null) {
-			ConversationTreeModel treeModel = new ConversationTreeModel(
-					getConversation(), ConversationTreeModel.REQUEST);
-			tree.setModel(treeModel);
-			contentPanel.setContentType(getConversation().getRequestHeader(
-					"Content-Type"));
-			contentPanel.setContent(getConversation().getRequestContent());
-
-			StringBuffer buff = new StringBuffer();
-			buff.append(getConversation().getRequestMethod()).append(" ");
-			buff.append(getConversation().getRequestUri()).append(" ");
-			buff.append(getConversation().getRequestVersion()).append("\n");
-			NamedValue[] headers = getConversation().getRequestHeaders();
-			if (headers != null) {
-				for (int i = 0; i < headers.length; i++) {
-					buff.append(headers[i].getName()).append(": ");
-					buff.append(headers[i].getValue()).append("\n");
+			if (tree != null) {
+				ConversationTreeModel treeModel = new ConversationTreeModel(
+						getConversation(), ConversationTreeModel.RESPONSE);
+				tree.setModel(treeModel);
+			}
+			if (contentPanel != null) {
+				contentPanel.setContentType(getConversation()
+						.getResponseHeader("Content-Type"));
+				contentPanel.setContent(getConversation().getResponseContent());
+			}
+			if (textArea != null) {
+				StringBuffer buff = new StringBuffer();
+				buff.append(getConversation().getResponseVersion()).append(" ");
+				buff.append(getConversation().getResponseStatus()).append(" ");
+				buff.append(getConversation().getResponseMessage())
+						.append("\n");
+				NamedValue[] headers = getConversation().getResponseHeaders();
+				if (headers != null) {
+					for (int i = 0; i < headers.length; i++) {
+						buff.append(headers[i].getName()).append(": ");
+						buff.append(headers[i].getValue()).append("\n");
+					}
 				}
+				buff.append("\n");
+				if (getConversation().getResponseContent() != null) {
+					buff.append(new String(getConversation()
+							.getResponseContent()));
+				}
+				textArea.setText(buff.toString());
 			}
-			buff.append("\n");
-			if (getConversation().getRequestContent() != null) {
-				buff.append(new String(getConversation().getRequestContent()));
-			}
-			textArea.setText(buff.toString());
 		}
 	}
 }

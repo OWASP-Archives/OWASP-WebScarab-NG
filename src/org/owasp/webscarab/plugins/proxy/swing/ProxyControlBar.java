@@ -16,7 +16,7 @@ import javax.swing.JWindow;
 import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.plugins.proxy.Annotator;
 import org.owasp.webscarab.plugins.proxy.Proxy;
-import org.owasp.webscarab.ui.AnnotationForm;
+import org.owasp.webscarab.ui.forms.AnnotationForm;
 
 /**
  * @author rdawes

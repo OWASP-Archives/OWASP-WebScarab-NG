@@ -10,11 +10,13 @@
 
 package org.owasp.webscarab.ui;
 
+import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -30,8 +32,12 @@ import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.Conversation;
 import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
+import org.owasp.webscarab.ui.forms.RequestForm;
+import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.UriTreeModel;
+import org.springframework.binding.form.FormModel;
+import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.richclient.application.PageComponentContext;
@@ -39,6 +45,11 @@ import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
 import org.springframework.richclient.command.support.GlobalCommandIds;
+import org.springframework.richclient.form.Form;
+import org.springframework.richclient.form.FormModelHelper;
+import org.springframework.richclient.settings.SettingsException;
+import org.springframework.richclient.settings.SettingsManager;
+import org.springframework.richclient.settings.support.TableMemento;
 import org.springframework.richclient.util.PopupMenuMouseListener;
 
 import ca.odell.glazedlists.EventList;
@@ -63,6 +74,8 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 	private JTable conversationTable;
 
+	private TableMemento tableMemento;
+	
 	private TableModel tableModel;
 
 	private JTree uriTree;
@@ -71,6 +84,8 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 	private ShowConversationExecutor showConversationExecutor = new ShowConversationExecutor();
 
+	private SettingsManager settingsManager;
+	
 	/** Creates a new instance of SummaryView */
 	public SummaryView() {
 	}
@@ -121,7 +136,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		this.tableModel = null;
 		getConversationTable().setModel(getTableModel());
 	}
-
+	
 	protected javax.swing.JComponent createControl() {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setResizeWeight(0.3);
@@ -138,6 +153,12 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		if (conversationTable == null) {
 			conversationTable = getComponentFactory().createTable(
 					getTableModel());
+			if (getSettingsManager() != null) {
+				tableMemento = new TableMemento(conversationTable, getClass().getName() + "conversationTable");
+				try {
+					tableMemento.restoreState(getSettingsManager().getUserSettings());
+				} catch (SettingsException se) {}
+			}
 			conversationTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			conversationTable.getSelectionModel().addListSelectionListener(
 					new ListSelectionListener() {
@@ -280,11 +301,16 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		public void execute() {
 			Conversation conversation = getSelectedConversation();
 
-			MinimalApplicationWindow maw = new MinimalApplicationWindow();
-			maw.showPage("conversationView");
-			ConversationView cv = (ConversationView) maw.getPage()
-					.getActiveComponent();
-			cv.setConversation(conversation);
+			ValidatingFormModel model = FormModelHelper.createFormModel(conversation);
+			model.setEnabled(false);
+			Form requestForm = new RequestForm(model);
+			Form responseForm = new ResponseForm(model);
+			ConversationView cv = new ConversationView(requestForm, responseForm, null);
+			JFrame frame = new JFrame();
+			frame.getContentPane().setLayout(new BorderLayout());
+			frame.getContentPane().add(cv.getControl(), BorderLayout.CENTER);
+			frame.pack();
+			frame.setVisible(true);
 		}
 	}
 
@@ -322,5 +348,13 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 				}
 			}
 		}
+	}
+
+	public SettingsManager getSettingsManager() {
+		return this.settingsManager;
+	}
+
+	public void setSettingsManager(SettingsManager settingsManager) {
+		this.settingsManager = settingsManager;
 	}
 }

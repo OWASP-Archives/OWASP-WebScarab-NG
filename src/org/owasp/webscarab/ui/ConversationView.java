@@ -3,12 +3,14 @@
  */
 package org.owasp.webscarab.ui;
 
-import javax.swing.JComponent;
+import java.awt.BorderLayout;
 
-import org.owasp.webscarab.Conversation;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+
 import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.form.Form;
-import org.springframework.richclient.form.FormModelHelper;
 
 /**
  * @author rdawes
@@ -16,19 +18,16 @@ import org.springframework.richclient.form.FormModelHelper;
  */
 public class ConversationView extends AbstractView {
 
-	private Form form = null;
+	private Form requestForm;
+	private Form responseForm;
+	private Form annotationForm;
 	
-	public void setConversation(Conversation conversation) {
-		if (form == null) {
-			createForm();
-		}
-		form.setFormObject(conversation);
+	public ConversationView(Form requestForm, Form responseForm, Form annotationForm) {
+		this.requestForm = requestForm;
+		this.responseForm = responseForm;
+		this.annotationForm = annotationForm;
 	}
-
-	public Conversation getConversation() {
-		return (Conversation) form.getFormObject();
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -36,14 +35,16 @@ public class ConversationView extends AbstractView {
 	 */
 	@Override
 	protected JComponent createControl() {
-		if (form == null) {
-			createForm();
-		}
-		return form.getControl();
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane.setResizeWeight(0.5);
+		splitPane.setTopComponent(requestForm.getControl());
+		splitPane.setBottomComponent(responseForm.getControl());
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(splitPane, BorderLayout.CENTER);
+		if (annotationForm != null)
+			panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
+		return panel;
 	}
 
-	private void createForm() {
-		form = new ConversationForm(FormModelHelper
-				.createFormModel(new Conversation()));
-	}
 }
