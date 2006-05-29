@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.owasp.webscarab.Finding;
 import org.owasp.webscarab.dao.FindingDao;
+import org.owasp.webscarab.domain.Finding;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

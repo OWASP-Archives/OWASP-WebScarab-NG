@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.owasp.webscarab.Annotation;
 import org.owasp.webscarab.dao.AnnotationDao;
+import org.owasp.webscarab.domain.Annotation;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

@@ -6,7 +6,7 @@ package org.owasp.webscarab.ui.forms.support;
 import java.lang.reflect.Array;
 import java.net.URI;
 
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.value.support.DefaultValueChangeDetector;
 
 /**

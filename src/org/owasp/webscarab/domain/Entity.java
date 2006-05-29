@@ -8,7 +8,7 @@
  * Open. You can then make changes to the template in the Source Editor.
  */
 
-package org.owasp.webscarab;
+package org.owasp.webscarab.domain;
 
 /**
  *

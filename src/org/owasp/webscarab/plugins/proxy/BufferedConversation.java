@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 
 /**
  * @author rdawes

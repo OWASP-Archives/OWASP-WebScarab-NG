@@ -3,7 +3,7 @@
  */
 package org.owasp.webscarab.plugins.proxy;
 
-import org.owasp.webscarab.Annotation;
+import org.owasp.webscarab.domain.Annotation;
 
 /**
  * @author rdawes

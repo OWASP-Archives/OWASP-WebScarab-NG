@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.validation.DefaultValidationResults;
 import org.springframework.binding.validation.Severity;
 import org.springframework.binding.validation.ValidationResults;

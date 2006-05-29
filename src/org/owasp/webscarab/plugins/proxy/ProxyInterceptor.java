@@ -5,8 +5,8 @@ package org.owasp.webscarab.plugins.proxy;
 
 import java.io.IOException;
 
-import org.owasp.webscarab.Annotation;
-import org.owasp.webscarab.Conversation;
+import org.owasp.webscarab.domain.Annotation;
+import org.owasp.webscarab.domain.Conversation;
 
 /**
  * @author rdawes

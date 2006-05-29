@@ -49,7 +49,7 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.NamedValue;
 
 /**
  * 

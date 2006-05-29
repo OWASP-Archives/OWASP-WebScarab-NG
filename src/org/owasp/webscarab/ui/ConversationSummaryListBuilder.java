@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceEvent;
-import org.owasp.webscarab.ConversationSummary;
+import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationEvent;
 import org.owasp.webscarab.services.ConversationService;
 

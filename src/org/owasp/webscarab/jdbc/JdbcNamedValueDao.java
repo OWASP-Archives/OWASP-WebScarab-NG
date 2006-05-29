@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.jdbc.object.SqlUpdate;

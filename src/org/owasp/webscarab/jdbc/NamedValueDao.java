@@ -3,7 +3,7 @@
  */
 package org.owasp.webscarab.jdbc;
 
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.NamedValue;
 
 /**
  * @author rdawes

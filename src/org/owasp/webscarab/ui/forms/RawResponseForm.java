@@ -5,8 +5,6 @@ package org.owasp.webscarab.ui.forms;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +14,8 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;
@@ -99,7 +97,7 @@ public class RawResponseForm extends AbstractForm {
 			}
 		}
 		
-		// Now we split the request line into its component parts
+		// Now we split the response line into its component parts
 		String[] parts = responseLine.split(" ", 3);
 		
 		ValueModel vm = getValueModel(Conversation.PROPERTY_RESPONSE_VERSION);

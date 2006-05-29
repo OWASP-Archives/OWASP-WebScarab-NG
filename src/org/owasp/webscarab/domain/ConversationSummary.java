@@ -1,7 +1,8 @@
-package org.owasp.webscarab;
+package org.owasp.webscarab.domain;
 
 import java.net.URI;
 import java.util.Date;
+
 
 import com.twmacinta.util.MD5;
 

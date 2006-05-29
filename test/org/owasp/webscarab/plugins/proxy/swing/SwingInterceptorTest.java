@@ -7,8 +7,8 @@ import java.awt.Image;
 import java.io.IOException;
 import java.net.URI;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.ui.forms.support.ArrayChangeDetector;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.richclient.application.support.DefaultApplicationServices;

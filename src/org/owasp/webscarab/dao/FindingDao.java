@@ -5,7 +5,7 @@ package org.owasp.webscarab.dao;
 
 import java.util.Collection;
 
-import org.owasp.webscarab.Finding;
+import org.owasp.webscarab.domain.Finding;
 
 /**
  * @author rdawes

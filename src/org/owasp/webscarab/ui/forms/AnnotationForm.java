@@ -7,7 +7,7 @@ import java.awt.Dimension;
 
 import javax.swing.JComponent;
 
-import org.owasp.webscarab.Annotation;
+import org.owasp.webscarab.domain.Annotation;
 import org.springframework.richclient.form.AbstractForm;
 import org.springframework.richclient.form.FormModelHelper;
 import org.springframework.richclient.form.builder.TableFormBuilder;

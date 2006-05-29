@@ -7,8 +7,8 @@ import java.net.URI;
 
 import javax.swing.tree.TreePath;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.richclient.tree.AbstractTreeModel;
 
 /**

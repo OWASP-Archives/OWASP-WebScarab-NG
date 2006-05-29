@@ -12,8 +12,8 @@ import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.util.HttpMethodUtils;
 
 import junit.framework.TestCase;

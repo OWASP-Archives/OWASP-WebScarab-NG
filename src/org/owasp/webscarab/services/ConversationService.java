@@ -6,11 +6,11 @@ package org.owasp.webscarab.services;
 import java.util.Collection;
 
 import org.bushe.swing.event.EventService;
-import org.owasp.webscarab.Annotation;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
 import org.owasp.webscarab.dao.AnnotationDao;
 import org.owasp.webscarab.dao.ConversationDao;
+import org.owasp.webscarab.domain.Annotation;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.ConversationSummary;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

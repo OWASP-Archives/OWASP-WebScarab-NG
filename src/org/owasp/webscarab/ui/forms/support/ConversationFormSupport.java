@@ -3,7 +3,7 @@
  */
 package org.owasp.webscarab.ui.forms.support;
 
-import org.owasp.webscarab.Conversation;
+import org.owasp.webscarab.domain.Conversation;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.form.FormModelHelper;
 

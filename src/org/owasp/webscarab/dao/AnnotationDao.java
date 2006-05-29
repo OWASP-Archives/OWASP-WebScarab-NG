@@ -5,7 +5,7 @@ package org.owasp.webscarab.dao;
 
 import java.util.Collection;
 
-import org.owasp.webscarab.Annotation;
+import org.owasp.webscarab.domain.Annotation;
 
 /**
  * @author rdawes

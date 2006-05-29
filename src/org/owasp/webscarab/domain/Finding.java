@@ -1,7 +1,8 @@
 /**
  * 
  */
-package org.owasp.webscarab;
+package org.owasp.webscarab.domain;
+
 
 /**
  * @author rdawes

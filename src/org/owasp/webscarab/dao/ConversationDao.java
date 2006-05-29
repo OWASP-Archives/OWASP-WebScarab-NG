@@ -1,8 +1,8 @@
 package org.owasp.webscarab.dao;
 
 import java.util.Collection;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.ConversationSummary;
 
 public interface ConversationDao {
 	

@@ -28,15 +28,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 
-import org.owasp.webscarab.Annotation;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
+import org.owasp.webscarab.domain.Annotation;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.ui.forms.RequestForm;
 import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.UriTreeModel;
-import org.springframework.binding.form.FormModel;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;

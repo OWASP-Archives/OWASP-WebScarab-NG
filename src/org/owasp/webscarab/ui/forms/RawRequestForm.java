@@ -16,8 +16,8 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.NamedValue;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;

@@ -8,7 +8,7 @@
  * Open. You can then make changes to the template in the Source Editor.
  */
 
-package org.owasp.webscarab;
+package org.owasp.webscarab.domain;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,11 +23,6 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
-
-import org.springframework.core.closure.Constraint;
-import org.springframework.rules.PropertyConstraintProvider;
-import org.springframework.rules.Rules;
-import org.springframework.rules.constraint.property.PropertyConstraint;
 
 /**
  * The <code>Conversation</code> is the basic element used by WebScarab. It
@@ -44,8 +39,7 @@ import org.springframework.rules.constraint.property.PropertyConstraint;
  * @author rdawes
  */
 
-public class Conversation extends BaseEntity implements
-		PropertyConstraintProvider {
+public class Conversation extends BaseEntity {
 
 	public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
 
@@ -98,8 +92,6 @@ public class Conversation extends BaseEntity implements
 	protected NamedValue[] responseFooters;
 
 	protected Logger logger = Logger.getLogger(getClass().getName());
-
-	private static Rules validationRules;
 
 	/** Creates a new instance of DefaultConversation */
 	public Conversation() {
@@ -515,35 +507,6 @@ public class Conversation extends BaseEntity implements
 			}
 			return num;
 		}
-	}
-
-	public PropertyConstraint getPropertyConstraint(String propertyName) {
-//		if (validationRules == null)
-//			validationRules = new Rules(getClass()) {
-//				protected void initRules() {
-//					add(PROPERTY_REQUEST_METHOD, any(new Constraint[] {
-//							eq("GET"), eq("POST"), eq("HEAD"), eq("TRACE"),
-//							eq("OPTIONS") }));
-//					add(PROPERTY_REQUEST_URI, new Constraint() {
-//						public boolean test(Object object) {
-//							if (object == null)
-//								return false;
-//							if (!(object instanceof URI))
-//								return false;
-//							URI uri = (URI) object;
-//							return uri.getScheme().startsWith("http")
-//									&& uri.getHost() != null;
-//						}
-//					});
-//					add(PROPERTY_REQUEST_VERSION, or(eq("HTTP/1.0"), eq("HTTP/1.1")));
-//					add(PROPERTY_REQUEST_CONTENT, any( new Constraint[] {
-//							and()
-//					}));
-//				}
-//
-//			};
-//		return validationRules.getPropertyConstraint(propertyName);
-		return null;
 	}
 
 }

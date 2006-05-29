@@ -4,8 +4,8 @@
 package org.owasp.webscarab.services;
 
 import org.bushe.swing.event.EventServiceEvent;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.ConversationSummary;
 
 /**
  * @author rdawes

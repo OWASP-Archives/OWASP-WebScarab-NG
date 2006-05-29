@@ -14,12 +14,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.jdbc.object.SqlUpdate;
-import org.owasp.webscarab.Conversation;
-import org.owasp.webscarab.ConversationSummary;
-import org.owasp.webscarab.NamedValue;
 import org.owasp.webscarab.dao.BlobDao;
 import org.owasp.webscarab.dao.ConversationDao;
 import org.owasp.webscarab.dao.UriDao;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.jdbc.VersionDao;
 
 /**
