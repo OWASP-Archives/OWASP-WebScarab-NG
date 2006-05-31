@@ -3,8 +3,6 @@
  */
 package org.owasp.webscarab.plugins.proxy;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -22,7 +20,7 @@ import junit.framework.TestCase;
  */
 public class ListenerTest extends TestCase {
 
-	private Listener listener;
+	private Proxy.Listener listener;
 
 	private Thread listenerThread;
 
@@ -37,7 +35,10 @@ public class ListenerTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		listener = new Listener(new InetSocketAddress(InetAddress.getLocalHost(), 8008));
+		ListenerConfiguration config = new ListenerConfiguration();
+		config.setHostName("localhost");
+		config.setPort(8008);
+		listener = new Proxy().new Listener(config);
 		listenerThread = new Thread(listener);
 		listenerThread.setDaemon(true);
 		listenerThread.start();

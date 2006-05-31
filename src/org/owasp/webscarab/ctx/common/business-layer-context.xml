@@ -41,26 +41,8 @@
 		</property>
 	</bean>
 
-	<bean id="listener"
-		class="org.owasp.webscarab.plugins.proxy.Listener" lazy-init="true">
-		<constructor-arg index="0">
-			<bean class="java.net.InetSocketAddress">
-				<constructor-arg index="0"><value>localhost</value></constructor-arg>
-				<constructor-arg index="1"><value>8008</value></constructor-arg>
-			</bean>
-		</constructor-arg>
-		<property name="conversationService">
-			<ref local="conversationService" />
-		</property>
-		<property name="keyStoreFile"><value>certificates/server.p12</value></property>
-		<property name="keyStorePassword"><value>password</value></property>
-		<property name="keyPassword"><value>password</value></property>
-	</bean>
-
 	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
-		<property name="listener">
-			<ref local="listener" />
-		</property>
+		<property name="eventService" ref="eventService"/>
 	</bean>
 
 </beans>

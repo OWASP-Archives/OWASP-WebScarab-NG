@@ -19,7 +19,6 @@ public class SwingxTableFactory implements TableFactory {
 	 */
 	public JTable createTable() {
 		JXTable table = new JXTable();
-		table.setColumnControlVisible(true);
 		return table;
 	}
 
@@ -28,7 +27,6 @@ public class SwingxTableFactory implements TableFactory {
 	 */
 	public JTable createTable(TableModel model) {
 		JXTable table = new JXTable(model);
-		table.setColumnControlVisible(true);
 		return table;
 	}
 

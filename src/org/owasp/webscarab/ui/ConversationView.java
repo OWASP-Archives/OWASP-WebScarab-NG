@@ -22,12 +22,30 @@ public class ConversationView extends AbstractView {
 	private Form responseForm;
 	private Form annotationForm;
 	
-	public ConversationView(Form requestForm, Form responseForm, Form annotationForm) {
-		this.requestForm = requestForm;
-		this.responseForm = responseForm;
+	public Form getAnnotationForm() {
+		return this.annotationForm;
+	}
+
+	public void setAnnotationForm(Form annotationForm) {
 		this.annotationForm = annotationForm;
 	}
-	
+
+	public Form getRequestForm() {
+		return this.requestForm;
+	}
+
+	public void setRequestForm(Form requestForm) {
+		this.requestForm = requestForm;
+	}
+
+	public Form getResponseForm() {
+		return this.responseForm;
+	}
+
+	public void setResponseForm(Form responseForm) {
+		this.responseForm = responseForm;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -35,13 +53,18 @@ public class ConversationView extends AbstractView {
 	 */
 	@Override
 	protected JComponent createControl() {
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.setResizeWeight(0.5);
-		splitPane.setTopComponent(requestForm.getControl());
-		splitPane.setBottomComponent(responseForm.getControl());
+		JSplitPane splitPane = null;
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(splitPane, BorderLayout.CENTER);
+		if (responseForm != null) {
+			splitPane = new JSplitPane();
+			splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+			splitPane.setResizeWeight(0.5);
+			splitPane.setTopComponent(requestForm.getControl());
+			splitPane.setBottomComponent(responseForm.getControl());
+			panel.add(splitPane, BorderLayout.CENTER);
+		} else {
+			panel.add(requestForm.getControl(), BorderLayout.CENTER);
+		}
 		if (annotationForm != null)
 			panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
 		return panel;

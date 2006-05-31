@@ -28,6 +28,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeModel;
 
+import org.bushe.swing.event.EventService;
+import org.jdesktop.swingx.JXTable;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.ConversationSummary;
@@ -65,6 +67,8 @@ import ca.odell.glazedlists.swing.EventTableModel;
  */
 public class SummaryView extends AbstractView implements ApplicationListener {
 
+	private EventService eventService;
+	
 	private ConversationService conversationService = null;
 
 	private ConversationTableFormat format = new ConversationTableFormat();
@@ -152,6 +156,8 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		if (conversationTable == null) {
 			conversationTable = getComponentFactory().createTable(
 					getTableModel());
+			if (conversationTable instanceof JXTable)
+				((JXTable) conversationTable).setColumnControlVisible(true);
 			if (getSettingsManager() != null) {
 				tableMemento = new TableMemento(conversationTable, getClass().getName() + "conversationTable");
 				try {
@@ -220,12 +226,22 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		this.conversationService = conversationService;
 	}
 
+	/**
+	 * @return Returns the conversationService.
+	 */
+	public ConversationService getConversationService() {
+		if (conversationService == null)
+			conversationService = (ConversationService) getApplicationContext()
+					.getBean("conversationService");
+		return conversationService;
+	}
+
 	private Conversation getSelectedConversation() {
 		int row = conversationTable.getSelectedRow();
 		if (row == -1)
 			return null;
 		ConversationSummary summary = conversationSummaryList.get(row);
-		return conversationService.getConversation(summary.getId());
+		return getConversationService().getConversation(summary.getId());
 	}
 
 	private JPopupMenu createConversationPopupContextMenu() {
@@ -284,7 +300,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 					return summary.getResponseStatus() + " "
 							+ summary.getResponseMessage();
 				case 7 : 
-					Annotation a = conversationService.getAnnotation(summary.getId());
+					Annotation a = getConversationService().getAnnotation(summary.getId());
 					if (a == null) return a;
 					return a.getAnnotation();
 			}
@@ -304,12 +320,15 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 			model.setEnabled(false);
 			Form requestForm = new RequestForm(model);
 			Form responseForm = new ResponseForm(model);
-			ConversationView cv = new ConversationView(requestForm, responseForm, null);
+			ConversationView cv = new ConversationView();
+			cv.setRequestForm(requestForm);
+			cv.setResponseForm(responseForm);
 			JFrame frame = new JFrame();
 			frame.getContentPane().setLayout(new BorderLayout());
 			frame.getContentPane().add(cv.getControl(), BorderLayout.CENTER);
 			frame.pack();
 			frame.setVisible(true);
+			
 		}
 	}
 
@@ -355,5 +374,13 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 	public void setSettingsManager(SettingsManager settingsManager) {
 		this.settingsManager = settingsManager;
+	}
+
+	public EventService getEventService() {
+		return this.eventService;
+	}
+
+	public void setEventService(EventService eventService) {
+		this.eventService = eventService;
 	}
 }

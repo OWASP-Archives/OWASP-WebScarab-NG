@@ -39,13 +39,15 @@ public class ArrayChangeDetector extends DefaultValueChangeDetector {
 			Class oldClass = oldValue.getClass().getComponentType();
 			Class newClass = newValue.getClass().getComponentType();
 			if (!oldClass.equals(newClass)) return true;
-			if (getClassesWithSafeEquals().contains(oldClass)) {
+			if (getClassesWithSafeEquals().contains(oldClass) || oldClass.isPrimitive()) {
 				for (int i=0; i<oldLength; i++) {
 					Object oldObj = Array.get(oldValue, i);
 					Object newObj = Array.get(newValue, i);
 					if (super.hasValueChanged(oldObj, newObj))
 						return true;
 				}
+			} else {
+				return super.hasValueChanged(oldValue, newValue);
 			}
 			return false;
 		}

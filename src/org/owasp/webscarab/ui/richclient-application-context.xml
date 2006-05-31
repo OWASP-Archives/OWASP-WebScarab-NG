@@ -58,6 +58,7 @@
 		<property name="rulesSource" ref="rulesSource"/>
 		<property name="formComponentInterceptorFactory" ref="formComponentInterceptorFactory"/>
 		<property name="applicationObjectConfigurerId"><idref bean="applicationObjectConfigurer"/></property>
+		<property name="componentFactory" ref="componentFactory"/>
 	</bean>
 
 	<bean id="application"
@@ -129,9 +130,6 @@
 
 	<bean id="componentFactory"
 		class="org.springframework.richclient.factory.DefaultComponentFactory">
-		<property name="iconSource">
-			<ref bean="iconSource" />
-		</property>
 		<property name="messageSource">
 			<ref bean="messageSource" />
 		</property>
@@ -203,34 +201,14 @@
 	</bean>
 
 	<bean id="rulesSource" 
-		class="org.owasp.webscarab.domain.WebScarabValidationRulesSource"/><!--
+		class="org.owasp.webscarab.domain.WebScarabValidationRulesSource"/>
 		
-	<bean id="formPropertyFaceDescriptorSource"
-		class="org.springframework.binding.form.support.MessageSourceFieldFaceSource" />
-		
-	--><bean id="basicConversationSummaryList"
-		class="ca.odell.glazedlists.BasicEventList">
-	</bean>
-
-	<bean id="conversationSummaryListBuilder"
-		class="org.owasp.webscarab.ui.ConversationSummaryListBuilder" lazy-init="false">
-		<property name="conversationService">
-			<ref bean="conversationService" />
-		</property>
+	<bean id="conversationSummaryList"
+		class="org.owasp.webscarab.ui.ConversationSummaryListFactory" singleton="true" 
+		lazy-init="true">
 		<property name="eventService">
 			<ref bean="eventService" />
 		</property>
-		<property name="summaryList">
-			<ref bean="basicConversationSummaryList" />
-		</property>
-	</bean>
-
-	<bean id="conversationSummaryList"
-		class="ca.odell.glazedlists.SortedList" lazy-init="true"
-		depends-on="conversationSummaryListBuilder">
-		<constructor-arg index="0">
-			<ref local="basicConversationSummaryList" />
-		</constructor-arg>
 	</bean>
 
 	<bean id="summaryView"
@@ -244,9 +222,6 @@
 		</property>
 		<property name="viewProperties">
 			<map>
-				<entry key="conversationService">
-					<ref bean="conversationService" />
-				</entry>
 				<entry key="conversationSummaryList">
 					<ref bean="conversationSummaryList" />
 				</entry>	

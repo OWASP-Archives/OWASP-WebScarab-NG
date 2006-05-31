@@ -124,4 +124,13 @@ public class NamedValue extends BaseEntity {
 		}
 		return values;
 	}
+	
+	public static String get(String name, NamedValue[] nv) {
+		if (nv == null) return null;
+		for (int i=0; i<nv.length; i++)
+			if (name.equalsIgnoreCase(nv[i].getName())) 
+				return nv[i].getValue();
+		return null;
+	}
+	
 }

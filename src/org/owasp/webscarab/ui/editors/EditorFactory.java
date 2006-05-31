@@ -67,8 +67,6 @@ public class EditorFactory {
 
 	@SuppressWarnings("unchecked")
 	public static ByteArrayEditor[] getEditors(String contentType) {
-		if (contentType == null)
-			return new ByteArrayEditor[] { new HexPanel() };
 		if (_editors == null)
 			registerEditors();
 		Iterator it = _editors.keySet().iterator();

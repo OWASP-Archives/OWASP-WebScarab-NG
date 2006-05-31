@@ -34,7 +34,14 @@
 	<bean id="showProxyControlBar" 
 		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarCommand">
 		<property name="proxyControlBar" ref="proxyControlBar"/>
-	</bean><!--
+	</bean>
+	
+	<bean id="showProxyConfiguration"
+		class="org.owasp.webscarab.plugins.proxy.swing.ProxyConfigCommand">
+		<property name="proxy" ref="proxy"/>
+	</bean>
+	
+	<!--
 		
 	<bean id="toolBar" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
@@ -105,6 +112,7 @@
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
 				<ref bean="showProxyControlBar"/>
+				<ref bean="showProxyConfiguration"/>
 				<value>separator</value>
 				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  
 			</list>
@@ -131,6 +139,12 @@
 			<value>org/owasp/webscarab/about.txt</value>
 		</property>
 	</bean>
-		
+
+	<bean id="selectSessionCommand"
+		class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
+		<property name="dataSourceFactory" ref="&amp;dataSource"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="displaySuccessMessage"><value>false</value></property>
+	</bean>
 
 </beans>

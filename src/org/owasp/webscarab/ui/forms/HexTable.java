@@ -43,6 +43,7 @@ public class HexTable extends JTable {
 
 	public HexTable(final ValueModel vm, boolean editable, int columns) {
 		super(new HexTableModel(vm, editable, columns));
+		setAutoResizeMode(AUTO_RESIZE_OFF);
 		setFont(new Font("Monospaced", Font.PLAIN, 12));
 		getTableHeader().setReorderingAllowed(false);
 		TableColumnModel colModel = getColumnModel();
@@ -225,6 +226,7 @@ public class HexTable extends JTable {
 					newData[position] = new Integer(Integer.parseInt(s.trim(),
 							16)).byteValue();
 					fireTableCellUpdated(rowIndex, columns + 1);
+					System.out.println("Calling setValue");
 					vm.setValueSilently(newData, this);
 				} catch (NumberFormatException nfe) {
 					System.out.println("Number format error : " + nfe);

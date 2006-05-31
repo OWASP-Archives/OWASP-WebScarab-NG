@@ -17,6 +17,8 @@ import junit.framework.TestCase;
  */
 public class ConnectionHandlerTest extends TestCase {
 
+	private Proxy.Listener listener;
+	
     private static String stdHeaders = "Host: localhost\r\n"
             + "User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)\r\n"
             + "Proxy-Connection: Keep-Alive\r\n";
@@ -24,6 +26,14 @@ public class ConnectionHandlerTest extends TestCase {
     public static void main(String[] args) {
         junit.textui.TestRunner.run(ConnectionHandlerTest.class);
     }
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		ListenerConfiguration config = new ListenerConfiguration();
+		config.setPort(65535);
+		listener = new Proxy().new Listener(config);
+	}
 
     /*
      * Test method for
@@ -42,7 +52,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
+        Proxy.Listener.ConnectionHandler connectionHandler = listener.new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 477, os.size());
@@ -69,7 +79,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
+        Proxy.Listener.ConnectionHandler connectionHandler = listener.new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 482, os.size());
@@ -88,7 +98,7 @@ public class ConnectionHandlerTest extends TestCase {
         InputStream is = new ByteArrayInputStream(request.toString().getBytes());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Socket socket = new MockSocket(is, os);
-        ConnectionHandler connectionHandler = new ConnectionHandler(socket, null);
+        Proxy.Listener.ConnectionHandler connectionHandler = listener.new ConnectionHandler(socket, null);
         connectionHandler.run();
         System.out.write(os.toByteArray());
         assertEquals("Response size", 482, os.size());

@@ -5,7 +5,9 @@ package org.owasp.webscarab.util.swing;
 
 import javax.swing.JOptionPane;
 
+import org.bushe.swing.event.EventService;
 import org.owasp.webscarab.jdbc.DataSourceFactory;
+import org.owasp.webscarab.ui.SessionEvent;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.Application;
@@ -65,7 +67,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	private DataSourceFactory dataSourceFactory = null;
 
-	private String postSelectionPageId = null;
+	private EventService eventService = null;
 	
 	/**
 	 * Constructor.
@@ -89,7 +91,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	/**
 	 * Execute the login command. Display the dialog and attempt authentication.
 	 */
-	protected void doExecuteCommand() {
+    protected void doExecuteCommand() {
 		CompositeDialogPage tabbedPage = new TabbedDialogPage(
 				"selectDatabaseForm");
 
@@ -105,7 +107,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 						.getFormObject();
 
 				try {
-					dataSourceFactory.setJdbcConnectionDetails(jdbcDetails);
+					getDataSourceFactory().setJdbcConnectionDetails(jdbcDetails);
 					postSelection();
 				} catch (Exception e) {
 					logger.error("Error opening connection", e);
@@ -168,8 +170,8 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * Called to give subclasses control after a successful selection.
 	 */
 	protected void postSelection() {
-		if (postSelectionPageId != null)
-			getApplicationWindow().showPage(postSelectionPageId);
+		if (getEventService() != null)
+			eventService.publish(new SessionEvent(this));
 	}
 
 	/**
@@ -219,12 +221,12 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 		this.dataSourceFactory = dataSourceFactory;
 	}
 
-	public String getPostSelectionPageId() {
-		return this.postSelectionPageId;
+	public EventService getEventService() {
+		return this.eventService;
 	}
 
-	public void setPostSelectionPageId(String postSelectionPageId) {
-		this.postSelectionPageId = postSelectionPageId;
+	public void setEventService(EventService eventService) {
+		this.eventService = eventService;
 	}
 
 }

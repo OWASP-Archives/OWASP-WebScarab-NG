@@ -10,36 +10,29 @@ import org.springframework.richclient.command.support.ApplicationWindowAwareComm
 
 /**
  * @author rdawes
- *
+ * 
  */
-public class WebScarabLifecycleAdvisor extends DefaultApplicationLifecycleAdvisor {
+public class WebScarabLifecycleAdvisor extends
+		DefaultApplicationLifecycleAdvisor {
 
-	private ApplicationWindowAwareCommand introCommand = null;
-	
 	public void onPreWindowOpen(ApplicationWindowConfigurer configurer) {
-        super.onPreWindowOpen(configurer);
-        // comment out to hide the menubar, toolbar, or reduce window size...
-//        configurer.setShowMenuBar(false);
-        configurer.setShowToolBar(false);
-//        configurer.setInitialSize(new Dimension(640, 480));
-    }
+		super.onPreWindowOpen(configurer);
+		// comment out to hide the menubar, toolbar, or reduce window size...
+		// configurer.setShowMenuBar(false);
+		configurer.setShowToolBar(false);
+		// configurer.setInitialSize(new Dimension(640, 480));
+		configurer.setShowStatusBar(true);
+	}
 
 	@Override
-	protected void showIntro(ApplicationWindow applicationWindow) {
-		super.showIntro(applicationWindow);
-		if (introCommand != null) {
-			introCommand.setApplicationWindow(applicationWindow);
-			introCommand.execute();
-		}
+	public void onPostStartup() {
+        ApplicationWindowAwareCommand command = (ApplicationWindowAwareCommand) getCommandBarFactory().getBean("selectSessionCommand");
+        if (command != null) 
+        	command.execute();
 	}
 
-	public ApplicationWindowAwareCommand getIntroCommand() {
-		return this.introCommand;
-	}
-
-	public void setIntroCommand(
-			ApplicationWindowAwareCommand postStartupCommand) {
-		this.introCommand = postStartupCommand;
-	}
+	public void onCommandsCreated(ApplicationWindow window) {
+		
+    }
 
 }
