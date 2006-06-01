@@ -15,6 +15,7 @@ import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
 import org.springframework.richclient.dialog.TitledPageApplicationDialog;
+import org.springframework.richclient.form.FormModelHelper;
 
 /**
  * @author rdawes
@@ -26,8 +27,8 @@ public class SwingInterceptor implements ProxyInterceptor {
 	}
 	
 	public void editRequest(Conversation conversation, Annotation annotation) throws IOException {
-		ValidatingFormModel model = ConversationFormSupport.createRequestFormModel(conversation);
-		final RequestForm requestForm = new RequestForm(model);
+		ValidatingFormModel model = FormModelHelper.createFormModel(conversation, true);
+		final RequestForm requestForm = new RequestForm(model, true);
 		final DialogPage page = new FormBackedDialogPage(requestForm);
 		TitledPageApplicationDialog dialog = new TitledPageApplicationDialog(page, null) {
 			protected void onAboutToShow() {
@@ -45,12 +46,9 @@ public class SwingInterceptor implements ProxyInterceptor {
 	}
 
 	public void editResponse(Conversation conversation, Annotation annotation) throws IOException {
-		ValidatingFormModel requestModel = ConversationFormSupport.createRequestFormModel(conversation);
-		final RequestForm requestForm = new RequestForm(requestModel);
-		requestForm.setEnabled(false);
-		ValidatingFormModel responseModel = ConversationFormSupport.createResponseFormModel(conversation);
-		final ResponseForm responseForm = new ResponseForm(responseModel);
-		responseForm.setEnabled(true);
+		ValidatingFormModel model = FormModelHelper.createFormModel(conversation, true);
+		final RequestForm requestForm = new RequestForm(model, false);
+		final ResponseForm responseForm = new ResponseForm(model);
 	}
 
 }

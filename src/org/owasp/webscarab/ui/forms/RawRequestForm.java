@@ -40,8 +40,11 @@ public class RawRequestForm extends AbstractForm {
 
 	private boolean updating = false;
 
-	public RawRequestForm(FormModel formModel) {
+	private boolean editable;
+	
+	public RawRequestForm(FormModel formModel, boolean editable) {
 		super(formModel, FORM_ID);
+		this.editable = editable;
 		getValueModel(Conversation.PROPERTY_REQUEST_METHOD)
 				.addValueChangeListener(listener);
 		getValueModel(Conversation.PROPERTY_REQUEST_URI)
@@ -59,6 +62,7 @@ public class RawRequestForm extends AbstractForm {
 		if (scrollPane == null) {
 			textArea = getComponentFactory().createTextArea();
 			textArea.setText(requestString());
+			textArea.setEditable(editable && getFormModel().isEnabled());
 			textArea.getDocument().addDocumentListener(listener);
 			scrollPane = getComponentFactory().createScrollPane(textArea);
 			scrollPane.addComponentListener(listener);

@@ -28,9 +28,7 @@ public class ResponseForm extends AbstractForm {
 	public ResponseForm(FormModel model) {
 		super(model, FORM_ID);
 		rawResponseForm = new RawResponseForm(model);
-//		addChildForm(rawResponseForm);
 		parsedResponseForm = new ParsedResponseForm(model);
-//		addChildForm(parsedResponseForm);
 	}
 
 	/**

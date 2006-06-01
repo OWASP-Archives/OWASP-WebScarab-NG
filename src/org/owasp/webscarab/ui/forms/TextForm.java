@@ -67,7 +67,7 @@ public class TextForm extends AbstractForm implements ContentForm {
 	
 	public boolean canHandle(String contentType) {
 		if (contentType == null) return false;
-		if (contentType.matches("text/*")) return true;
+		if (contentType.matches("text/.*")) return true;
 		if (contentType.matches("application/x-javascript")) return true;
 		if (contentType.matches("application/x-www-form-urlencoded")) return true;
 		return false;

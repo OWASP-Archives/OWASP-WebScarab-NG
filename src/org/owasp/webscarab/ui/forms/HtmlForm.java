@@ -56,7 +56,7 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 
 	@Override
 	protected JComponent createFormControl() {
-		if (scrollPane != null) {
+		if (scrollPane == null) {
 			listener = new ContentListener();
 			vm.addValueChangeListener(listener);
 			editorPane = new NoNetEditorPane();
@@ -131,6 +131,7 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 					HTML.Tag kind = (HTML.Tag) o;
 					if (kind == HTML.Tag.FRAME || kind == HTML.Tag.FRAMESET
 							|| kind == HTML.Tag.OBJECT
+							|| kind == HTML.Tag.IMG
 							|| kind == HTML.Tag.APPLET) {
 						return new NoView(elem);
 					}
