@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.owasp.webscarab.ui;
+package org.owasp.webscarab.domain;
 
 import org.bushe.swing.event.AbstractEventServiceEvent;
 
