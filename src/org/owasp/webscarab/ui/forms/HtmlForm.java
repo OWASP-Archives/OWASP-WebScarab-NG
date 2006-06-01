@@ -37,7 +37,7 @@ import org.springframework.richclient.form.AbstractForm;
  * @author rdawes
  * 
  */
-public class HtmlForm extends AbstractForm {
+public class HtmlForm extends AbstractForm implements ContentForm {
 
 	private static String FORM_ID = "htmlForm";
 
@@ -47,37 +47,42 @@ public class HtmlForm extends AbstractForm {
 
 	private JEditorPane editorPane;
 
-	private boolean upToDate = false;
+	private JScrollPane scrollPane = null;
 	
-	public HtmlForm(FormModel model, String propertyName) {
+	public HtmlForm(FormModel model, String contentPropertyName) {
 		super(model, FORM_ID);
-		vm = model.getValueModel(propertyName);
-		listener = new ContentListener();
-		vm.addValueChangeListener(listener);
+		vm = getValueModel(contentPropertyName);
 	}
 
 	@Override
 	protected JComponent createFormControl() {
-		editorPane = new NoNetEditorPane();
-		editorPane.setEditable(false);
-		editorPane.setEditorKit(new MyHTMLEditorKit());
-		editorPane.addHyperlinkListener(new LinkToolTipListener());
-		JScrollPane scrollPane = getComponentFactory().createScrollPane(editorPane);
-		// we use a component listener to delay rendering the HTML until
-		// someone is actually interested in it i.e. the component is shown
-		// we have to add it to the scrollPane, since the editorPane does not receive
-		// the necessary events for some reason.
-		scrollPane.addComponentListener(listener);
+		if (scrollPane != null) {
+			listener = new ContentListener();
+			vm.addValueChangeListener(listener);
+			editorPane = new NoNetEditorPane();
+			editorPane.setEditable(false);
+			editorPane.setEditorKit(new MyHTMLEditorKit());
+			editorPane.addHyperlinkListener(new LinkToolTipListener());
+			scrollPane = getComponentFactory().createScrollPane(editorPane);
+			// we use a component listener to delay rendering the HTML until
+			// someone is actually interested in it i.e. the component is shown
+			// we have to add it to the scrollPane, since the editorPane does not receive
+			// the necessary events for some reason.
+			scrollPane.addComponentListener(listener);
+		}
 		return scrollPane;
 	}
 
-	private void updateEditorPane() {
+	public boolean canHandle(String contentType) {
+		return contentType != null && contentType.matches("text/html.*");
+	}
+	
+	private void updateFormControl() {
 		editorPane.setContentType("text/html");
         editorPane.setDocument(JEditorPane.createEditorKitForContentType("text/html").createDefaultDocument());
         editorPane.putClientProperty("IgnoreCharsetDirective", Boolean.TRUE);
         editorPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
         editorPane.setText(contentString());
-        upToDate = true;
 	}
 	
 	private String contentString() {
@@ -89,15 +94,21 @@ public class HtmlForm extends AbstractForm {
 
 	private class ContentListener extends ComponentAdapter implements PropertyChangeListener {
 
+		private boolean upToDate = false;
+		
 		public void propertyChange(PropertyChangeEvent evt) {
 			upToDate = false;
-			if (editorPane != null && editorPane.isShowing())
-				updateEditorPane();
+			if (editorPane != null && editorPane.isShowing()) {
+				updateFormControl();
+				upToDate = true;
+			}
 		}
 
 		public void componentShown(ComponentEvent e) {
-			if (!upToDate)
-				updateEditorPane();
+			if (!upToDate) {
+				updateFormControl();
+				upToDate = true;
+			}
 		}
 
 	}

@@ -3,6 +3,8 @@
  */
 package org.owasp.webscarab.ui.forms;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -21,7 +23,7 @@ import org.springframework.richclient.form.AbstractForm;
  * @author rdawes
  *
  */
-public class TextForm extends AbstractForm {
+public class TextForm extends AbstractForm implements ContentForm {
 
 	private static String FORM_ID = "textForm";
 	
@@ -31,30 +33,53 @@ public class TextForm extends AbstractForm {
 	
 	private JTextArea textArea;
 	
+	private JScrollPane scrollPane = null;
+	
+	private boolean updating = false;
+	
 	public TextForm(FormModel model, String propertyName) {
 		super(model, FORM_ID);
-		listener = new ContentListener();
-		model.addPropertyChangeListener(listener);
 		vm = model.getValueModel(propertyName);
-		vm.addValueChangeListener(listener);
 	}
 
 	@Override
 	protected JComponent createFormControl() {
-		textArea = getComponentFactory().createTextArea();
-		textArea.setEditable(getFormModel().isEnabled());
-		textArea.setText(contentString());
-		textArea.getDocument().addDocumentListener(listener);
-		return new JScrollPane(textArea);
+		if (scrollPane == null) {
+			listener = new ContentListener();
+			getFormModel().addPropertyChangeListener(listener);
+			vm.addValueChangeListener(listener);
+			textArea = getComponentFactory().createTextArea();
+			textArea.setEditable(getFormModel().isEnabled());
+			textArea.setText(contentString());
+			textArea.getDocument().addDocumentListener(listener);
+			scrollPane = getComponentFactory().createScrollPane(textArea);
+			scrollPane.addComponentListener(listener);
+		}
+		return scrollPane;
 	}
 
+	private void updateFormControl() {
+		updating = true;
+		textArea.setText(contentString());
+		textArea.setCaretPosition(0);
+		updating = false;
+	}
+	
+	public boolean canHandle(String contentType) {
+		if (contentType == null) return false;
+		if (contentType.matches("text/*")) return true;
+		if (contentType.matches("application/x-javascript")) return true;
+		if (contentType.matches("application/x-www-form-urlencoded")) return true;
+		return false;
+	}
+	
 	private String contentString() {
 		byte[] content = (byte[]) vm.getValue();
 		if (content == null) return null;
 		return new String(content);
 	}
 	
-	private void updateContent() {
+	private void parseChanges() {
 		String content = textArea.getText();
 		if (content == null || content.length() == 0) {
 			vm.setValueSilently(null, listener);
@@ -63,9 +88,9 @@ public class TextForm extends AbstractForm {
 		}
 	}
 	
-	private class ContentListener implements PropertyChangeListener, DocumentListener {
+	private class ContentListener extends ComponentAdapter implements PropertyChangeListener, DocumentListener {
 
-		private boolean updating = false;
+		private boolean upToDate = false;
 		
 		public void propertyChange(PropertyChangeEvent evt) {
 			// if we have not yet constructed the text area, we don't care
@@ -80,31 +105,40 @@ public class TextForm extends AbstractForm {
 			if (evt.getSource() == getFormModel()) {
 				if (evt.getPropertyName().equals(ValidatingFormModel.ENABLED_PROPERTY)) 
 					textArea.setEnabled(getFormModel().isEnabled());
-			} else if (!updating) {
-				// we'd like to test if the evt.getSource is the ValueModel
-				// but the event is actually fired by a wrapped class, so
-				// that doesn't work!
-				updating = true;
-				textArea.setText(contentString());
-				textArea.setCaretPosition(0);
-				updating = false;
+			} else {
+				upToDate = false;
+				if (textArea != null && textArea.isShowing()) {
+					// we'd like to test if the evt.getSource is the ValueModel
+					// but the event is actually fired by a wrapped class, so
+					// that doesn't work!
+					updateFormControl();
+					upToDate = true;
+				}
 			}
 		}
 
 		public void changedUpdate(DocumentEvent e) {
 			if (!updating)
-				updateContent();
+				parseChanges();
 		}
 
 		public void insertUpdate(DocumentEvent e) {
 			if (!updating)
-				updateContent();
+				parseChanges();
 		}
 
 		public void removeUpdate(DocumentEvent e) {
 			if (!updating)
-				updateContent();
+				parseChanges();
 		}
+		
+		public void componentShown(ComponentEvent e) {
+			if (!upToDate) {
+				updateFormControl();
+				upToDate = true;
+			}
+		}
+
 		
 	}
 	

@@ -33,23 +33,33 @@ import org.springframework.richclient.form.AbstractForm;
  * @author rdawes
  * 
  */
-public class HexForm extends AbstractForm {
+public class HexForm extends AbstractForm implements ContentForm {
 
 	private static String FORM_ID = "hexForm";
 
-	private String propertyName;
-
+	private ValueModel vm;
+	
+	private JScrollPane scrollPane = null;
+	
 	public HexForm(FormModel model, String propertyName) {
 		super(model, FORM_ID);
-		this.propertyName = propertyName;
+		vm = getValueModel(propertyName);
 	}
 
 	@Override
 	protected JComponent createFormControl() {
-		ValueModel vm = getValueModel(propertyName);
-		return new JScrollPane(new HexTable(vm, getFormModel().isEnabled()));
+		if (scrollPane == null) {
+			HexTable table = new HexTable(vm, getFormModel().isEnabled());
+			scrollPane = new JScrollPane(table);
+		}
+		return scrollPane;
 	}
 
+	public boolean canHandle(String contentType) {
+		// hex can handle anything
+		return true;
+	}
+	
 	private class HexTable extends JTable {
 
 		private static final long serialVersionUID = 3392044528006906279L;
