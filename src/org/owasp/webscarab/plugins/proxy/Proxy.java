@@ -39,7 +39,6 @@ import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.domain.SessionEvent;
-import org.owasp.webscarab.services.ConversationEvent;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.HttpMethodUtils;
 import org.springframework.context.ApplicationContext;

@@ -4,7 +4,6 @@
 package org.owasp.webscarab.plugins.proxy.swing;
 
 import org.owasp.webscarab.plugins.proxy.Proxy;
-import org.owasp.webscarab.services.ConversationService;
 import org.springframework.beans.BeansException;
 import org.springframework.binding.form.HierarchicalFormModel;
 import org.springframework.context.ApplicationContext;
