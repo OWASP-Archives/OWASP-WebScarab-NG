@@ -4,19 +4,20 @@
 package org.owasp.webscarab.util.swing;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import javax.swing.JLabel;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
  * @author rdawes
  * 
  */
-public class HeapMonitor extends JLabel implements ActionListener {
+public class HeapMonitor extends JButton implements ActionListener {
 
 	private long free;
 
@@ -29,26 +30,35 @@ public class HeapMonitor extends JLabel implements ActionListener {
 	private static final long serialVersionUID = 2794077275357170746L;
 
 	public HeapMonitor() {
+		this(5000);
+	}
+	
+	public HeapMonitor(int interval) {
 		max = Runtime.getRuntime().maxMemory();
+		setOpaque(true);
 		update();
-		
-		timer = new Timer(1000, this);
-		timer.start();
-
-		addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					gc();
-				}
+		setMinimumSize(new Dimension(120, 22));
+		setPreferredSize(getMinimumSize());
+		setAction(new AbstractAction() {
+			private static final long serialVersionUID = 8625117663082769802L;
+			public void actionPerformed(ActionEvent e) {
+				gc();
 			}
 		});
+		
+		timer = new Timer(interval, this);
+		timer.start();
 	}
 
 	private void gc() {
 		new Thread("Garbage collector") {
 			public void run() {
-				System.out.println("Running gc");
 				System.gc();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						update();
+					}
+				});
 			}
 		}.start();
 	}
@@ -56,8 +66,7 @@ public class HeapMonitor extends JLabel implements ActionListener {
 	private void update() {
 		free = max + Runtime.getRuntime().freeMemory()
 				- Runtime.getRuntime().totalMemory();
-		String label = toMB(max - free) + " / " + toMB(max);
-		setOpaque(true);
+		setText(toMB(max - free) + " / " + toMB(max));
 		double ratio = (double) (max - free) / (double) max;
 		if (ratio > 0.9f) {
 			setBackground(Color.RED);
@@ -66,7 +75,6 @@ public class HeapMonitor extends JLabel implements ActionListener {
 		} else {
 			setBackground(Color.GREEN);
 		}
-		setText(label);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -82,10 +90,9 @@ public class HeapMonitor extends JLabel implements ActionListener {
 	}
 
 	public static void main(String[] args) throws Exception {
-		javax.swing.JFrame frame = new javax.swing.JFrame("Heapspace");
-		frame.getContentPane().add(new HeapMonitor());
+		javax.swing.JWindow frame = new javax.swing.JWindow();
+		frame.getContentPane().add(new HeapMonitor(1000));
 		frame.pack();
-		frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		// do something to allocate memory
 		byte[][] bytes = new byte[1024][];
@@ -94,6 +101,7 @@ public class HeapMonitor extends JLabel implements ActionListener {
 			java.util.Arrays.fill(bytes[i], (byte) 1);
 			Thread.sleep(10);
 		}
+		Thread.sleep(10000);
 		System.exit(0);
 	}
 

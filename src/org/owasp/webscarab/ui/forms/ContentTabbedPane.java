@@ -68,7 +68,7 @@ public class ContentTabbedPane extends JTabbedPane {
     private Listener listener;
     
     /** Creates new form ContentTabbedPane */
-    public ContentTabbedPane(FormModel model, String headerProperty, String contentProperty, boolean editable) {
+    public ContentTabbedPane(FormModel model, String headerProperty, String contentProperty) {
     	super();
     	forms.put(new ImageForm(model, contentProperty), null);
     	forms.put(new HtmlForm(model, contentProperty), null);

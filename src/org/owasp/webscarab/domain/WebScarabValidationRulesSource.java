@@ -23,6 +23,8 @@ public class WebScarabValidationRulesSource extends DefaultRulesSource {
 	private Rules createConversationRules() {
 		return new Rules(Conversation.class) {
 			protected void initRules() {
+//				add(Conversation.PROPERTY_REQUEST_METHOD, inGroup(new Object[] {
+//						"GET", "POST", "HEAD", "TRACE", "OPTIONS" }));
 				add(Conversation.PROPERTY_REQUEST_METHOD, any(new Constraint[] {
 						eq("GET"), eq("POST"), eq("HEAD"), eq("TRACE"),
 						eq("OPTIONS") }));

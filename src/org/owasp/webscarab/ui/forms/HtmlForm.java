@@ -48,7 +48,7 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 	private JEditorPane editorPane;
 
 	private JScrollPane scrollPane = null;
-	
+
 	public HtmlForm(FormModel model, String contentPropertyName) {
 		super(model, FORM_ID);
 		vm = getValueModel(contentPropertyName);
@@ -66,7 +66,8 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 			scrollPane = getComponentFactory().createScrollPane(editorPane);
 			// we use a component listener to delay rendering the HTML until
 			// someone is actually interested in it i.e. the component is shown
-			// we have to add it to the scrollPane, since the editorPane does not receive
+			// we have to add it to the scrollPane, since the editorPane does
+			// not receive
 			// the necessary events for some reason.
 			scrollPane.addComponentListener(listener);
 		}
@@ -76,15 +77,18 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 	public boolean canHandle(String contentType) {
 		return contentType != null && contentType.matches("text/html.*");
 	}
-	
+
 	private void updateFormControl() {
 		editorPane.setContentType("text/html");
-        editorPane.setDocument(JEditorPane.createEditorKitForContentType("text/html").createDefaultDocument());
-        editorPane.putClientProperty("IgnoreCharsetDirective", Boolean.TRUE);
-        editorPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
-        editorPane.setText(contentString());
+		editorPane.setDocument(JEditorPane.createEditorKitForContentType(
+				"text/html").createDefaultDocument());
+		editorPane.putClientProperty("IgnoreCharsetDirective", Boolean.TRUE);
+		editorPane.getDocument().putProperty("IgnoreCharsetDirective",
+				Boolean.TRUE);
+		editorPane.setText(contentString());
+		editorPane.setCaretPosition(0);
 	}
-	
+
 	private String contentString() {
 		byte[] content = (byte[]) vm.getValue();
 		if (content == null)
@@ -92,10 +96,11 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 		return new String(content);
 	}
 
-	private class ContentListener extends ComponentAdapter implements PropertyChangeListener {
+	private class ContentListener extends ComponentAdapter implements
+			PropertyChangeListener {
 
 		private boolean upToDate = false;
-		
+
 		public void propertyChange(PropertyChangeEvent evt) {
 			upToDate = false;
 			if (editorPane != null && editorPane.isShowing()) {
@@ -125,13 +130,13 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 
 		private static class MyHTMLFactory extends HTMLEditorKit.HTMLFactory {
 			public View create(Element elem) {
+
 				Object o = elem.getAttributes().getAttribute(
 						StyleConstants.NameAttribute);
 				if (o instanceof HTML.Tag) {
 					HTML.Tag kind = (HTML.Tag) o;
 					if (kind == HTML.Tag.FRAME || kind == HTML.Tag.FRAMESET
-							|| kind == HTML.Tag.OBJECT
-							|| kind == HTML.Tag.IMG
+							|| kind == HTML.Tag.OBJECT || kind == HTML.Tag.IMG
 							|| kind == HTML.Tag.APPLET) {
 						return new NoView(elem);
 					}
@@ -163,7 +168,6 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 			public void paint(Graphics g, Shape allocation) {
 			}
 		}
-
 	}
 
 	private class NoNetEditorPane extends JEditorPane {

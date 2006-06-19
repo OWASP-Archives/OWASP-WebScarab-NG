@@ -10,13 +10,13 @@
 
 package org.owasp.webscarab.ui;
 
-import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -31,23 +31,20 @@ import javax.swing.tree.TreeModel;
 import org.bushe.swing.event.EventService;
 import org.jdesktop.swingx.JXTable;
 import org.owasp.webscarab.domain.Annotation;
-import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
-import org.owasp.webscarab.ui.forms.RequestForm;
-import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.UriTreeModel;
-import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.richclient.application.PageComponentContext;
+import org.springframework.richclient.application.PageDescriptor;
 import org.springframework.richclient.application.support.AbstractView;
+import org.springframework.richclient.application.support.DefaultViewDescriptor;
+import org.springframework.richclient.application.support.SingleViewPageDescriptor;
 import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
 import org.springframework.richclient.command.support.GlobalCommandIds;
-import org.springframework.richclient.form.Form;
-import org.springframework.richclient.form.FormModelHelper;
 import org.springframework.richclient.settings.SettingsException;
 import org.springframework.richclient.settings.SettingsManager;
 import org.springframework.richclient.settings.support.TableMemento;
@@ -96,7 +93,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	/**
 	 * @return Returns the conversationSummaryList.
 	 */
-	public EventList getConversationSummaryList() {
+	public EventList<ConversationSummary> getConversationSummaryList() {
 		return conversationSummaryList;
 	}
 
@@ -175,11 +172,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 					});
 			conversationTable.addMouseListener(new PopupMenuMouseListener() {
 				protected boolean onAboutToShow(MouseEvent e) {
-					return getSelectedConversation() != null;
+					return getSelectedSummary() != null;
 				}
 
 				protected JPopupMenu getPopupMenu() {
-					return getSelectedConversation() != null
+					return getSelectedSummary() != null
 							? createConversationPopupContextMenu()
 							: null;
 				}
@@ -236,12 +233,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return conversationService;
 	}
 
-	private Conversation getSelectedConversation() {
+	private ConversationSummary getSelectedSummary() {
 		int row = conversationTable.getSelectedRow();
 		if (row == -1)
 			return null;
-		ConversationSummary summary = conversationSummaryList.get(row);
-		return getConversationService().getConversation(summary.getId());
+		return conversationSummaryList.get(row);
 	}
 
 	private JPopupMenu createConversationPopupContextMenu() {
@@ -314,21 +310,15 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 				AbstractActionCommandExecutor {
 
 		public void execute() {
-			Conversation conversation = getSelectedConversation();
-
-			ValidatingFormModel model = FormModelHelper.createFormModel(conversation);
-			model.setEnabled(false);
-			Form requestForm = new RequestForm(model);
-			Form responseForm = new ResponseForm(model);
-			ConversationView cv = new ConversationView();
-			cv.setRequestForm(requestForm);
-			cv.setResponseForm(responseForm);
-			JFrame frame = new JFrame();
-			frame.getContentPane().setLayout(new BorderLayout());
-			frame.getContentPane().add(cv.getControl(), BorderLayout.CENTER);
-			frame.pack();
-			frame.setVisible(true);
-			
+			DefaultViewDescriptor viewDescriptor = (DefaultViewDescriptor) getApplicationContext().getBean("conversationView");
+			Map<String, Object> viewProperties = new HashMap<String, Object>();
+			viewProperties.put("conversationList", getConversationSummaryList());
+			viewProperties.put("conversationService", getConversationService());
+			viewProperties.put("selectedSummary", getSelectedSummary());
+			viewDescriptor.setViewProperties(viewProperties);
+			PageDescriptor pageDescriptor = new SingleViewPageDescriptor(viewDescriptor);
+			DescriptorApplicationWindow window = new DescriptorApplicationWindow();
+			window.showPage(pageDescriptor);
 		}
 	}
 

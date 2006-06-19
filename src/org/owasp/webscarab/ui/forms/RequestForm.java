@@ -34,8 +34,8 @@ public class RequestForm extends AbstractForm {
 	 */
 	public RequestForm(FormModel model, boolean editable) {
 		super(model, FORM_ID);
-		rawRequestForm = new RawRequestForm(model, editable);
-		parsedRequestForm = new ParsedRequestForm(model, editable);
+		rawRequestForm = new RawRequestForm(model);
+		parsedRequestForm = new ParsedRequestForm(model);
 	}
 
 	/**

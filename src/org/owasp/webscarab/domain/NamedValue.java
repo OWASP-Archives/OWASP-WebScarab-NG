@@ -90,6 +90,13 @@ public class NamedValue extends BaseEntity {
 		return (NamedValue[]) found.toArray(new NamedValue[found.size()]);
 	}
 
+	public static NamedValue findOne(String name, NamedValue[] nv) {
+		NamedValue[] found = find(name, nv);
+		if (found == null || found.length == 0) return null;
+		if (found.length == 1) return found[0];
+		throw new IllegalStateException("More than one result for '" + name + "'");
+	}
+	
 	public static NamedValue[] add(NamedValue[] headers, NamedValue header) {
 		if (headers == null || headers.length == 0)
 			return new NamedValue[] { header };
@@ -118,7 +125,9 @@ public class NamedValue extends BaseEntity {
 			String[] nv = pairs[i].split(nvSeparator, 2);
 			if (nv.length == 2) {
 				values[i] = new NamedValue(nv[0], nv[1]);
-			} else
+			} else if (nv.length == 1 && !"".equals(nv[0])) {
+				values[i] = new NamedValue(nv[0], null);
+			} else 
 				throw new ArrayIndexOutOfBoundsException(pairs[i]
 						+ " did not contain '" + nvSeparator + "'");
 		}
@@ -131,6 +140,25 @@ public class NamedValue extends BaseEntity {
 			if (name.equalsIgnoreCase(nv[i].getName())) 
 				return nv[i].getValue();
 		return null;
+	}
+	
+	public static NamedValue[] set(String name, String value, NamedValue[] nv) {
+		NamedValue[] existing = find(name, nv);
+		NamedValue newNv = new NamedValue(name, value);
+		if (existing == null)
+			return add(nv, newNv);
+		if (existing.length > 1) {
+			return add(delete(name, nv), newNv);
+		}
+		NamedValue[] result = new NamedValue[nv.length];
+		for (int i=0; i<nv.length; i++) {
+			if (nv[i].getName().equals(name)) {
+				result[i] = newNv;
+			} else {
+				result[i] = nv[i];
+			}
+		}
+		return result;
 	}
 	
 }

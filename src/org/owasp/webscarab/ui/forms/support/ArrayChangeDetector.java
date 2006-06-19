@@ -32,6 +32,7 @@ public class ArrayChangeDetector extends DefaultValueChangeDetector {
 			return super.hasValueChanged(oldValue, newValue);
 		
 		if (oldValue.getClass().isArray() && newValue.getClass().isArray()) {
+			if (oldValue == newValue) return true; // we can't tell
 			int oldLength = Array.getLength(oldValue);
 			int newLength = Array.getLength(newValue);
 			if (oldLength != newLength)

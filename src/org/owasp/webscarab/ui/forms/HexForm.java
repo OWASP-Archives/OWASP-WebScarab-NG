@@ -41,15 +41,18 @@ public class HexForm extends AbstractForm implements ContentForm {
 	
 	private JScrollPane scrollPane = null;
 	
+	boolean readOnly;
+	
 	public HexForm(FormModel model, String propertyName) {
 		super(model, FORM_ID);
 		vm = getValueModel(propertyName);
+		readOnly = getFormModel().getFieldMetadata(propertyName).isReadOnly();
 	}
 
 	@Override
 	protected JComponent createFormControl() {
 		if (scrollPane == null) {
-			HexTable table = new HexTable(vm, getFormModel().isEnabled());
+			HexTable table = new HexTable(vm, !readOnly);
 			scrollPane = new JScrollPane(table);
 		}
 		return scrollPane;
@@ -69,7 +72,7 @@ public class HexForm extends AbstractForm implements ContentForm {
 		}
 
 		public HexTable(ValueModel vm, boolean editable) {
-			this(vm, editable, 8);
+			this(vm, editable, 16);
 		}
 
 		public HexTable(final ValueModel vm, boolean editable, int columns) {

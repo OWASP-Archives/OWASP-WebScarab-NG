@@ -151,7 +151,11 @@ public class ConversationService {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            getAnnotationDao().update(annotation);
+        	if (annotation.getAnnotation() != null && ! "".equals(annotation.getAnnotation())) {
+        		getAnnotationDao().update(annotation);
+        	} else {
+        		getAnnotationDao().delete(annotation.getId());
+        	}
         } catch (Exception e) {
         	e.printStackTrace();
         } finally {

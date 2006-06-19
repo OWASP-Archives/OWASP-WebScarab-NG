@@ -15,7 +15,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;
 
@@ -37,8 +36,11 @@ public class TextForm extends AbstractForm implements ContentForm {
 	
 	private boolean updating = false;
 	
+	private String propertyName;
+	
 	public TextForm(FormModel model, String propertyName) {
 		super(model, FORM_ID);
+		this.propertyName = propertyName;
 		vm = model.getValueModel(propertyName);
 	}
 
@@ -46,10 +48,9 @@ public class TextForm extends AbstractForm implements ContentForm {
 	protected JComponent createFormControl() {
 		if (scrollPane == null) {
 			listener = new ContentListener();
-			getFormModel().addPropertyChangeListener(listener);
 			vm.addValueChangeListener(listener);
 			textArea = getComponentFactory().createTextArea();
-			textArea.setEditable(getFormModel().isEnabled());
+			textArea.setEditable(! getFormModel().getFieldMetadata(propertyName).isReadOnly());
 			textArea.setText(contentString());
 			textArea.getDocument().addDocumentListener(listener);
 			scrollPane = getComponentFactory().createScrollPane(textArea);
@@ -101,19 +102,13 @@ public class TextForm extends AbstractForm implements ContentForm {
 			// in that case, it makes sense to reset the caret position
 			// we also have to flag the update, so that we don't try to reparse
 			// the text area unnecessarily, when the change is external
-			// Alternatively, it could fire if the FormModel itself changes settings
-			if (evt.getSource() == getFormModel()) {
-				if (evt.getPropertyName().equals(ValidatingFormModel.ENABLED_PROPERTY)) 
-					textArea.setEnabled(getFormModel().isEnabled());
-			} else {
-				upToDate = false;
-				if (textArea != null && textArea.isShowing()) {
-					// we'd like to test if the evt.getSource is the ValueModel
-					// but the event is actually fired by a wrapped class, so
-					// that doesn't work!
-					updateFormControl();
-					upToDate = true;
-				}
+			upToDate = false;
+			if (textArea != null && textArea.isShowing()) {
+				// we'd like to test if the evt.getSource is the ValueModel
+				// but the event is actually fired by a wrapped class, so
+				// that doesn't work!
+				updateFormControl();
+				upToDate = true;
 			}
 		}
 

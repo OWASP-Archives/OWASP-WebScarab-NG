@@ -17,42 +17,49 @@
 				<value>deleteCommand</value>
 			</list>
 		</property>
-	</bean>
+	</bean><!--
 	
 	<bean id="menuBar" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
+	--><bean id="menuBar" 
+		class="org.owasp.webscarab.util.swing.NonSingletonCommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<ref bean="fileMenu"/><!--
-				<ref bean="editMenu"/>
-				--><ref bean="windowMenu"/>
+				<ref bean="editMenu"/>-->
+				<value>pluginMenu</value>
+				<ref bean="windowMenu"/>
 				<ref bean="helpMenu"/>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="showProxyControlBar" 
-		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarCommand">
-		<property name="proxyControlBar" ref="proxyControlBar"/>
+	<bean id="showProxyControlBarCommand" 
+		class="org.springframework.richclient.command.TargetableActionCommand" singleton="true">
+		<property name="commandExecutor" ref="showProxyControlBarExecutor"/>
 	</bean>
 	
+	<bean id="interceptRequests" 
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptRequestsToggleCommand">
+		<property name="interceptor" ref="proxyInterceptor"/>
+		<property name="proxyControlBar" ref="proxyControlBar"/>
+	</bean>
+			
 	<bean id="showProxyConfiguration"
-		class="org.owasp.webscarab.plugins.proxy.swing.ProxyConfigCommand">
+		class="org.owasp.webscarab.plugins.proxy.swing.ProxyConfigCommand" singleton="false">
 		<property name="proxy" ref="proxy"/>
 	</bean>
 	
-	<!--
-		
 	<bean id="toolBar" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="showProxyControlBar"/>
+				<ref bean="showProxyControlBarCommand"/>
 			</list>
 		</property>
 	</bean>
 	
-	--><bean id="fileMenu" 
+	<bean id="fileMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
@@ -106,13 +113,21 @@
 		</property>
 	</bean>
 	
-	--><bean id="windowMenu" 
+	--><bean id="pluginMenu" 
+		class="org.springframework.richclient.command.CommandGroupFactoryBean">
+		<property name="members">
+			<list>
+				<ref bean="showProxyControlBarCommand"/>
+				<ref bean="showProxyConfiguration"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="windowMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
-				<ref bean="showProxyControlBar"/>
-				<ref bean="showProxyConfiguration"/>
 				<value>separator</value>
 				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  
 			</list>

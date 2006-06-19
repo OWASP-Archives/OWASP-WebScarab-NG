@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceEvent;
+import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.services.ConversationEvent;
@@ -88,11 +89,13 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 		if (getEventService() != null) {
 			getEventService().unsubscribe(ConversationEvent.class, this);
 			getEventService().unsubscribe(SessionEvent.class, this);
+			getEventService().unsubscribe("annotation", this);
 		}
 		this.eventService = eventService;
 		if (getEventService() != null) {
 			getEventService().subscribeStrongly(ConversationEvent.class, this);
 			getEventService().subscribeStrongly(SessionEvent.class, this);
+			getEventService().subscribeStrongly("annotation", this);
 		}
 	}
 
@@ -129,6 +132,22 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 		}
 	}
 
+	protected void handleEventOnEDT(String topic, Object data) {
+		if (topic.equals("annotation")) {
+			Annotation annotation = (Annotation) data;
+			Integer id = annotation.getId();
+			if (id == null) return;
+			getSummaryList().getReadWriteLock().writeLock().lock();
+			for (int i=0; i<getSummaryList().size(); i++) {
+				if (getSummaryList().get(i).getId().equals(id)) {
+					getSummaryList().set(i, getSummaryList().get(i));
+					break;
+				}
+			}
+			getSummaryList().getReadWriteLock().writeLock().unlock();
+		}
+	}
+	
 	public Object getObject() throws Exception {
 		return summaryList;
 	}

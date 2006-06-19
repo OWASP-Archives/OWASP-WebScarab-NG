@@ -77,22 +77,9 @@
 			<value>org/owasp/webscarab/ui/commands-context.xml</value>
 		</property>
 		<property name="startingPageId">
-			<value>summaryView</value>
-		</property><!--
-		<property name="introCommand">
-						<bean class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
-				<property name="dataSourceFactory">
-					<ref bean="&amp;dataSource"/>
-				</property>
-				<property name="displaySuccessMessage">
-					<value>false</value>
-				</property>
-				<property name="postSelectionPageId">
-					<value>summaryView</value>
-				</property>
-				</bean>
+			<value>conversationView</value>
 		</property>
-	--></bean>
+	</bean>
 
 	<bean id="eventService"
 		class="org.bushe.swing.event.ThreadSafeEventService">
@@ -109,20 +96,6 @@
 		<property name="title">
 			<value>WebScarab - the Next Generation</value>
 		</property>
-		<!--
-			<property name="version">
-			<value>0.1</value>
-			</property>
-			<property name="buildId">
-			<value>20041025001</value>
-			</property>
-			<property name="caption">
-			<value>caption</value>
-			</property>
-			<property name="description">
-			<value>description</value>
-			</property>
-		-->
 	</bean>
 
 	<bean id="applicationEventMulticaster"
@@ -211,15 +184,12 @@
 		</property>
 	</bean>
 
-	<bean id="summaryView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor" 
-		depends-on="proxy" lazy-init="true">
-		<property name="viewClass">
-			<value>org.owasp.webscarab.ui.SummaryView</value>
-		</property>
-		<property name="title">
-			<value>SummaryView</value>
-		</property>
+	<bean id="conversationTableFactory"
+		class="org.owasp.webscarab.ui.ConversationTableFactory" singleton="true"/>
+		
+	<bean id="conversationView"
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
+		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="conversationSummaryList">
@@ -228,12 +198,26 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
+		<property name="eventService" ref="eventService"/>
+		<property name="proxyInterceptor" ref="proxyInterceptor"/>
+	</bean>
 
-	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar">
+	<bean id="proxyInterceptor" 
+		class="org.owasp.webscarab.plugins.proxy.swing.SwingInterceptor" singleton="true">
+	</bean>
+		
+	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar" singleton="true">
 		<property name="proxy" ref="proxy"></property>
 		<property name="annotationForm">
 			<bean class="org.owasp.webscarab.ui.forms.AnnotationForm"/>
 		</property>
+	</bean>
+	
+	<bean id="showProxyControlBarExecutor" 
+		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarExecutor" singleton="true">
+		<property name="proxyControlBar" ref="proxyControlBar"/>
 	</bean>
 	
 </beans>

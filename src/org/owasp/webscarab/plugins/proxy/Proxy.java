@@ -66,6 +66,8 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 	private ApplicationContext applicationContext;
 
+	private ProxyInterceptor proxyInterceptor = null;
+	
 	public Proxy() {
 	}
 
@@ -333,6 +335,12 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						if (getAnnotator() != null)
 							annotation = getAnnotator().getAnnotation();
 
+						if (annotation == null)
+							annotation = new Annotation();
+						
+						if (proxyInterceptor != null)
+							proxyInterceptor.editRequest(conversation, annotation);
+						
 						HttpMethodUtils.setRequestContent(conversation, is);
 						if (client == null)
 							client = new HttpClient();
@@ -341,8 +349,20 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						client.executeMethod(httpMethod);
 						HttpMethodUtils.fillResponse(conversation, httpMethod);
 
+						// we use a buffered conversation to record any changes made 
+						// to the response during editing since we want to save the 
+						// original response as sent by the server in the archive
+						BufferedConversation bc = null;
+						if (proxyInterceptor != null) {
+							bc = new BufferedConversation(conversation);
+							proxyInterceptor.editResponse(bc, annotation);
+						}
 						try {
-							writeConversationToBrowser(conversation, os);
+							if (bc != null) {
+								writeConversationToBrowser(bc, os);
+							} else {
+								writeConversationToBrowser(conversation, os);
+							}
 						} catch (SocketException se) {
 							conversation.getResponseContent();
 							close = true;
@@ -483,16 +503,20 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 				String chunked = conversation
 						.getResponseHeader("Transfer-Encoding");
 				ChunkedOutputStream cos = null;
+				if (chunked != null && chunked.equalsIgnoreCase("chunked")) {
+					cos = new ChunkedOutputStream(os);
+					os = cos;
+				}
 				InputStream cs = conversation.getResponseContentStream();
 				if (cs != null) {
-					if (chunked != null && chunked.equalsIgnoreCase("chunked")) {
-						cos = new ChunkedOutputStream(os);
-						os = cos;
-					}
 					byte[] buff = new byte[4096];
 					int got;
 					while ((got = cs.read(buff)) > -1)
 						os.write(buff, 0, got);
+				} else {
+					byte[] content = conversation.getResponseContent();
+					if (content != null)
+						os.write(content);
 				}
 				os.flush();
 				if (cos != null)
@@ -511,6 +535,14 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 		}
 
+	}
+
+	public ProxyInterceptor getProxyInterceptor() {
+		return this.proxyInterceptor;
+	}
+
+	public void setProxyInterceptor(ProxyInterceptor proxyInterceptor) {
+		this.proxyInterceptor = proxyInterceptor;
 	}
 
 }

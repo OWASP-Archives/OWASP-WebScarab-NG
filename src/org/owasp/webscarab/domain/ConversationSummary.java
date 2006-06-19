@@ -18,6 +18,8 @@ public class ConversationSummary extends BaseEntity implements Comparable {
     
     private String requestContentChecksum = null;
 
+    private int requestContentSize = 0;
+    
     private String responseVersion = null;
     
     private String responseStatus = null;
@@ -26,6 +28,8 @@ public class ConversationSummary extends BaseEntity implements Comparable {
 
     private String responseContentChecksum = null;
 
+    private int responseContentSize = 0;
+    
     private String plugin = null;
 
     public ConversationSummary() {
@@ -41,6 +45,7 @@ public class ConversationSummary extends BaseEntity implements Comparable {
             MD5 md5 = new MD5();
             md5.Update(content);
             setRequestContentChecksum(md5.asHex());
+            setRequestContentSize(content.length);
         }
         setResponseStatus(conversation.getResponseStatus());
         setResponseMessage(conversation.getResponseMessage());
@@ -49,6 +54,7 @@ public class ConversationSummary extends BaseEntity implements Comparable {
             MD5 md5 = new MD5();
             md5.Update(content);
             setResponseContentChecksum(md5.asHex());
+            setResponseContentSize(content.length);
         }
         setResponseVersion(conversation.getResponseVersion());
         setId(conversation.getId());
@@ -211,4 +217,20 @@ public class ConversationSummary extends BaseEntity implements Comparable {
             throw new NullPointerException("Id is null");
         return this.getDate().compareTo(that.getDate());
     }
+
+	public int getRequestContentSize() {
+		return this.requestContentSize;
+	}
+
+	public void setRequestContentSize(int requestContentSize) {
+		this.requestContentSize = requestContentSize;
+	}
+
+	public int getResponseContentSize() {
+		return this.responseContentSize;
+	}
+
+	public void setResponseContentSize(int responseContentSize) {
+		this.responseContentSize = responseContentSize;
+	}
 }

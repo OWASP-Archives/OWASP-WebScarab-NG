@@ -30,6 +30,13 @@ public class RawResponseForm extends AbstractForm {
 
 	private static final String FORM_ID = "rawResponse";
 
+	private static final String[] properties = {
+		Conversation.PROPERTY_RESPONSE_VERSION,
+		Conversation.PROPERTY_RESPONSE_STATUS,
+		Conversation.PROPERTY_RESPONSE_MESSAGE,
+		Conversation.PROPERTY_RESPONSE_HEADERS,
+		Conversation.PROPERTY_RESPONSE_CONTENT };
+
 	private JTextArea textArea;
 
 	private JScrollPane scrollPane;
@@ -38,18 +45,15 @@ public class RawResponseForm extends AbstractForm {
 
 	private boolean updating = false;
 
+	private boolean readOnly;
+	
 	public RawResponseForm(FormModel formModel) {
 		super(formModel, FORM_ID);
-		getValueModel(Conversation.PROPERTY_RESPONSE_VERSION)
-				.addValueChangeListener(listener);
-		getValueModel(Conversation.PROPERTY_RESPONSE_STATUS)
-				.addValueChangeListener(listener);
-		getValueModel(Conversation.PROPERTY_RESPONSE_MESSAGE)
-				.addValueChangeListener(listener);
-		getValueModel(Conversation.PROPERTY_RESPONSE_HEADERS)
-				.addValueChangeListener(listener);
-		getValueModel(Conversation.PROPERTY_RESPONSE_CONTENT)
-				.addValueChangeListener(listener);
+		readOnly = false;
+		for (int i = 0; i < properties.length; i++) {
+			readOnly |= formModel.getFieldMetadata(properties[i]).isReadOnly();
+			getValueModel(properties[i]).addValueChangeListener(listener);
+		}
 	}
 
 	@Override
@@ -57,8 +61,10 @@ public class RawResponseForm extends AbstractForm {
 		if (scrollPane == null) {
 			textArea = getComponentFactory().createTextArea();
 			textArea.setText(responseString());
+			textArea.setEditable(!readOnly);
 			textArea.getDocument().addDocumentListener(listener);
 			scrollPane = getComponentFactory().createScrollPane(textArea);
+			scrollPane.addComponentListener(listener);
 		}
 		return scrollPane;
 	}
