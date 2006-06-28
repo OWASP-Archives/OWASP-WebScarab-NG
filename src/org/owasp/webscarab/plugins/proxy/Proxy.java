@@ -330,6 +330,10 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 							}
 						}
 
+						// Get the request content (if any) from the stream, apply it
+						// to the HttpMethod, as well as to the conversation.
+						HttpMethodUtils.setRequestContent(conversation, is);
+						
 						// see if we can get an annotation for this conversation
 						Annotation annotation = null;
 						if (getAnnotator() != null)
@@ -341,7 +345,6 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						if (proxyInterceptor != null)
 							proxyInterceptor.editRequest(conversation, annotation);
 						
-						HttpMethodUtils.setRequestContent(conversation, is);
 						if (client == null)
 							client = new HttpClient();
 						HttpMethod httpMethod = HttpMethodUtils
