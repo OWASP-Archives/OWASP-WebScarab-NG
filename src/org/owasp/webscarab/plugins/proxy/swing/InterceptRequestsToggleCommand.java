@@ -29,7 +29,7 @@ public class InterceptRequestsToggleCommand extends ToggleCommand {
 		this.interceptor = interceptor;
 		if (interceptor != null) {
 			setAuthorized(true);
-			interceptor.setInterceptRequests(isEnabled());
+			interceptor.setInterceptRequests(isSelected());
 		}
 	}
 
