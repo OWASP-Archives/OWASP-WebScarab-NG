@@ -35,7 +35,7 @@ public class RawResponseForm extends AbstractForm {
 		Conversation.PROPERTY_RESPONSE_STATUS,
 		Conversation.PROPERTY_RESPONSE_MESSAGE,
 		Conversation.PROPERTY_RESPONSE_HEADERS,
-		Conversation.PROPERTY_RESPONSE_CONTENT };
+		Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT };
 
 	private JTextArea textArea;
 
@@ -86,7 +86,7 @@ public class RawResponseForm extends AbstractForm {
 				b.append(headers[i].getValue()).append("\n");
 			}
 		b.append("\n");
-		vm = getValueModel(Conversation.PROPERTY_RESPONSE_CONTENT);
+		vm = getValueModel(Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT);
 		byte[] content = (byte[]) vm.getValue();
 		if (content != null)
 			b.append(new String(content));
@@ -158,7 +158,7 @@ public class RawResponseForm extends AbstractForm {
 			vm.setValueSilently(null, listener);
 		}
 
-		vm = getValueModel(Conversation.PROPERTY_RESPONSE_CONTENT);
+		vm = getValueModel(Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT);
 		if (contentString != null && contentString.length() > 0) {
 			vm.setValueSilently(contentString.getBytes(), listener);
 		} else {

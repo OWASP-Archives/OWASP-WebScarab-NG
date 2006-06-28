@@ -37,7 +37,7 @@ public class RawRequestForm extends AbstractForm {
 			Conversation.PROPERTY_REQUEST_URI,
 			Conversation.PROPERTY_REQUEST_VERSION,
 			Conversation.PROPERTY_REQUEST_HEADERS,
-			Conversation.PROPERTY_REQUEST_CONTENT };
+			Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT };
 
 	private JTextArea textArea;
 
@@ -88,7 +88,7 @@ public class RawRequestForm extends AbstractForm {
 				b.append(headers[i].getValue()).append("\n");
 			}
 		b.append("\n");
-		vm = getValueModel(Conversation.PROPERTY_REQUEST_CONTENT);
+		vm = getValueModel(Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT);
 		byte[] content = (byte[]) vm.getValue();
 		if (content != null)
 			b.append(new String(content));
@@ -168,7 +168,7 @@ public class RawRequestForm extends AbstractForm {
 			vm.setValueSilently(null, listener);
 		}
 
-		vm = getValueModel(Conversation.PROPERTY_REQUEST_CONTENT);
+		vm = getValueModel(Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT);
 		if (contentString != null && contentString.length() > 0) {
 			vm.setValueSilently(contentString.getBytes(), listener);
 		} else {

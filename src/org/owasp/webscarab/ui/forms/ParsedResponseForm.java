@@ -35,13 +35,13 @@ public class ParsedResponseForm extends AbstractParsedContentForm {
 		Conversation.PROPERTY_RESPONSE_STATUS,
 		Conversation.PROPERTY_RESPONSE_MESSAGE,
 		Conversation.PROPERTY_RESPONSE_HEADERS,
-		Conversation.PROPERTY_RESPONSE_CONTENT };
+		Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT };
 
 	private boolean readOnly;
 	
 	public ParsedResponseForm(FormModel model) {
 		super(model, FORM_ID, Conversation.PROPERTY_RESPONSE_HEADERS,
-				Conversation.PROPERTY_RESPONSE_CONTENT);
+				Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT);
 		readOnly = false;
 		for (int i = 0; i < properties.length; i++)
 			readOnly |= model.getFieldMetadata(properties[i]).isReadOnly();

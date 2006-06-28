@@ -51,6 +51,8 @@ public class Conversation extends BaseEntity {
 
 	public static final String PROPERTY_REQUEST_CONTENT = "requestContent";
 
+	public static final String PROPERTY_REQUEST_PROCESSED_CONTENT = "processedRequestContent";
+
 	public static final String PROPERTY_RESPONSE_VERSION = "responseVersion";
 
 	public static final String PROPERTY_RESPONSE_STATUS = "responseStatus";
@@ -60,6 +62,8 @@ public class Conversation extends BaseEntity {
 	public static final String PROPERTY_RESPONSE_HEADERS = "responseHeaders";
 
 	public static final String PROPERTY_RESPONSE_CONTENT = "responseContent";
+
+	public static final String PROPERTY_RESPONSE_PROCESSED_CONTENT = "processedResponseContent";
 
 	public static final String PROPERTY_RESPONSE_FOOTERS = "responseFooters";
 

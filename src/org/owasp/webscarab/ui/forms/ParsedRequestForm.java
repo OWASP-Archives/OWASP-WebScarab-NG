@@ -40,13 +40,13 @@ public class ParsedRequestForm extends AbstractParsedContentForm {
 			Conversation.PROPERTY_REQUEST_URI,
 			Conversation.PROPERTY_REQUEST_VERSION,
 			Conversation.PROPERTY_REQUEST_HEADERS,
-			Conversation.PROPERTY_REQUEST_CONTENT };
+			Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT };
 
 	private boolean readOnly;
 
 	public ParsedRequestForm(FormModel model) {
 		super(model, FORM_ID, Conversation.PROPERTY_REQUEST_HEADERS,
-				Conversation.PROPERTY_REQUEST_CONTENT);
+				Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT);
 		readOnly = false;
 		for (int i = 0; i < properties.length; i++)
 			readOnly |= model.getFieldMetadata(properties[i]).isReadOnly();
