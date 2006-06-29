@@ -40,14 +40,13 @@
 package org.owasp.webscarab.ui.forms;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.form.FormModel;
 import org.springframework.util.ObjectUtils;
 
-import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 import java.awt.event.ComponentAdapter;
@@ -63,17 +62,17 @@ public class ContentTabbedPane extends JTabbedPane {
     
 	private static final long serialVersionUID = -2640392392974249564L;
 	
-	private Map<ContentForm, JComponent> forms = new LinkedHashMap<ContentForm, JComponent>();
+	private List<ContentForm> forms = new LinkedList<ContentForm>();
 	
     private Listener listener;
     
     /** Creates new form ContentTabbedPane */
     public ContentTabbedPane(FormModel model, String headerProperty, String contentProperty) {
     	super();
-    	forms.put(new ImageForm(model, contentProperty), null);
-    	forms.put(new HtmlForm(model, contentProperty), null);
-    	forms.put(new TextForm(model, contentProperty), null);
-    	forms.put(new HexForm(model, contentProperty), null);
+    	forms.add(new ImageForm(model, contentProperty));
+    	forms.add(new HtmlForm(model, contentProperty));
+    	forms.add(new TextForm(model, contentProperty));
+    	forms.add(new HexForm(model, contentProperty));
     	listener = new Listener();
     	NamedValue[] headers = (NamedValue[]) model.getValueModel(headerProperty).getValue();
     	String contentType = NamedValue.get("Content-Type", headers);
@@ -84,16 +83,11 @@ public class ContentTabbedPane extends JTabbedPane {
     
     private void showForms(String contentType) {
     	removeAll();
-    	Iterator<ContentForm> it = forms.keySet().iterator();
+    	Iterator<ContentForm> it = forms.iterator();
     	while (it.hasNext()) {
     		ContentForm contentForm = it.next();
     		if (contentForm.canHandle(contentType)) {
-    			JComponent control = forms.get(contentForm);
-    			if (control == null) {
-    				control = contentForm.getControl();
-    				forms.put(contentForm, control);
-    			}
-    			addTab(contentForm.getId(), control);
+    			addTab(contentForm.getId(), contentForm.getControl());
     		}
     	}
     }
