@@ -34,6 +34,7 @@ public class ConversationFormSupport {
 		model.getFieldMetadata(Conversation.PROPERTY_REQUEST_VERSION).setReadOnly(!editable);
 		model.getFieldMetadata(Conversation.PROPERTY_REQUEST_HEADERS).setReadOnly(!editable);
 		model.getFieldMetadata(Conversation.PROPERTY_REQUEST_CONTENT).setReadOnly(!editable);
+		model.getFieldMetadata(Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT).setReadOnly(!editable);
 	}
 	
 	private static void setResponseEditable(FormModel model, boolean editable) {
@@ -42,5 +43,6 @@ public class ConversationFormSupport {
 		model.getFieldMetadata(Conversation.PROPERTY_RESPONSE_MESSAGE).setReadOnly(!editable);
 		model.getFieldMetadata(Conversation.PROPERTY_RESPONSE_HEADERS).setReadOnly(!editable);
 		model.getFieldMetadata(Conversation.PROPERTY_RESPONSE_CONTENT).setReadOnly(!editable);
+		model.getFieldMetadata(Conversation.PROPERTY_RESPONSE_PROCESSED_CONTENT).setReadOnly(!editable);
 	}
 }
