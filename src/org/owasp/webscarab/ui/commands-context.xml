@@ -39,12 +39,6 @@
 		<property name="commandExecutor" ref="showProxyControlBarExecutor"/>
 	</bean>
 	
-	<bean id="interceptRequests" 
-		class="org.owasp.webscarab.plugins.proxy.swing.InterceptRequestsToggleCommand">
-		<property name="interceptor" ref="proxyInterceptor"/>
-		<property name="proxyControlBar" ref="proxyControlBar"/>
-	</bean>
-			
 	<bean id="showProxyConfiguration"
 		class="org.owasp.webscarab.plugins.proxy.swing.ProxyConfigCommand" singleton="false">
 		<property name="proxy" ref="proxy"/>

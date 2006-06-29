@@ -5,6 +5,9 @@ package org.owasp.webscarab.plugins.proxy.swing;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -16,6 +19,7 @@ import org.owasp.webscarab.plugins.proxy.ProxyInterceptor;
 import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.ui.forms.RequestForm;
 import org.owasp.webscarab.ui.forms.ResponseForm;
+import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.dialog.DialogPage;
@@ -29,27 +33,34 @@ import org.springframework.richclient.form.FormModelHelper;
  */
 public class SwingInterceptor implements ProxyInterceptor {
 
-	private boolean interceptRequests = false;
+	private List<String> interceptRequestMethods = null;
+	
+	private List<Pattern> interceptResponseTypes = null;
+	
+	private String skipRequestRegex = ".*(\\.(gif|jpg|png|css|js|ico|swf|axd.*)|refresher.asp)$";
 
 	private boolean interceptResponses = false;
-
-	private String interceptRequestRegex = ".*(\\.(gif|jpg|png|css|js|ico|swf|axd.*)|refresher.asp)$";
-
+	
+	private boolean interceptAllResponses = false;
+	
 	public SwingInterceptor() {
 	}
 
 	public synchronized void editRequest(Conversation conversation,
 			Annotation annotation) throws IOException {
+		String method = conversation.getRequestMethod();
 		String uri = conversation.getRequestUri().toASCIIString();
-
-		if (!interceptRequests || uri.matches(interceptRequestRegex))
+		
+		if (interceptRequestMethods == null || !interceptRequestMethods.contains(method))
+			return;
+		if (uri.matches(skipRequestRegex))
 			return;
 
-		final ValidatingFormModel requestModel = FormModelHelper
-				.createFormModel(conversation, true);
+		final ValidatingFormModel requestModel = ConversationFormSupport
+				.createBufferedConversationFormModel(conversation, true, false);
 		final ValidatingFormModel annotationModel = FormModelHelper
 				.createFormModel(annotation, true);
-		final RequestForm requestForm = new RequestForm(requestModel, true);
+		final RequestForm requestForm = new RequestForm(requestModel);
 		final AnnotationForm annotationForm = new AnnotationForm(
 				annotationModel);
 		final DialogPage page = new InterceptRequestDialogPage(requestForm,
@@ -73,13 +84,23 @@ public class SwingInterceptor implements ProxyInterceptor {
 
 	public synchronized void editResponse(Conversation conversation,
 			Annotation annotation) throws IOException {
-		if (!interceptResponses) return;
+		if (!interceptResponses)
+			return;
 		String contentType = conversation.getResponseHeader("Content-Type");
-		if (contentType == null || !contentType.startsWith("text"))
+		boolean intercept = interceptAllResponses;
+		if (! intercept && contentType != null && interceptResponseTypes != null) {
+			Iterator<Pattern> it = interceptResponseTypes.iterator();
+			while (it.hasNext()) {
+				Pattern pattern = it.next();
+				if (pattern.matcher(contentType).matches())
+					intercept = true;
+			}
+		}
+		if (!intercept)
 			return;
 		final ValidatingFormModel model = FormModelHelper.createFormModel(
 				conversation, true);
-		final RequestForm requestForm = new RequestForm(model, false);
+		final RequestForm requestForm = new RequestForm(model);
 		final ResponseForm responseForm = new ResponseForm(model);
 		final ValidatingFormModel annotationModel = FormModelHelper
 				.createFormModel(annotation, true);
@@ -121,6 +142,8 @@ public class SwingInterceptor implements ProxyInterceptor {
 					.createPanel(new BorderLayout());
 			panel.add(requestForm.getControl(), BorderLayout.CENTER);
 			panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
+			initPageValidationReporter();
+			requestForm.getFormModel().validate();
 			return panel;
 		}
 
@@ -151,25 +174,43 @@ public class SwingInterceptor implements ProxyInterceptor {
 			splitPane.setRightComponent(responseForm.getControl());
 			panel.add(splitPane, BorderLayout.CENTER);
 			panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
+			initPageValidationReporter();
+			responseForm.getFormModel().validate();
 			return panel;
 		}
 
 	}
 
-	public String getInterceptRequestRegex() {
-		return this.interceptRequestRegex;
+	public String getSkipRequestRegex() {
+		return this.skipRequestRegex;
 	}
 
-	public void setInterceptRequestRegex(String interceptRequestRegex) {
-		this.interceptRequestRegex = interceptRequestRegex;
+	public void setSkipRequestRegex(String interceptRequestRegex) {
+		this.skipRequestRegex = interceptRequestRegex;
 	}
 
-	public boolean isInterceptRequests() {
-		return this.interceptRequests;
+	public boolean isInterceptAllResponses() {
+		return this.interceptAllResponses;
 	}
 
-	public void setInterceptRequests(boolean interceptRequests) {
-		this.interceptRequests = interceptRequests;
+	public void setInterceptAllResponses(boolean interceptAllResponses) {
+		this.interceptAllResponses = interceptAllResponses;
+	}
+
+	public List<String> getInterceptRequestMethods() {
+		return this.interceptRequestMethods;
+	}
+
+	public void setInterceptRequestMethods(List<String> interceptRequestMethods) {
+		this.interceptRequestMethods = interceptRequestMethods;
+	}
+
+	public List<Pattern> getInterceptResponseTypes() {
+		return this.interceptResponseTypes;
+	}
+
+	public void setInterceptResponseTypes(List<Pattern> interceptResponseTypes) {
+		this.interceptResponseTypes = interceptResponseTypes;
 	}
 
 	public boolean isInterceptResponses() {

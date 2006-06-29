@@ -209,11 +209,12 @@
 	</bean>
 		
 	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar" singleton="true">
-		<property name="proxy" ref="proxy"></property>
+		<property name="proxy" ref="proxy"/>
+		<property name="swingInterceptor" ref="proxyInterceptor"/><!--
 		<property name="annotationForm">
 			<bean class="org.owasp.webscarab.ui.forms.AnnotationForm"/>
 		</property>
-	</bean>
+	--></bean>
 	
 	<bean id="showProxyControlBarExecutor" 
 		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarExecutor" singleton="true">

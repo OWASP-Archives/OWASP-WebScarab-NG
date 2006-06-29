@@ -26,13 +26,6 @@ public class RequestForm extends AbstractForm {
 	 * Constructor.
 	 */
 	public RequestForm(FormModel model) {
-		this(model, false);
-	}
-	
-	/**
-	 * Constructor.
-	 */
-	public RequestForm(FormModel model, boolean editable) {
 		super(model, FORM_ID);
 		rawRequestForm = new RawRequestForm(model);
 		parsedRequestForm = new ParsedRequestForm(model);
