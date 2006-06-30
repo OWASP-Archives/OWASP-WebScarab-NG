@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -27,7 +28,10 @@ import org.owasp.webscarab.plugins.proxy.Annotator;
 import org.owasp.webscarab.plugins.proxy.Proxy;
 import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.util.swing.HeapMonitor;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.core.enums.LabeledEnumResolver;
 import org.springframework.core.enums.ShortCodedLabeledEnum;
+import org.springframework.richclient.application.ApplicationServicesLocator;
 import org.springframework.richclient.command.ToggleCommand;
 import org.springframework.richclient.factory.AbstractControlFactory;
 
@@ -90,11 +94,12 @@ public class ProxyControlBar implements Annotator {
 			});
 			window.addMouseMotionListener(new MouseMotionAdapter() {
 				public void mouseDragged(MouseEvent e) {
-					Point p = window.getLocation();
-					window.setLocation(p.x + e.getX() - origin.x, p.y
+					int x = window.getX();
+					int y = window.getY();
+					window.setLocation(x + e.getX() - origin.x, y
 							+ e.getY() - origin.y);
-					prefs.putInt("x", (int) window.getLocation().getX());
-					prefs.putInt("y", (int) window.getLocation().getY());
+					prefs.putInt("x", x);
+					prefs.putInt("y", y);
 				}
 			});
 			int x = prefs.getInt("x", Integer.MIN_VALUE);
@@ -137,7 +142,8 @@ public class ProxyControlBar implements Annotator {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			Object selection = ((JComboBox) e.getSource()).getSelectedItem();
+			InterceptRequestOption selection = (InterceptRequestOption) ((JComboBox) e
+					.getSource()).getSelectedItem();
 			if (selection == InterceptRequestOption.interceptNone) {
 				swingInterceptor.setInterceptRequestMethods(null);
 			} else if (selection == InterceptRequestOption.interceptGet) {
@@ -149,18 +155,34 @@ public class ProxyControlBar implements Annotator {
 			} else if (selection == InterceptRequestOption.interceptAll) {
 				swingInterceptor.setInterceptRequestMethods(ALL);
 			}
+			prefs.put("interceptRequest", selection.getLabel());
+		}
+
+		protected LabeledEnumResolver getEnumResolver() {
+			return (LabeledEnumResolver) ApplicationServicesLocator.services()
+					.getService(LabeledEnumResolver.class);
 		}
 
 		public JComponent createControl() {
-			JComboBox combo = getComponentFactory().createComboBox(
+			JComboBox comboBox = getComponentFactory().createComboBox(
 					InterceptRequestOption.class);
-			combo.addActionListener(this);
-			return combo;
+			comboBox.addActionListener(this);
+			ComboBoxModel model = comboBox.getModel();
+			String selected = prefs.get("interceptRequest", "interceptNone");
+			for (int i = 0; i < model.getSize(); i++) {
+				if (((InterceptRequestOption) model.getElementAt(i)).getLabel()
+						.equals(selected)) {
+					model.setSelectedItem(model.getElementAt(i));
+				}
+			}
+			return comboBox;
 		}
 
 	}
 
-	public static class InterceptRequestOption extends ShortCodedLabeledEnum {
+	public static class InterceptRequestOption extends ShortCodedLabeledEnum
+			implements MessageSourceResolvable {
+
 		private static final long serialVersionUID = 7382148038528775564L;
 
 		public static final InterceptRequestOption interceptNone = new InterceptRequestOption(
@@ -181,6 +203,19 @@ public class ProxyControlBar implements Annotator {
 		private InterceptRequestOption(int code, String label) {
 			super(code, label);
 		}
+
+		public Object[] getArguments() {
+			return null;
+		}
+
+		public String[] getCodes() {
+			return new String[] { getLabel() };
+		}
+
+		public String getDefaultMessage() {
+			return getLabel();
+		}
+
 	}
 
 	public SwingInterceptor getSwingInterceptor() {
