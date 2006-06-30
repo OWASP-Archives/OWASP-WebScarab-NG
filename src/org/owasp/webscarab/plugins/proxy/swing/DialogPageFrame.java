@@ -4,9 +4,14 @@
 package org.owasp.webscarab.plugins.proxy.swing;
 
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -32,8 +37,12 @@ public class DialogPageFrame {
 
 	private boolean actionPerformed = false;
 
+	private Preferences prefs;
+
 	public DialogPageFrame(DialogPage page, ActionCommand okCommand,
 			final ActionCommand cancelCommand) {
+		prefs = Preferences.userNodeForPackage(getClass());
+
 		frame = new JFrame();
 		Container pane = frame.getContentPane();
 
@@ -62,11 +71,23 @@ public class DialogPageFrame {
 				cancelCommand.getActionAdapter());
 		frame.setTitle(page.getTitle());
 		frame.setIconImage(page.getImage());
-		frame.setSize(800, 600); // FIXME - we need some way of tracking the preferred size/location
+		setFrameBounds();
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
 				if (!actionPerformed)
 					cancelCommand.execute();
+			}
+		});
+		frame.addComponentListener(new ComponentAdapter() {
+			public void componentMoved(ComponentEvent e) {
+				if (!frame.isShowing()) return;
+				prefs.putInt("x", frame.getX());
+				prefs.putInt("y", frame.getY());
+			}
+			public void componentResized(ComponentEvent e) {
+				if (!frame.isShowing()) return;
+				prefs.putInt("w", frame.getWidth());
+				prefs.putInt("h", frame.getHeight());
 			}
 		});
 	}
@@ -87,4 +108,12 @@ public class DialogPageFrame {
 		frame.dispose();
 	}
 
+	private void setFrameBounds() {
+		int w = prefs.getInt("w", 800);
+		int h = prefs.getInt("h", 600);
+		Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = prefs.getInt("x", (ss.width-w)/2);
+		int y = prefs.getInt("y", (ss.height-h)/2);
+		frame.setBounds(x,y,w,h);
+	}
 }
