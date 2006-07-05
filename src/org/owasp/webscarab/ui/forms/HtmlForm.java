@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import javax.swing.JComponent;
@@ -29,6 +30,7 @@ import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.owasp.webscarab.util.CharsetUtils;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;
@@ -91,9 +93,17 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 
 	private String contentString() {
 		byte[] content = (byte[]) vm.getValue();
-		if (content == null)
-			return null;
-		return new String(content);
+		if (content == null) return null;
+		String charset = CharsetUtils.getCharset(content);
+		if (charset == null) {
+			return new String(content);
+		} else {
+			try {
+				return new String(content, charset);
+			} catch (UnsupportedEncodingException uee) {
+				return new String(content);
+			}
+		}
 	}
 
 	private class ContentListener extends ComponentAdapter implements

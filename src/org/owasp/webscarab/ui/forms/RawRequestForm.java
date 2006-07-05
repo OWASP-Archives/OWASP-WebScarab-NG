@@ -7,6 +7,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import javax.swing.event.DocumentListener;
 
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
+import org.owasp.webscarab.util.CharsetUtils;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;
@@ -45,6 +47,8 @@ public class RawRequestForm extends AbstractForm {
 
 	private Listener listener = new Listener();
 
+	private String charset;
+	
 	private boolean updating = false;
 
 	private boolean readOnly;
@@ -90,8 +94,18 @@ public class RawRequestForm extends AbstractForm {
 		b.append("\n");
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT);
 		byte[] content = (byte[]) vm.getValue();
-		if (content != null)
-			b.append(new String(content));
+		if (content != null) {
+			charset = CharsetUtils.getCharset(content);
+			if (charset == null) {
+				b.append(new String(content));
+			} else {
+				try {
+					b.append(new String(content, charset));
+				} catch (UnsupportedEncodingException uee) {
+					b.append(new String(content));
+				}
+			}
+		}
 		return b.toString();
 	}
 
@@ -170,7 +184,15 @@ public class RawRequestForm extends AbstractForm {
 
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT);
 		if (contentString != null && contentString.length() > 0) {
-			vm.setValueSilently(contentString.getBytes(), listener);
+			if (charset == null) {
+				vm.setValueSilently(contentString.getBytes(), listener);
+			} else {
+				try {
+					vm.setValueSilently(contentString.getBytes(charset), listener);
+				} catch (UnsupportedEncodingException uee) {
+					vm.setValueSilently(contentString.getBytes(), listener);
+				}
+			}
 		} else {
 			vm.setValueSilently(null, listener);
 		}

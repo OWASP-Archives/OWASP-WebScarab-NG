@@ -7,6 +7,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -14,6 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.owasp.webscarab.util.CharsetUtils;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.form.AbstractForm;
@@ -37,6 +39,8 @@ public class TextForm extends AbstractForm implements ContentForm {
 	private boolean updating = false;
 	
 	private String propertyName;
+	
+	private String charset;
 	
 	public TextForm(FormModel model, String propertyName) {
 		super(model, FORM_ID);
@@ -77,7 +81,17 @@ public class TextForm extends AbstractForm implements ContentForm {
 	private String contentString() {
 		byte[] content = (byte[]) vm.getValue();
 		if (content == null) return null;
-		return new String(content);
+		charset = CharsetUtils.getCharset(content);
+		if (charset == null) {
+			return new String(content);
+		} else {
+			try {
+				return new String(content, charset);
+			} catch (UnsupportedEncodingException uee) {
+				System.out.println("Unknown characterset encoding: " + charset);
+				return new String(content);
+			}
+		}
 	}
 	
 	private void parseChanges() {
@@ -85,7 +99,15 @@ public class TextForm extends AbstractForm implements ContentForm {
 		if (content == null || content.length() == 0) {
 			vm.setValueSilently(null, listener);
 		} else {
-			vm.setValueSilently(content.getBytes(), listener);
+			if (charset == null) {
+				vm.setValueSilently(content.getBytes(), listener);
+			} else {
+				try {
+					vm.setValueSilently(content.getBytes(charset), listener);
+				} catch (UnsupportedEncodingException uee) {
+					vm.setValueSilently(content.getBytes(), listener);
+				}
+			}
 		}
 	}
 	
