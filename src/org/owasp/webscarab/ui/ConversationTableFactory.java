@@ -3,12 +3,14 @@
  */
 package org.owasp.webscarab.ui;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.owasp.webscarab.domain.Annotation;
@@ -16,6 +18,8 @@ import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.renderers.DateRenderer;
+import org.owasp.webscarab.util.swing.renderers.TableColorProvider;
+import org.owasp.webscarab.util.swing.renderers.TableColorRenderer;
 import org.springframework.richclient.application.support.ApplicationServicesAccessor;
 
 import ca.odell.glazedlists.EventList;
@@ -133,6 +137,12 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		return conversationService;
 	}
 
+	private void registerRenderersForClass(JTable table, TableColorProvider colorProvider, Class klass) {
+		TableCellRenderer delegate = table.getDefaultRenderer(klass);
+		TableCellRenderer renderer = new TableColorRenderer(delegate, colorProvider);
+		table.setDefaultRenderer(klass, renderer);
+	}
+	
 	public JTable getConversationTable(EventList<ConversationSummary> conversationSummaryList) {
 		JTable table = getComponentFactory().createTable();
 		table.setModel(new EventTableModel<ConversationSummary>(conversationSummaryList, tableFormat));
@@ -147,6 +157,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 //			new TableComparatorChooser<ConversationSummary>(table, sorted, true);
 //		}
 		table.setDefaultRenderer(Date.class, new DateRenderer());
+		TableColorProvider colorProvider = new AnnotationColorProvider(conversationSummaryList);
+		registerRenderersForClass(table, colorProvider, Object.class);
+		registerRenderersForClass(table, colorProvider, Date.class);
 		return table;
 	}
 	
@@ -186,6 +199,29 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 
 		public ConversationSummary setColumnValue(ConversationSummary summary, Object value, int column) {
 			return columns.get(column).setAttribute(summary, value);
+		}
+		
+	}
+	
+	private class AnnotationColorProvider implements TableColorProvider {
+		
+		private EventList<ConversationSummary> conversations;
+		
+		public AnnotationColorProvider(EventList<ConversationSummary> conversations) {
+			this.conversations = conversations;
+		}
+		
+		public Color getBackGroundColor(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			ConversationSummary summary = conversations.get(row);
+			if (getConversationService().getAnnotation(summary.getId()) != null) {
+				return Color.PINK.darker();
+			} else {
+				return table.getBackground();
+			}
+		}
+
+		public Color getForegroundColor(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			return table.getForeground();
 		}
 		
 	}
