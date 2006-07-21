@@ -15,6 +15,7 @@ import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.UrlUtils;
+import org.owasp.webscarab.util.swing.renderers.DateRenderer;
 import org.springframework.richclient.application.support.ApplicationServicesAccessor;
 
 import ca.odell.glazedlists.EventList;
@@ -145,6 +146,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			SortedList<ConversationSummary> sorted = (SortedList<ConversationSummary>) conversationSummaryList;
 			new TableComparatorChooser<ConversationSummary>(table, sorted, true);
 		}
+		table.setDefaultRenderer(Date.class, new DateRenderer());
 		return table;
 	}
 	
