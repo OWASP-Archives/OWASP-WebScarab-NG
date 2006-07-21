@@ -80,6 +80,12 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 		return contentType != null && contentType.matches("text/html.*");
 	}
 
+	private void clearFormControl() {
+		editorPane.setContentType("text/html");
+		editorPane.setDocument(JEditorPane.createEditorKitForContentType(
+				"text/html").createDefaultDocument());
+	}
+	
 	private void updateFormControl() {
 		editorPane.setContentType("text/html");
 		editorPane.setDocument(JEditorPane.createEditorKitForContentType(
@@ -87,7 +93,11 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 		editorPane.putClientProperty("IgnoreCharsetDirective", Boolean.TRUE);
 		editorPane.getDocument().putProperty("IgnoreCharsetDirective",
 				Boolean.TRUE);
-		editorPane.setText(contentString());
+		try {
+			editorPane.setText(contentString());
+		} catch (Exception e) {
+			editorPane.setText("invalid HTML");
+		}
 		editorPane.setCaretPosition(0);
 	}
 
@@ -116,6 +126,8 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 			if (editorPane != null && editorPane.isShowing()) {
 				updateFormControl();
 				upToDate = true;
+			} else if (editorPane != null) {
+				clearFormControl();
 			}
 		}
 

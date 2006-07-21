@@ -63,6 +63,13 @@ public class TextForm extends AbstractForm implements ContentForm {
 		return scrollPane;
 	}
 
+	private void clearFormControl() {
+		updating = true;
+		textArea.setText("");
+		textArea.setCaretPosition(0);
+		updating = false;
+	}
+	
 	private void updateFormControl() {
 		updating = true;
 		textArea.setText(contentString());
@@ -125,12 +132,14 @@ public class TextForm extends AbstractForm implements ContentForm {
 			// we also have to flag the update, so that we don't try to reparse
 			// the text area unnecessarily, when the change is external
 			upToDate = false;
-			if (textArea != null && textArea.isShowing()) {
+			if (textArea.isShowing()) {
 				// we'd like to test if the evt.getSource is the ValueModel
 				// but the event is actually fired by a wrapped class, so
 				// that doesn't work!
 				updateFormControl();
 				upToDate = true;
+			} else {
+				clearFormControl();
 			}
 		}
 
