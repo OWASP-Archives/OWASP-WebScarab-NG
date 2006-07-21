@@ -142,10 +142,10 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			jx.setColumnControlVisible(true);
 			jx.setSortable(false);
 		}
-		if (conversationSummaryList instanceof SortedList) {
-			SortedList<ConversationSummary> sorted = (SortedList<ConversationSummary>) conversationSummaryList;
-			new TableComparatorChooser<ConversationSummary>(table, sorted, true);
-		}
+//		if (conversationSummaryList instanceof SortedList) {
+//			SortedList<ConversationSummary> sorted = (SortedList<ConversationSummary>) conversationSummaryList;
+//			new TableComparatorChooser<ConversationSummary>(table, sorted, true);
+//		}
 		table.setDefaultRenderer(Date.class, new DateRenderer());
 		return table;
 	}
