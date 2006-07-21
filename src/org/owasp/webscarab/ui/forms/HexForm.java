@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.springframework.binding.form.FormModel;
@@ -53,6 +54,9 @@ public class HexForm extends AbstractForm implements ContentForm {
 	protected JComponent createFormControl() {
 		if (scrollPane == null) {
 			HexTable table = new HexTable(vm, !readOnly);
+			DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+			dtcr.putClientProperty("html.disable", Boolean.TRUE);
+			table.setDefaultRenderer(Object.class, dtcr);
 			scrollPane = new JScrollPane(table);
 		}
 		return scrollPane;
