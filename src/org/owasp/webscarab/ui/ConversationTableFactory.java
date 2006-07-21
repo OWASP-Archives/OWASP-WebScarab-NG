@@ -5,6 +5,7 @@ package org.owasp.webscarab.ui;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JTable;
@@ -18,6 +19,7 @@ import org.springframework.richclient.application.support.ApplicationServicesAcc
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
@@ -41,6 +43,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return Date.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.date";
 			}
@@ -143,7 +148,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		return table;
 	}
 	
-	private class CompoundConversationTableFormat implements WritableTableFormat<ConversationSummary> {
+	private class CompoundConversationTableFormat implements WritableTableFormat<ConversationSummary>, AdvancedTableFormat<ConversationSummary> {
 
 		private List<ObjectAttribute<ConversationSummary>> columns = new ArrayList<ObjectAttribute<ConversationSummary>>();
 		
