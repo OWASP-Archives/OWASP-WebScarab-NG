@@ -7,7 +7,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -40,6 +42,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 	
 	public ConversationTableFactory() {
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return Integer.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.id";
 			}
@@ -59,6 +64,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.requestMethod";
 			}
@@ -67,6 +75,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.requestUri.host";
 			}
@@ -75,6 +86,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.requestUri.path";
 			}
@@ -83,6 +97,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.requestUri.parameters";
 			}
@@ -91,6 +108,9 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.responseStatus";
 			}
@@ -99,22 +119,35 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return Integer.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.requestContentSize";
 			}
 			public Object getValue(ConversationSummary summary) {
-				return summary.getRequestContentSize();
+				int size = summary.getRequestContentSize();
+				if (size == 0) return null;
+				return new Integer(size);
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return Integer.class;
+			}
 			public String getAttributeId() {
 				return "conversationSummary.responseContentSize";
 			}
 			public Object getValue(ConversationSummary summary) {
-				return summary.getResponseContentSize();
+				int size = summary.getResponseContentSize();
+				if (size == 0) return null;
+				return new Integer(size);
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+			public Class getAttributeClass() {
+				return String.class;
+			}
 			public String getAttributeId() {
 				return "annotation.annotation";
 			}
@@ -137,29 +170,31 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		return conversationService;
 	}
 
-	private void registerRenderersForClass(JTable table, TableColorProvider colorProvider, Class klass) {
-		TableCellRenderer delegate = table.getDefaultRenderer(klass);
-		TableCellRenderer renderer = new TableColorRenderer(delegate, colorProvider);
-		table.setDefaultRenderer(klass, renderer);
+	private void registerRenderersForTable(JTable table, TableColorProvider colorProvider) {
+		Set<Class> columnClasses = new HashSet<Class>();
+		for (int i=0; i<table.getColumnCount(); i++) {
+			columnClasses.add(table.getColumnClass(i));
+		}
+		for (Class klass: columnClasses) {
+			TableCellRenderer delegate = table.getDefaultRenderer(klass);
+			TableCellRenderer renderer = new TableColorRenderer(delegate, colorProvider);
+			table.setDefaultRenderer(klass, renderer);
+		}
 	}
 	
-	public JTable getConversationTable(EventList<ConversationSummary> conversationSummaryList) {
+	public JTable getConversationTable(SortedList<ConversationSummary> conversationSummaryList) {
 		JTable table = getComponentFactory().createTable();
-		table.setModel(new EventTableModel<ConversationSummary>(conversationSummaryList, tableFormat));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		if (table instanceof JXTable) {
 			JXTable jx = (JXTable) table;
 			jx.setColumnControlVisible(true);
 			jx.setSortable(false);
 		}
-//		if (conversationSummaryList instanceof SortedList) {
-//			SortedList<ConversationSummary> sorted = (SortedList<ConversationSummary>) conversationSummaryList;
-//			new TableComparatorChooser<ConversationSummary>(table, sorted, true);
-//		}
+		table.setModel(new EventTableModel<ConversationSummary>(conversationSummaryList, tableFormat));
+		new TableComparatorChooser<ConversationSummary>(table, conversationSummaryList, true);
 		table.setDefaultRenderer(Date.class, new DateRenderer());
 		TableColorProvider colorProvider = new AnnotationColorProvider(conversationSummaryList);
-		registerRenderersForClass(table, colorProvider, Object.class);
-		registerRenderersForClass(table, colorProvider, Date.class);
+		registerRenderersForTable(table, colorProvider);
 		return table;
 	}
 	
