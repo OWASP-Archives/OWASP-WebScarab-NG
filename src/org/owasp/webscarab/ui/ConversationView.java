@@ -4,9 +4,13 @@
 package org.owasp.webscarab.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -15,8 +19,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.transform.URIResolver;
 
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
@@ -26,6 +32,8 @@ import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.ui.forms.RequestForm;
 import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
+import org.owasp.webscarab.util.swing.UriTreeModel;
+import org.owasp.webscarab.util.swing.renderers.UriRenderer;
 import org.springframework.binding.form.CommitListener;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.form.ValidatingFormModel;
@@ -39,6 +47,8 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.MatcherEditor;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
@@ -71,6 +81,8 @@ public class ConversationView extends AbstractView {
 	
 	private FindExecutor findExecutor = new FindExecutor();
 	
+	private UriTreeModel uriTreeModel;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -92,19 +104,32 @@ public class ConversationView extends AbstractView {
 
 		annotationModel.addCommitListener(new AnnotationListener());
 
-		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
-		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		mainSplitPane.setResizeWeight(0.5);
-		
-		filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JTextField filterField = getComponentFactory().createTextField();
-		filterPanel.add(getComponentFactory().createLabelFor("filter", filterField));
-		filterPanel.add(filterField);
-		
 		TextFilterator<ConversationSummary> filterator = new ConversationSummaryFilter();
 		MatcherEditor<ConversationSummary> matcher = new TextComponentMatcherEditor<ConversationSummary>(filterField, filterator);
 		FilterList<ConversationSummary> filterList = new FilterList(getConversationSummaryList(), matcher);
 		SortedList<ConversationSummary> sortedList = new SortedList<ConversationSummary>(filterList);
+		
+		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
+		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		mainSplitPane.setResizeWeight(0.5);
+		
+		JSplitPane topSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		topSplitPane.setResizeWeight(0.2);
+		topSplitPane.setOneTouchExpandable(true);
+		uriTreeModel = new UriTreeModel();
+		JTree uriTree = new JTree(uriTreeModel);
+		uriTree.setRootVisible(false);
+		uriTree.setShowsRootHandles(true);
+		uriTree.setCellRenderer(new UriRenderer());
+		new UriTreeManager(getConversationSummaryList(), uriTreeModel);
+		JScrollPane treeScrollPane = getComponentFactory().createScrollPane(uriTree);
+		treeScrollPane.setMinimumSize(new Dimension(200, 30));
+		topSplitPane.setLeftComponent(treeScrollPane);
+		
+		filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		filterPanel.add(getComponentFactory().createLabelFor("filter", filterField));
+		filterPanel.add(filterField);
 		
 		JTable table = getConversationTableFactory().getConversationTable(sortedList);
 		final EventSelectionModel<ConversationSummary> conversationSelectionModel = new EventSelectionModel<ConversationSummary>(
@@ -112,21 +137,21 @@ public class ConversationView extends AbstractView {
 		table.setSelectionModel(conversationSelectionModel);
 		JScrollPane tableScrollPane = getComponentFactory().createScrollPane(
 				table);
+		tableScrollPane.setMinimumSize(new Dimension(100, 60));
 		JPanel topPanel = new JPanel(new BorderLayout());
 		topPanel.add(tableScrollPane, BorderLayout.CENTER);
 		topPanel.add(filterPanel, BorderLayout.SOUTH);
-		mainSplitPane.setTopComponent(topPanel);
+		topSplitPane.setRightComponent(topPanel);
+		mainSplitPane.setTopComponent(topSplitPane);
 
 		table.getSelectionModel().addListSelectionListener(
 			new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent e) {
 					if (e.getValueIsAdjusting())
 						return;
-					if (conversationSelectionModel.isSelectionEmpty())
-						return;
 					EventList<ConversationSummary> selected = conversationSelectionModel
 							.getSelected();
-					if (selected.isEmpty()) {
+					if (selected.isEmpty() || selected.size() > 1) {
 						updateSelection(null);
 					} else {
 						updateSelection(selected.get(0));
@@ -253,5 +278,46 @@ public class ConversationView extends AbstractView {
 		public void execute() {
 			filterPanel.setVisible(true);
 		}
+	}
+	
+	private class UriTreeManager implements ListEventListener<ConversationSummary> {
+
+		private EventList<ConversationSummary> list;
+		private List<URI> uriList = new ArrayList<URI>();
+		private UriTreeModel uriTree;
+		
+		public UriTreeManager(EventList<ConversationSummary> list, UriTreeModel uriTree) {
+			this.list = list;
+			this.uriTree = uriTree;
+			populateExisting();
+			// the conversationSummary list is only ever updated on the EDT
+			list.addListEventListener(this); 
+		}
+		
+		private void populateExisting() {
+			list.getReadWriteLock().readLock().lock();
+			uriList.clear();
+			Iterator<ConversationSummary> it = list.iterator();
+			while (it.hasNext()) {
+				URI uri = it.next().getRequestUri();
+				uriList.add(uri);
+				uriTree.add(uri);
+			}
+			list.getReadWriteLock().readLock().unlock();
+		}
+		
+		public void listChanged(ListEvent<ConversationSummary> evt) {
+			while (evt.next()) {
+				int index = evt.getIndex();
+				if (evt.getType() == ListEvent.DELETE) {
+					uriTree.remove(uriList.remove(index));
+				} else if (evt.getType() == ListEvent.INSERT) {
+					URI uri = list.get(index).getRequestUri();
+					uriList.add(index, uri);
+					uriTree.add(uri);
+				}
+			}
+		}
+		
 	}
 }
