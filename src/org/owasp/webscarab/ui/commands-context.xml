@@ -15,7 +15,6 @@
 				<value>pasteCommand</value>
 				<value>selectAllCommand</value>
 				<value>deleteCommand</value>
-				<value>findCommand</value>
 			</list>
 		</property>
 	</bean><!--
