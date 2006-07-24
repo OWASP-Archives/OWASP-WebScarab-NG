@@ -3,10 +3,6 @@
  */
 package org.owasp.webscarab.util.swing;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 import org.owasp.webscarab.util.UrlUtils;
