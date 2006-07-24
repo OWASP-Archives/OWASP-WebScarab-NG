@@ -18,12 +18,8 @@
 		class="org.springframework.context.support.ResourceMapFactoryBean">
 		<property name="locations">
 			<list>
-				<value>
-					classpath:org/springframework/richclient/image/images.properties
-				</value>
-				<value>
-					classpath:org/owasp/webscarab/ui/images.properties
-				</value>
+				<value>classpath:org/springframework/richclient/image/images.properties</value>
+				<value>classpath:org/owasp/webscarab/ui/images.properties</value>
 			</list>
 		</property>
 		<property name="resourceBasePath">
