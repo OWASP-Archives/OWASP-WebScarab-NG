@@ -22,6 +22,10 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import javax.xml.transform.URIResolver;
 
 import org.owasp.webscarab.domain.Annotation;
@@ -49,6 +53,8 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.AbstractMatcherEditor;
+import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.matchers.MatcherEditor;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
@@ -105,9 +111,18 @@ public class ConversationView extends AbstractView {
 		annotationModel.addCommitListener(new AnnotationListener());
 
 		JTextField filterField = getComponentFactory().createTextField();
+		uriTreeModel = new UriTreeModel();
+		JTree uriTree = new JTree(uriTreeModel);
+		uriTree.setRootVisible(false);
+		uriTree.setShowsRootHandles(true);
+		uriTree.setCellRenderer(new UriRenderer());
+		UriMatcher uriMatcher = new UriMatcher(uriTree);
+		
+		EventList<ConversationSummary> conversationList = getConversationSummaryList();
+		FilterList<ConversationSummary> uriFilterList = new FilterList(conversationList, uriMatcher);
 		TextFilterator<ConversationSummary> filterator = new ConversationSummaryFilter();
 		MatcherEditor<ConversationSummary> matcher = new TextComponentMatcherEditor<ConversationSummary>(filterField, filterator);
-		FilterList<ConversationSummary> filterList = new FilterList(getConversationSummaryList(), matcher);
+		FilterList<ConversationSummary> filterList = new FilterList(uriFilterList, matcher);
 		SortedList<ConversationSummary> sortedList = new SortedList<ConversationSummary>(filterList);
 		
 		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
@@ -117,11 +132,7 @@ public class ConversationView extends AbstractView {
 		JSplitPane topSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		topSplitPane.setResizeWeight(0.2);
 		topSplitPane.setOneTouchExpandable(true);
-		uriTreeModel = new UriTreeModel();
-		JTree uriTree = new JTree(uriTreeModel);
-		uriTree.setRootVisible(false);
-		uriTree.setShowsRootHandles(true);
-		uriTree.setCellRenderer(new UriRenderer());
+
 		new UriTreeManager(getConversationSummaryList(), uriTreeModel);
 		JScrollPane treeScrollPane = getComponentFactory().createScrollPane(uriTree);
 		treeScrollPane.setMinimumSize(new Dimension(200, 30));
@@ -317,6 +328,51 @@ public class ConversationView extends AbstractView {
 					uriTree.add(uri);
 				}
 			}
+		}
+		
+	}
+	
+	private class UriMatcher extends AbstractMatcherEditor<ConversationSummary> implements TreeSelectionListener {
+
+		private TreeSelectionModel tsm;
+		private Matcher<ConversationSummary> matcher;
+		
+		public UriMatcher(JTree tree) {
+			this.tsm = tree.getSelectionModel();
+			matcher = new Matcher<ConversationSummary>() {
+				public boolean matches(ConversationSummary summary) {
+					if (tsm.getSelectionCount() == 0) return true;
+					TreePath[] selection = tsm.getSelectionPaths(); 
+					for (int i=0; i<selection.length; i++) {
+						Object lastComponent = selection[i].getLastPathComponent(); 
+						if (!(lastComponent instanceof URI)) continue;
+						URI uri = (URI) lastComponent;
+						if (summary.getRequestUri().toString().startsWith(uri.toString()))
+							return true;
+					}
+					return false;
+				}
+			};
+			tree.addTreeSelectionListener(this);
+		}
+		
+		/* (non-Javadoc)
+		 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+		 */
+		public void valueChanged(TreeSelectionEvent e) {
+			if (tsm.getSelectionCount() == 0) {
+				fireMatchAll();
+			} else {
+				fireChanged(matcher);
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see ca.odell.glazedlists.matchers.AbstractMatcherEditor#getMatcher()
+		 */
+		@Override
+		public Matcher<ConversationSummary> getMatcher() {
+			return matcher;
 		}
 		
 	}
