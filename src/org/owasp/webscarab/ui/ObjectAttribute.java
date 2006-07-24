@@ -6,6 +6,7 @@ package org.owasp.webscarab.ui;
 import java.util.Comparator;
 
 import org.springframework.util.comparator.ComparableComparator;
+import org.springframework.util.comparator.NullSafeComparator;
 
 /**
  * @author rdawes
@@ -18,7 +19,9 @@ public abstract class ObjectAttribute<T> {
 	public abstract String getAttributeId ();
 	
 	public Comparator getComparator() {
-		return new ComparableComparator();
+		if (Comparable.class.isAssignableFrom(getAttributeClass()))
+			return new NullSafeComparator(new ComparableComparator(), true);
+		return null;
 	}
 	
 	public Class getAttributeClass() {
