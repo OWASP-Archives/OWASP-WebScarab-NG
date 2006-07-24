@@ -4,12 +4,18 @@
 package org.owasp.webscarab.ui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -24,13 +30,19 @@ import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
 import org.springframework.binding.form.CommitListener;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.form.ValidatingFormModel;
+import org.springframework.richclient.application.PageComponentContext;
 import org.springframework.richclient.application.support.AbstractView;
+import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
 import org.springframework.richclient.form.Form;
 import org.springframework.richclient.form.FormModelHelper;
 
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.TextFilterator;
+import ca.odell.glazedlists.matchers.MatcherEditor;
 import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 /**
  * @author rdawes
@@ -56,6 +68,10 @@ public class ConversationView extends AbstractView {
 
 	private ValidatingFormModel annotationModel;
 
+	private JPanel filterPanel;
+	
+	private FindExecutor findExecutor = new FindExecutor();
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -80,34 +96,55 @@ public class ConversationView extends AbstractView {
 		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
 		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		mainSplitPane.setResizeWeight(0.5);
-		SortedList<ConversationSummary> sorted = new SortedList(
-				getConversationSummaryList());
-		JTable table = getConversationTableFactory().getConversationTable(
-				sorted);
+		
+		filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JTextField filterField = getComponentFactory().createTextField();
+		filterPanel.add(getComponentFactory().createLabelFor("filter", filterField));
+		filterPanel.add(filterField);
+		
+		TextFilterator<ConversationSummary> filterator = new ConversationSummaryFilter();
+		MatcherEditor<ConversationSummary> matcher = new TextComponentMatcherEditor<ConversationSummary>(filterField, filterator);
+		FilterList<ConversationSummary> filterList = new FilterList(getConversationSummaryList(), matcher);
+		SortedList<ConversationSummary> sortedList = new SortedList<ConversationSummary>(filterList);
+		
+		JTable table = getConversationTableFactory().getConversationTable(sortedList);
 		final EventSelectionModel<ConversationSummary> conversationSelectionModel = new EventSelectionModel<ConversationSummary>(
-				conversationSummaryList);
+				sortedList);
 		table.setSelectionModel(conversationSelectionModel);
 		JScrollPane tableScrollPane = getComponentFactory().createScrollPane(
 				table);
-
-		mainSplitPane.setTopComponent(tableScrollPane);
+		JPanel topPanel = new JPanel(new BorderLayout());
+		topPanel.add(tableScrollPane, BorderLayout.CENTER);
+		topPanel.add(filterPanel, BorderLayout.SOUTH);
+		mainSplitPane.setTopComponent(topPanel);
 
 		table.getSelectionModel().addListSelectionListener(
-				new ListSelectionListener() {
-					public void valueChanged(ListSelectionEvent e) {
-						if (e.getValueIsAdjusting())
-							return;
-						if (conversationSelectionModel.isSelectionEmpty())
-							return;
-						EventList<ConversationSummary> selected = conversationSelectionModel
-								.getSelected();
-						if (selected.isEmpty()) {
-							updateSelection(null);
-						} else {
-							updateSelection(selected.get(0));
-						}
+			new ListSelectionListener() {
+				public void valueChanged(ListSelectionEvent e) {
+					if (e.getValueIsAdjusting())
+						return;
+					if (conversationSelectionModel.isSelectionEmpty())
+						return;
+					EventList<ConversationSummary> selected = conversationSelectionModel
+							.getSelected();
+					if (selected.isEmpty()) {
+						updateSelection(null);
+					} else {
+						updateSelection(selected.get(0));
 					}
-				});
+				}
+			}
+		);
+		table.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				findExecutor.setEnabled(true);
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+//				findExecutor.setEnabled(false);
+			}
+		});
 		JSplitPane conversationSplitPane = new JSplitPane();
 		conversationSplitPane.setOneTouchExpandable(true);
 		conversationSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
@@ -122,6 +159,16 @@ public class ConversationView extends AbstractView {
 		}
 		return panel;
 	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.richclient.application.support.AbstractView#registerLocalCommandExecutors(org.springframework.richclient.application.PageComponentContext)
+	 */
+	@Override
+	protected void registerLocalCommandExecutors(PageComponentContext context) {
+        context.register("findCommand", findExecutor);
+	}
+
 
 	private void updateSelection(ConversationSummary summary) {
 		if (annotationModel.isDirty())
@@ -185,6 +232,27 @@ public class ConversationView extends AbstractView {
 			getConversationService().updateAnnotation((Annotation)formModel.getFormObject());
 		}
 		public void preCommit(FormModel formModel) {
+		}
+	}
+	
+	private class ConversationSummaryFilter implements TextFilterator<ConversationSummary> {
+
+		public void getFilterStrings(List<String> list, ConversationSummary summary) {
+			list.add(summary.getRequestMethod());
+			list.add(summary.getRequestUri().toString());
+			list.add(summary.getResponseStatus());
+			list.add(summary.getResponseMessage());
+			list.add(summary.getPlugin());
+			Annotation annotation = getConversationService().getAnnotation(summary.getId());
+			if (annotation != null && !"".equals(annotation.getAnnotation()))
+				list.add(annotation.getAnnotation());
+		}
+		
+	}
+	
+	private class FindExecutor extends AbstractActionCommandExecutor {
+		public void execute() {
+			filterPanel.setVisible(true);
 		}
 	}
 }

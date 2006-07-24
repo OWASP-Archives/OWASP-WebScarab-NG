@@ -15,6 +15,7 @@
 				<value>pasteCommand</value>
 				<value>selectAllCommand</value>
 				<value>deleteCommand</value>
+				<value>findCommand</value>
 			</list>
 		</property>
 	</bean><!--
@@ -25,9 +26,9 @@
 		class="org.owasp.webscarab.util.swing.NonSingletonCommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="fileMenu"/><!--
-				<ref bean="editMenu"/>-->
-				<value>pluginMenu</value>
+				<ref bean="fileMenu"/>
+				<ref bean="editMenu"/>
+				<ref bean="pluginMenu"/>
 				<ref bean="windowMenu"/>
 				<ref bean="helpMenu"/>
 			</list>
@@ -88,7 +89,7 @@
 			<ref bean="newOwnerWizard"/>
 		</property>
 	</bean>
---><!--
+-->
 
 	<bean id="editMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
@@ -103,11 +104,13 @@
 				<value>separator</value>
 				<value>selectAllCommand</value>
 				<value>deleteCommand</value>
+				<value>separator</value>
+				<value>findCommand</value>
 			</list>
 		</property>
 	</bean>
 	
-	--><bean id="pluginMenu" 
+	<bean id="pluginMenu" 
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
