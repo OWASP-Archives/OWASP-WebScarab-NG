@@ -18,6 +18,8 @@ public class ConversationSummary extends BaseEntity implements Comparable {
     
     private String requestContentChecksum = null;
 
+    private String requestContentType = null;
+    
     private int requestContentSize = 0;
     
     private String responseVersion = null;
@@ -28,6 +30,8 @@ public class ConversationSummary extends BaseEntity implements Comparable {
 
     private String responseContentChecksum = null;
 
+    private String responseContentType = null;
+    
     private int responseContentSize = 0;
     
     private String plugin = null;
@@ -40,6 +44,9 @@ public class ConversationSummary extends BaseEntity implements Comparable {
         setRequestMethod(conversation.getRequestMethod());
         setRequestUri(conversation.getRequestUri());
         setRequestVersion(conversation.getRequestVersion());
+        NamedValue[] contentType = NamedValue.find("Content-Type", conversation.getRequestHeaders());
+        if (contentType != null && contentType.length > 0)
+        	setRequestContentType(contentType[0].getValue());
         byte[] content = conversation.getRequestContent();
         if (content != null && content.length > 0) {
             MD5 md5 = new MD5();
@@ -49,6 +56,9 @@ public class ConversationSummary extends BaseEntity implements Comparable {
         }
         setResponseStatus(conversation.getResponseStatus());
         setResponseMessage(conversation.getResponseMessage());
+        contentType = NamedValue.find("Content-Type", conversation.getResponseHeaders());
+        if (contentType != null && contentType.length > 0)
+        	setResponseContentType(contentType[0].getValue());
         content = conversation.getResponseContent();
         if (content != null && content.length > 0) {
             MD5 md5 = new MD5();
@@ -232,5 +242,33 @@ public class ConversationSummary extends BaseEntity implements Comparable {
 
 	public void setResponseContentSize(int responseContentSize) {
 		this.responseContentSize = responseContentSize;
+	}
+
+	/**
+	 * @return the requestContentType
+	 */
+	public String getRequestContentType() {
+		return this.requestContentType;
+	}
+
+	/**
+	 * @param requestContentType the requestContentType to set
+	 */
+	public void setRequestContentType(String requestContentType) {
+		this.requestContentType = requestContentType;
+	}
+
+	/**
+	 * @return the responseContentType
+	 */
+	public String getResponseContentType() {
+		return this.responseContentType;
+	}
+
+	/**
+	 * @param responseContentType the responseContentType to set
+	 */
+	public void setResponseContentType(String responseContentType) {
+		this.responseContentType = responseContentType;
 	}
 }
