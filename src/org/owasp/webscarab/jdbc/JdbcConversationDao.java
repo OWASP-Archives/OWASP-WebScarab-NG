@@ -134,7 +134,16 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 	 * @see org.owasp.webscarab.dao.ConversationDao#getConversationSummary(java.lang.Integer)
 	 */
 	public ConversationSummary getSummary(Integer id) {
-		return conversationSummaryQuery.getSummary(id);
+		ConversationSummary summary = conversationSummaryQuery.getSummary(id);
+		NamedValue[] headers = headersDao.findHeaders(id, HeadersDao.REQUEST_HEADERS);
+		NamedValue[] contentType = NamedValue.find("Content-Type", headers);
+		if (contentType != null && contentType.length > 0)
+			summary.setRequestContentType(contentType[0].getValue());
+		headers = headersDao.findHeaders(id, HeadersDao.RESPONSE_HEADERS);
+		contentType = NamedValue.find("Content-Type", headers);
+		if (contentType != null && contentType.length > 0)
+			summary.setResponseContentType(contentType[0].getValue());
+		return summary;
 	}
 
 	/*
@@ -298,9 +307,12 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 		}
 
 		protected Integer insert(Integer session, ConversationSummary summary) {
-			Integer uriId = uriDao.findUriId(summary.getRequestUri());
-			if (uriId == null)
-				uriId = uriDao.saveUri(summary.getRequestUri());
+			Integer uriId;
+			synchronized(uriDao) {
+				uriId = uriDao.findUriId(summary.getRequestUri());
+				if (uriId == null)
+					uriId = uriDao.saveUri(summary.getRequestUri());
+			}
 			Object[] objs = new Object[] { session, summary.getDate(),
 					getMethod(summary.getRequestMethod()), uriId,
 					versionDao.getId(summary.getRequestVersion()),
