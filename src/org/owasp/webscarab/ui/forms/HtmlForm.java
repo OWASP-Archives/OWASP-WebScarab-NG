@@ -12,7 +12,6 @@ import java.net.URL;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent.EventType;
@@ -39,22 +38,17 @@ public class HtmlForm extends AbstractContentForm {
 
 	private JEditorPane editorPane;
 
-	private JScrollPane scrollPane = null;
-
 	public HtmlForm(FormModel model, String headerPropertyName, String contentPropertyName) {
 		super(model, FORM_ID, headerPropertyName, contentPropertyName);
 	}
 
 	@Override
 	protected JComponent createContentFormControl() {
-		if (scrollPane == null) {
-			editorPane = new NoNetEditorPane();
-			editorPane.setEditable(false);
-			editorPane.setEditorKit(new MyHTMLEditorKit());
-			editorPane.addHyperlinkListener(new LinkToolTipListener());
-			scrollPane = getComponentFactory().createScrollPane(editorPane);
-		}
-		return scrollPane;
+		editorPane = new NoNetEditorPane();
+		editorPane.setEditable(false);
+		editorPane.setEditorKit(new MyHTMLEditorKit());
+		editorPane.addHyperlinkListener(new LinkToolTipListener());
+		return getComponentFactory().createScrollPane(editorPane);
 	}
 
 	public boolean canHandle(String contentType) {
@@ -85,7 +79,7 @@ public class HtmlForm extends AbstractContentForm {
 		editorPane.setEditorKit(kit);
 		editorPane.setDocument(doc);
 	}
-
+	
 	private static class MyHTMLEditorKit extends HTMLEditorKit {
 
 		private static final long serialVersionUID = 4540043911244942634L;
