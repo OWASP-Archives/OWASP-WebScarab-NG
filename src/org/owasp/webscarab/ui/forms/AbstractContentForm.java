@@ -78,7 +78,10 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 		if (ct == null) return null;
 		int semi = ct.indexOf(";");
 		if (semi < 0) return null;
-		return ct.substring(semi).trim();
+		String cs = ct.substring(semi+1).trim();
+		int eq = cs.indexOf("=");
+		if (eq < 0) return null;
+		return cs.substring(eq+1).trim();
 	}
 	
 	protected String getDetectedCharacterSet() {
