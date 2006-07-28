@@ -5,10 +5,9 @@ package org.owasp.webscarab.ui.forms;
 
 import java.awt.Event;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,67 +27,65 @@ import javax.swing.table.TableColumnModel;
 
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
-import org.springframework.richclient.form.AbstractForm;
 
 /**
  * @author rdawes
  * 
  */
-public class HexForm extends AbstractForm implements ContentForm {
+public class HexForm extends AbstractContentForm {
 
 	private static String FORM_ID = "hexForm";
 
 	private ValueModel vm;
-	
-	private JScrollPane scrollPane = null;
-	
-	boolean readOnly;
-	
-	public HexForm(FormModel model, String propertyName) {
-		super(model, FORM_ID);
-		vm = getValueModel(propertyName);
-		readOnly = getFormModel().getFieldMetadata(propertyName).isReadOnly();
+
+	private HexTableModel tableModel;
+
+	private HexTable table;
+
+	public HexForm(FormModel model, String headerPropertyName,
+			String contentPropertyName) {
+		super(model, FORM_ID, headerPropertyName, contentPropertyName);
 	}
 
 	@Override
-	protected JComponent createFormControl() {
-		if (scrollPane == null) {
-			HexTable table = new HexTable(vm, !readOnly);
-			DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
-			dtcr.putClientProperty("html.disable", Boolean.TRUE);
-			table.setDefaultRenderer(Object.class, dtcr);
-			scrollPane = new JScrollPane(table);
-		}
-		return scrollPane;
+	protected JComponent createContentFormControl() {
+		tableModel = new HexTableModel(16);
+		table = new HexTable(tableModel);
+		DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+		dtcr.putClientProperty("html.disable", Boolean.TRUE);
+		table.setDefaultRenderer(Object.class, dtcr);
+		return new JScrollPane(table);
+	}
+
+	protected void updateContentFormControl() {
+		tableModel.fireTableDataChanged();
+	}
+
+	protected void clearContentFormControl() {
+		// we can handle anything, and the table checks whether we are visible
+		// or not
 	}
 
 	public boolean canHandle(String contentType) {
 		// hex can handle anything
 		return true;
 	}
-	
+
 	private class HexTable extends JTable {
 
 		private static final long serialVersionUID = 3392044528006906279L;
 
-		public HexTable(ValueModel vm) {
-			this(vm, false);
-		}
-
-		public HexTable(ValueModel vm, boolean editable) {
-			this(vm, editable, 16);
-		}
-
-		public HexTable(final ValueModel vm, boolean editable, int columns) {
-			super(new HexTableModel(vm, editable, columns));
+		public HexTable(HexTableModel tableModel) {
+			super(tableModel);
+			int columns = tableModel.getColumnCount() - 2;
 			setAutoResizeMode(AUTO_RESIZE_OFF);
 			setFont(new Font("Monospaced", Font.PLAIN, 12));
 			getTableHeader().setReorderingAllowed(false);
 			TableColumnModel colModel = getColumnModel();
 			// FIXME : use FontMetrics to get the real width of the font
-			for (int i = 0; i < columns + 2; i++) {
-				colModel.getColumn(i).setPreferredWidth(2 * 9);
-				colModel.getColumn(i).setResizable(false);
+			for (int i = 0; i < columns; i++) {
+				colModel.getColumn(i + 1).setPreferredWidth(2 * 9);
+				colModel.getColumn(i + 1).setResizable(false);
 			}
 			colModel.getColumn(0).setPreferredWidth(8 * 9);
 			colModel.getColumn(columns + 1).setPreferredWidth(columns * 9);
@@ -97,89 +94,21 @@ public class HexForm extends AbstractForm implements ContentForm {
 					"Save");
 			im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.CTRL_MASK),
 					"Load");
-			getActionMap().put("Save", new AbstractAction() {
-				private static final long serialVersionUID = -872604689834638795L;
-
-				public void actionPerformed(ActionEvent evt) {
-					JFileChooser jfc = new JFileChooser();
-					jfc
-							.setDialogTitle("Select a file to write the message content to");
-					int returnVal = jfc.showOpenDialog(HexTable.this);
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						try {
-							FileOutputStream fos = new FileOutputStream(jfc
-									.getSelectedFile());
-							fos.write((byte[]) vm.getValue());
-							fos.close();
-						} catch (IOException ioe) {
-							JOptionPane.showMessageDialog(HexTable.this,
-									"Error writing file: " + ioe.getMessage(),
-									"Error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-				}
-			});
-			if (editable) {
-				getActionMap().put("Load", new AbstractAction() {
-					private static final long serialVersionUID = 7286272198340993109L;
-
-					public void actionPerformed(ActionEvent evt) {
-						JFileChooser jfc = new JFileChooser();
-						jfc
-								.setDialogTitle("Select a file to read the message content from");
-						int returnVal = jfc.showOpenDialog(HexTable.this);
-						if (returnVal == JFileChooser.APPROVE_OPTION) {
-							try {
-								FileInputStream fis = new FileInputStream(jfc
-										.getSelectedFile());
-								ByteArrayOutputStream baos = new ByteArrayOutputStream();
-								byte[] buff = new byte[2048];
-								int got;
-								while ((got = fis.read(buff)) > 0) {
-									baos.write(buff, 0, got);
-								}
-								fis.close();
-								baos.close();
-								vm.setValue(baos.toByteArray());
-							} catch (IOException ioe) {
-								JOptionPane.showMessageDialog(HexTable.this,
-										"Error writing file: "
-												+ ioe.getMessage(), "Error",
-										JOptionPane.ERROR_MESSAGE);
-							}
-						}
-					}
-				});
-			}
+			getActionMap().put("Save", new SaveAction());
+			getActionMap().put("Load", new LoadAction());
 
 		}
 
 	}
 
-	private static class HexTableModel extends AbstractTableModel implements
-			PropertyChangeListener {
+	private class HexTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = -3782965899741537329L;
 
-		private ValueModel vm;
-
 		private int columns;
 
-		private boolean editable;
-
-		public HexTableModel(ValueModel vm, boolean editable, int columns) {
-			this.vm = vm;
-			vm.addValueChangeListener(this);
+		public HexTableModel(int columns) {
 			this.columns = columns;
-			this.editable = editable;
-		}
-
-		public HexTableModel(ValueModel vm, boolean editable) {
-			this(vm, editable, 8);
-		}
-
-		public HexTableModel(ValueModel vm) {
-			this(vm, false);
 		}
 
 		public String getColumnName(int columnIndex) {
@@ -197,7 +126,7 @@ public class HexForm extends AbstractForm implements ContentForm {
 		}
 
 		public int getRowCount() {
-			byte[] data = (byte[]) vm.getValue();
+			byte[] data = getContent();
 			if (data == null || data.length == 0) {
 				return 0;
 			}
@@ -209,7 +138,7 @@ public class HexForm extends AbstractForm implements ContentForm {
 		}
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			byte[] data = (byte[]) vm.getValue();
+			byte[] data = getContent();
 			if (columnIndex == 0) {
 				return pad(Integer.toHexString(rowIndex * columns)
 						.toUpperCase(), '0', 8);
@@ -243,7 +172,7 @@ public class HexForm extends AbstractForm implements ContentForm {
 		}
 
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			if (!editable)
+			if (isReadOnly())
 				return false;
 			byte[] data = (byte[]) vm.getValue();
 			if (columnIndex == 0 || columnIndex > columns) {
@@ -251,13 +180,13 @@ public class HexForm extends AbstractForm implements ContentForm {
 			}
 			int position = rowIndex * columns + columnIndex - 1;
 			if (position < data.length) {
-				return editable;
+				return true;
 			}
 			return false;
 		}
 
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			byte[] data = (byte[]) vm.getValue();
+			byte[] data = getContent();
 			int position = rowIndex * columns + columnIndex - 1;
 			if (position >= data.length) {
 				return;
@@ -270,8 +199,7 @@ public class HexForm extends AbstractForm implements ContentForm {
 					newData[position] = new Integer(Integer.parseInt(s.trim(),
 							16)).byteValue();
 					fireTableCellUpdated(rowIndex, columns + 1);
-					System.out.println("Calling setValue");
-					vm.setValueSilently(newData, this);
+					setContent(newData);
 				} catch (NumberFormatException nfe) {
 					System.out.println("Number format error : " + nfe);
 				}
@@ -292,9 +220,61 @@ public class HexForm extends AbstractForm implements ContentForm {
 			return buff.toString();
 		}
 
-		public void propertyChange(PropertyChangeEvent evt) {
-			fireTableDataChanged();
+	}
+
+	private class SaveAction extends AbstractAction {
+		private static final long serialVersionUID = -872604689834638795L;
+
+		public void actionPerformed(ActionEvent evt) {
+			JFileChooser jfc = new JFileChooser();
+			jfc.setDialogTitle("Select a file to write the message content to");
+			int returnVal = jfc.showOpenDialog(table);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				try {
+					FileOutputStream fos = new FileOutputStream(jfc
+							.getSelectedFile());
+					fos.write(getContent());
+					fos.close();
+				} catch (IOException ioe) {
+					JOptionPane.showMessageDialog(table, "Error writing file: "
+							+ ioe.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 
+	private class LoadAction extends AbstractAction {
+		private static final long serialVersionUID = 7286272198340993109L;
+
+		public void actionPerformed(ActionEvent evt) {
+			if (isReadOnly()) {
+				Toolkit.getDefaultToolkit().beep();
+				return;
+			}
+			JFileChooser jfc = new JFileChooser();
+			jfc
+					.setDialogTitle("Select a file to read the message content from");
+			int returnVal = jfc.showOpenDialog(table);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				try {
+					FileInputStream fis = new FileInputStream(jfc
+							.getSelectedFile());
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					byte[] buff = new byte[2048];
+					int got;
+					while ((got = fis.read(buff)) > 0) {
+						baos.write(buff, 0, got);
+					}
+					fis.close();
+					baos.close();
+					setContent(baos.toByteArray());
+				} catch (IOException ioe) {
+					JOptionPane.showMessageDialog(table, "Error writing file: "
+							+ ioe.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+	}
 }

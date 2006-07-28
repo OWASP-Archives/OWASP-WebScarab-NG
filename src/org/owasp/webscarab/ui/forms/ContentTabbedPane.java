@@ -69,10 +69,10 @@ public class ContentTabbedPane extends JTabbedPane {
     /** Creates new form ContentTabbedPane */
     public ContentTabbedPane(FormModel model, String headerProperty, String contentProperty) {
     	super();
-    	forms.add(new ImageForm(model, contentProperty));
-    	forms.add(new HtmlForm(model, contentProperty));
-    	forms.add(new TextForm(model, contentProperty));
-    	forms.add(new HexForm(model, contentProperty));
+    	forms.add(new ImageForm(model, headerProperty, contentProperty));
+    	forms.add(new HtmlForm(model, headerProperty, contentProperty));
+    	forms.add(new TextForm(model, headerProperty, contentProperty));
+    	forms.add(new HexForm(model, headerProperty, contentProperty));
     	listener = new Listener();
     	NamedValue[] headers = (NamedValue[]) model.getValueModel(headerProperty).getValue();
     	String contentType = NamedValue.get("Content-Type", headers);

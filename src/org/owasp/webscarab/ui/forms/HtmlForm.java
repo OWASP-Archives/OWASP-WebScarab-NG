@@ -6,13 +6,8 @@ package org.owasp.webscarab.ui.forms;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentAdapter;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import javax.swing.JComponent;
@@ -22,56 +17,42 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.ChangedCharSetException;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.owasp.webscarab.util.CharsetUtils;
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.value.ValueModel;
-import org.springframework.richclient.form.AbstractForm;
 
 /**
  * @author rdawes
  * 
  */
-public class HtmlForm extends AbstractForm implements ContentForm {
+public class HtmlForm extends AbstractContentForm {
 
 	private static String FORM_ID = "htmlForm";
-
-	private ContentListener listener;
-
-	private ValueModel vm;
 
 	private JEditorPane editorPane;
 
 	private JScrollPane scrollPane = null;
 
-	public HtmlForm(FormModel model, String contentPropertyName) {
-		super(model, FORM_ID);
-		vm = getValueModel(contentPropertyName);
+	public HtmlForm(FormModel model, String headerPropertyName, String contentPropertyName) {
+		super(model, FORM_ID, headerPropertyName, contentPropertyName);
 	}
 
 	@Override
-	protected JComponent createFormControl() {
+	protected JComponent createContentFormControl() {
 		if (scrollPane == null) {
-			listener = new ContentListener();
-			vm.addValueChangeListener(listener);
 			editorPane = new NoNetEditorPane();
 			editorPane.setEditable(false);
 			editorPane.setEditorKit(new MyHTMLEditorKit());
 			editorPane.addHyperlinkListener(new LinkToolTipListener());
 			scrollPane = getComponentFactory().createScrollPane(editorPane);
-			// we use a component listener to delay rendering the HTML until
-			// someone is actually interested in it i.e. the component is shown
-			// we have to add it to the scrollPane, since the editorPane does
-			// not receive
-			// the necessary events for some reason.
-			scrollPane.addComponentListener(listener);
 		}
 		return scrollPane;
 	}
@@ -80,64 +61,29 @@ public class HtmlForm extends AbstractForm implements ContentForm {
 		return contentType != null && contentType.matches("text/html.*");
 	}
 
-	private void clearFormControl() {
+	protected void clearContentFormControl() {
 		editorPane.setContentType("text/html");
 		editorPane.setDocument(JEditorPane.createEditorKitForContentType(
 				"text/html").createDefaultDocument());
 	}
 	
-	private void updateFormControl() {
-		editorPane.setContentType("text/html");
-		editorPane.setDocument(JEditorPane.createEditorKitForContentType(
-				"text/html").createDefaultDocument());
-		editorPane.putClientProperty("IgnoreCharsetDirective", Boolean.TRUE);
-		editorPane.getDocument().putProperty("IgnoreCharsetDirective",
-				Boolean.TRUE);
+	protected void updateContentFormControl() {
+		HTMLEditorKit kit = new HTMLEditorKit();
+		HTMLDocument doc = (HTMLDocument)kit.createDefaultDocument();
+
 		try {
-			editorPane.setText(contentString());
+			try {
+				kit.read(getContentAsReader(), doc, 0);
+			} catch (ChangedCharSetException ccse) {
+				doc.putProperty("IgnoreCharsetDirective",
+						Boolean.TRUE);
+				kit.read(getContentAsReader(ccse.getCharSetSpec()), doc, 0);
+			}
 		} catch (Exception e) {
 			editorPane.setText("invalid HTML");
 		}
-		editorPane.setCaretPosition(0);
-	}
-
-	private String contentString() {
-		byte[] content = (byte[]) vm.getValue();
-		if (content == null) return null;
-		String charset = CharsetUtils.getCharset(content);
-		if (charset == null) {
-			return new String(content);
-		} else {
-			try {
-				return new String(content, charset);
-			} catch (UnsupportedEncodingException uee) {
-				return new String(content);
-			}
-		}
-	}
-
-	private class ContentListener extends ComponentAdapter implements
-			PropertyChangeListener {
-
-		private boolean upToDate = false;
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			upToDate = false;
-			if (editorPane != null && editorPane.isShowing()) {
-				updateFormControl();
-				upToDate = true;
-			} else if (editorPane != null) {
-				clearFormControl();
-			}
-		}
-
-		public void componentShown(ComponentEvent e) {
-			if (!upToDate) {
-				updateFormControl();
-				upToDate = true;
-			}
-		}
-
+		editorPane.setEditorKit(kit);
+		editorPane.setDocument(doc);
 	}
 
 	private static class MyHTMLEditorKit extends HTMLEditorKit {
