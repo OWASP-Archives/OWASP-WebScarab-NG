@@ -134,6 +134,18 @@ public class NamedValue extends BaseEntity {
 		return values;
 	}
 	
+	public static String join(NamedValue[] nv, String pairSeparator, String nvSeparator) {
+		if (nv == null || nv.length == 0) 
+			return null;
+		StringBuilder string = new StringBuilder();
+		for (int i=0; i<nv.length; i++) {
+			if (i>0) string.append(pairSeparator);
+			string.append(nv[i].getName()).append(nvSeparator);
+			string.append(nv[i].getValue());
+		}
+		return string.toString();
+	}
+	
 	public static String get(String name, NamedValue[] nv) {
 		if (nv == null) return null;
 		for (int i=0; i<nv.length; i++)
