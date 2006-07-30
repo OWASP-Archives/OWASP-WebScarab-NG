@@ -244,6 +244,130 @@ public class ParsedRequestForm extends AbstractParsedContentForm {
 			return null;
 		}
 
+		public void insertNode(TreePath path, int index, Object node) {
+			Object parent = path.getLastPathComponent();
+			NamedValue nv = (NamedValue) node;
+			if (parent == getRoot()) { // adding a header
+				int realIndex = index - 1;
+				NamedValue[] oldHeaders = (NamedValue[]) headerVM.getValue();
+				NamedValue[] newHeaders;
+				if (oldHeaders == null || oldHeaders.length == 0) {
+					newHeaders = new NamedValue[] { nv };
+				} else {
+					newHeaders = new NamedValue[oldHeaders.length + 1];
+					System.arraycopy(oldHeaders, 0, newHeaders, 0, realIndex);
+					System.arraycopy(oldHeaders, realIndex, newHeaders,
+							realIndex + 1, oldHeaders.length - realIndex);
+					newHeaders[realIndex] = nv;
+				}
+				headerVM.setValue(newHeaders);
+			} else if (parent instanceof String) { // adding a parameter
+				NamedValue[] oldParams = (NamedValue[]) nodes.get(parent);
+				NamedValue[] newParams;
+				if (oldParams == null || oldParams.length == 0) {
+					newParams = new NamedValue[] { nv };
+				} else {
+					newParams = new NamedValue[oldParams.length + 1];
+					System.arraycopy(oldParams, 0, newParams, 0, index);
+					System.arraycopy(oldParams, index, newParams, index + 1,
+							oldParams.length - index);
+					newParams[index] = nv;
+				}
+				String query = NamedValue.join(newParams, "&", "=");
+				URI uri = (URI) uriVM.getValue();
+				String base = UrlUtils.getSchemeHostPort(uri) + uri.getPath();
+				try {
+					URI newUri = new URI(base + "?" + query);
+					uriVM.setValue(newUri);
+				} catch (Exception e) {
+					System.out.println("Exception parsing url : " + e);
+				}
+			} else if (parent instanceof NamedValue) { // adding a cookie
+				NamedValue[] oldCookies = (NamedValue[]) nodes.get(parent);
+				NamedValue[] newCookies;
+				if (oldCookies == null || oldCookies.length == 0) {
+					newCookies = new NamedValue[] { nv };
+				} else {
+					newCookies = new NamedValue[oldCookies.length + 1];
+					System.arraycopy(oldCookies, 0, newCookies, 0, index);
+					System.arraycopy(oldCookies, index, newCookies, index + 1,
+							oldCookies.length - index);
+					newCookies[index] = nv;
+				}
+				String cookie = NamedValue.join(newCookies, "; ", "=");
+				NamedValue newCookie = new NamedValue("Cookie", cookie);
+				NamedValue oldCookie = (NamedValue) parent;
+				NamedValue[] headers = (NamedValue[]) headerVM.getValue();
+				NamedValue[] newHeaders = copyAndReplace(headers, oldCookie,
+						newCookie);
+				headerVM.setValue(newHeaders);
+			}
+		}
+
+		public void deleteNode(TreePath path, int index, Object node) {
+			Object parent = path.getLastPathComponent();
+			NamedValue nv = (NamedValue) node;
+			if (parent == getRoot()) { // deleting a header
+				int realIndex = index - 1;
+				NamedValue[] oldHeaders = (NamedValue[]) headerVM.getValue();
+				NamedValue[] newHeaders;
+				if (oldHeaders == null || oldHeaders.length <= 1) {
+					newHeaders = null;
+				} else {
+					newHeaders = new NamedValue[oldHeaders.length - 1];
+					System.arraycopy(oldHeaders, 0, newHeaders, 0,
+							realIndex - 1);
+					System.arraycopy(oldHeaders, realIndex + 1, newHeaders,
+							realIndex, oldHeaders.length - realIndex - 1);
+				}
+				headerVM.setValue(newHeaders);
+			} else if (parent instanceof String) { // adding a parameter
+				NamedValue[] oldParams = (NamedValue[]) nodes.get(parent);
+				NamedValue[] newParams;
+				if (oldParams == null || oldParams.length <= 1) {
+					newParams = null;
+				} else {
+					newParams = new NamedValue[oldParams.length - 1];
+					System.arraycopy(oldParams, 0, newParams, 0, index - 1);
+					System.arraycopy(oldParams, index + 1, newParams, index,
+							oldParams.length - index - 1);
+				}
+				URI uri = (URI) uriVM.getValue();
+				String base = UrlUtils.getSchemeHostPort(uri) + uri.getPath();
+				String query = null;
+				if (newParams != null) {
+					query = NamedValue.join(newParams, "&", "=");
+					try {
+						URI newUri = new URI(base
+								+ (query == null ? "" : "?" + query));
+						uriVM.setValue(newUri);
+					} catch (Exception e) {
+						System.out.println("Exception parsing url : " + e);
+					}
+				} else if (parent instanceof NamedValue) { // adding a cookie
+					NamedValue[] oldCookies = (NamedValue[]) nodes.get(parent);
+					NamedValue[] newCookies;
+					if (oldCookies == null || oldCookies.length <= 1) {
+						newCookies = null;
+					} else {
+						newCookies = new NamedValue[oldCookies.length - 1];
+						System.arraycopy(oldCookies, 0, newCookies, 0,
+								index - 1);
+						System.arraycopy(oldCookies, index + 1, newCookies,
+								index, oldCookies.length - index - 1);
+						newCookies[index] = nv;
+					}
+					String cookie = NamedValue.join(newCookies, "; ", "=");
+					NamedValue newCookie = new NamedValue("Cookie", cookie);
+					NamedValue oldCookie = (NamedValue) parent;
+					NamedValue[] headers = (NamedValue[]) headerVM.getValue();
+					NamedValue[] newHeaders = copyAndReplace(headers,
+							oldCookie, newCookie);
+					headerVM.setValue(newHeaders);
+				}
+			}
+		}
+
 		public void valueForPathChanged(TreePath path, Object newValue) {
 			Object last = path.getLastPathComponent();
 			System.out.println("New value for " + last + " is " + newValue);
