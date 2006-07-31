@@ -3,6 +3,7 @@
  */
 package org.owasp.webscarab.plugins.proxy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,9 +29,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.commons.httpclient.ChunkedInputStream;
 import org.apache.commons.httpclient.ChunkedOutputStream;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceEvent;
 import org.bushe.swing.event.EventSubscriber;
@@ -40,7 +41,7 @@ import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.services.ConversationService;
-import org.owasp.webscarab.util.HttpMethodUtils;
+import org.owasp.webscarab.services.HttpService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -62,6 +63,8 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 	private ConversationService conversationService = null;
 
+	private HttpService httpService = null;
+	
 	private EventService eventService;
 
 	private ApplicationContext applicationContext;
@@ -288,8 +291,6 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 			private String base;
 
-			private HttpClient client = null;
-
 			private Logger logger = Logger.getLogger(getClass().getName());
 
 			public ConnectionHandler(Socket socket, String base) {
@@ -332,7 +333,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 						// Get the request content (if any) from the stream, apply it
 						// to the HttpMethod, as well as to the conversation.
-						HttpMethodUtils.setRequestContent(conversation, is);
+						setRequestContent(conversation, is);
 						
 						// see if we can get an annotation for this conversation
 						Annotation annotation = null;
@@ -345,12 +346,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						if (proxyInterceptor != null)
 							proxyInterceptor.editRequest(conversation, annotation);
 						
-						if (client == null)
-							client = new HttpClient();
-						HttpMethod httpMethod = HttpMethodUtils
-								.constructMethod(conversation);
-						client.executeMethod(httpMethod);
-						HttpMethodUtils.fillResponse(conversation, httpMethod);
+						httpService.fetchResponse(conversation);
 
 						// we use a buffered conversation to record any changes made 
 						// to the response during editing since we want to save the 
@@ -370,8 +366,6 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 							conversation.getResponseContent();
 							close = true;
 						}
-						if (httpMethod != null)
-							httpMethod.releaseConnection();
 						if (getConversationService() != null) {
 							ConversationSummary summary = new ConversationSummary(
 									conversation);
@@ -488,6 +482,38 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 				return conversation;
 			}
 
+		    private void setRequestContent(Conversation conversation, InputStream is) throws IOException {
+		    	if ("CONNECT".equals(conversation.getRequestMethod())) return;
+		    	if ("HEAD".equals(conversation.getRequestMethod())) return;
+		    	if ("GET".equals(conversation.getRequestMethod())) return;
+		    	InputStream contentInputStream = null;
+		    	if ("POST".equals(conversation.getRequestMethod())) {
+		    		String te = conversation.getRequestHeader("Transfer-Encoding");
+		    		String length = conversation.getRequestHeader("Content-Length");
+		    		if ("chunked".equalsIgnoreCase(te)) {
+		    			contentInputStream = new ChunkedInputStream(is);
+		    		} else if (length != null) {
+		    			try {
+		    				long cl = Long.parseLong(length);
+		    				contentInputStream = new ContentLengthInputStream(is, cl);
+		    			} catch (NumberFormatException nfe) {
+		    				IOException ioe = new IOException("Error parsing Content-Length header: " + length);
+		    				ioe.initCause(nfe);
+		    				throw ioe;
+		    			}
+		    		}
+		    	} else {
+		    		throw new IOException("Can " + conversation.getRequestMethod() + " have a body or not? Not implemented yet!");
+		    	}
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				byte[] buff = new byte[4096];
+				int got;
+				while ((got = contentInputStream.read(buff)) > -1) {
+					baos.write(buff, 0, got);
+				}
+				conversation.setRequestContent(baos.toByteArray());
+		    }
+		    
 			private void writeConversationToBrowser(Conversation conversation,
 					OutputStream os) throws IOException {
 				os.write((conversation.getResponseVersion() + " "
@@ -546,6 +572,13 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 	public void setProxyInterceptor(ProxyInterceptor proxyInterceptor) {
 		this.proxyInterceptor = proxyInterceptor;
+	}
+
+	/**
+	 * @param httpService the httpService to set
+	 */
+	public void setHttpService(HttpService httpService) {
+		this.httpService = httpService;
 	}
 
 }

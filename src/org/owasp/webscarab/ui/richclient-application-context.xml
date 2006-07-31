@@ -195,9 +195,12 @@
 		</property>
 	</bean>
 	
+	<bean id="httpService" class="org.owasp.webscarab.services.HttpService" lazy-init="true"/>
+	
 	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
 		<property name="eventService" ref="eventService"/>
 		<property name="proxyInterceptor" ref="proxyInterceptor"/>
+		<property name="httpService" ref="httpService"/>
 	</bean>
 
 	<bean id="proxyInterceptor" 
