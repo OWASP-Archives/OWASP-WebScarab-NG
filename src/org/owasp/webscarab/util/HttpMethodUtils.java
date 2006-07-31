@@ -3,12 +3,8 @@
  */
 package org.owasp.webscarab.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.httpclient.ChunkedInputStream;
-import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
@@ -85,38 +81,6 @@ public class HttpMethodUtils {
 		return httpMethod;
 	}
 
-    public static void setRequestContent(Conversation conversation, InputStream is) throws IOException {
-    	if ("CONNECT".equals(conversation.getRequestMethod())) return;
-    	if ("HEAD".equals(conversation.getRequestMethod())) return;
-    	if ("GET".equals(conversation.getRequestMethod())) return;
-    	InputStream contentInputStream = null;
-    	if ("POST".equals(conversation.getRequestMethod())) {
-    		String te = conversation.getRequestHeader("Transfer-Encoding");
-    		String length = conversation.getRequestHeader("Content-Length");
-    		if ("chunked".equalsIgnoreCase(te)) {
-    			contentInputStream = new ChunkedInputStream(is);
-    		} else if (length != null) {
-    			try {
-    				long cl = Long.parseLong(length);
-    				contentInputStream = new ContentLengthInputStream(is, cl);
-    			} catch (NumberFormatException nfe) {
-    				IOException ioe = new IOException("Error parsing Content-Length header: " + length);
-    				ioe.initCause(nfe);
-    				throw ioe;
-    			}
-    		}
-    	} else {
-    		throw new IOException("Can " + conversation.getRequestMethod() + " have a body or not? Not implemented yet!");
-    	}
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buff = new byte[4096];
-		int got;
-		while ((got = contentInputStream.read(buff)) > -1) {
-			baos.write(buff, 0, got);
-		}
-		conversation.setRequestContent(baos.toByteArray());
-    }
-    
 	public static void fillResponse(Conversation conversation,
 			HttpMethod httpMethod) throws IOException {
 		conversation.setResponseVersion(httpMethod.getStatusLine()
@@ -126,7 +90,7 @@ public class HttpMethodUtils {
         conversation.setResponseMessage(httpMethod.getStatusLine().getReasonPhrase());
         Header[] headers = httpMethod.getResponseHeaders();
         conversation.setResponseHeaders(convert(headers));
-        	conversation.setResponseContentStream(httpMethod.getResponseBodyAsStream());
+    	conversation.setResponseContentStream(httpMethod.getResponseBodyAsStream());
 	}
 	
 	public static void fillFooters(Conversation conversation, HttpMethod httpMethod) {

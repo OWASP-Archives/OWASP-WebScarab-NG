@@ -3,7 +3,6 @@
  */
 package org.owasp.webscarab.plugins.proxy;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -99,7 +98,7 @@ public class HttpClientConversationTest extends TestCase {
         conversation.setRequestUri(new URI("http://localhost/WebScarab-test/TestGet.jsp"));
         conversation.setRequestVersion("HTTP/1.0");
         conversation.addRequestHeader(new NamedValue("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*"));
-        conversation.addRequestHeader(new NamedValue("Referer", "http://webmail.dawes.za.net/src/login.php"));
+        conversation.addRequestHeader(new NamedValue("Referer", "http://localhost/src/login.php"));
         conversation.addRequestHeader(new NamedValue("Accept-Language", "en-us"));
         conversation.addRequestHeader(new NamedValue("Content-Type", "application/x-www-form-urlencoded"));
         conversation.addRequestHeader(new NamedValue("Proxy-Connection", "Keep-Alive"));
@@ -107,8 +106,8 @@ public class HttpClientConversationTest extends TestCase {
         conversation.addRequestHeader(new NamedValue("Content-Length", "123"));
         conversation.addRequestHeader(new NamedValue("Pragma", "no-cache"));
         conversation.addRequestHeader(new NamedValue("Cookie", "SQMSESSID=78fc5f4c1edfa52e1ddb1ffb7adc5493"));
-        ByteArrayInputStream bais = new ByteArrayInputStream("SQMSESSID=78fc5f4c1edfa52e1ddb1ffb7adc5493&login_username=rdawes&secretkey=enitusa&js_autodetect_results=1&just_logged_in=1".getBytes());
-        HttpMethodUtils.setRequestContent(conversation, bais);
+        byte[] content = "SQMSESSID=78fc5f4c1edfa52e1ddb1ffb7adc5493&login_username=rdawes&secretkey=blah&js_autodetect_results=1&just_logged_in=1".getBytes();
+        conversation.setRequestContent(content);
         HttpMethod method = HttpMethodUtils.constructMethod(conversation);
         HttpClient client = new HttpClient();
         client.executeMethod(method);
