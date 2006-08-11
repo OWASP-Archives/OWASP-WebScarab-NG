@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -17,7 +17,7 @@ import org.springframework.jdbc.object.SqlUpdate;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
         UriDao {
@@ -45,7 +45,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.owasp.webscarab.dao.UriDao#getId(java.net.URI)
      */
     public Integer findUriId(URI uri) {
@@ -57,7 +57,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.owasp.webscarab.dao.UriDao#getUri(java.lang.Integer)
      */
     public URI findUri(Integer id) {
@@ -115,7 +115,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
          *      int)
          */
@@ -147,7 +147,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
          *      int)
          */

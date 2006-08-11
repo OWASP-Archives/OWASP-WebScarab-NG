@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -24,7 +24,7 @@ import org.owasp.webscarab.jdbc.VersionDao;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 		ConversationDao {
@@ -85,7 +85,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.ConversationDao#getConversationIds()
 	 */
 	public Collection<Integer> getAllIds(Integer session) {
@@ -94,7 +94,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.ConversationDao#getConversation(java.lang.Integer)
 	 */
 	public Conversation get(Integer id) {
@@ -130,7 +130,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.ConversationDao#getConversationSummary(java.lang.Integer)
 	 */
 	public ConversationSummary getSummary(Integer id) {
@@ -148,7 +148,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.ConversationDao#getId(org.owasp.webscarab.Conversation)
 	 */
 	public void update(Integer session, Conversation conversation,
@@ -252,7 +252,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
 		 *      int)
 		 */

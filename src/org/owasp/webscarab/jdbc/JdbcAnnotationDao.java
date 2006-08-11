@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 		AnnotationDao {
@@ -26,7 +26,7 @@ public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	@Override
@@ -43,7 +43,7 @@ public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.AnnotationDao#get(java.lang.Integer)
 	 */
 	@SuppressWarnings("unchecked")
@@ -60,7 +60,7 @@ public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.AnnotationDao#update(org.owasp.webscarab.Annotation)
 	 */
 	public void update(Annotation annotation) {
@@ -83,7 +83,7 @@ public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.AnnotationDao#getAll()
 	 */
 	@SuppressWarnings("unchecked")

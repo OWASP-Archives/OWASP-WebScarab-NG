@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -14,7 +14,7 @@ import org.springframework.jdbc.object.SqlUpdate;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcNamedValueDao extends
         PropertiesJdbcDaoSupport implements NamedValueDao {
@@ -22,12 +22,12 @@ public class JdbcNamedValueDao extends
     private NamedValueIdQuery namedValueIdQuery;
 
     private NamedValueQuery namedValueQuery;
-    
+
     private NamedValueInsert namedValueInsert;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.dao.support.DaoSupport#initDao()
      */
     @Override
@@ -37,7 +37,7 @@ public class JdbcNamedValueDao extends
         namedValueIdQuery = new NamedValueIdQuery();
         namedValueQuery = new NamedValueQuery();
         namedValueInsert = new NamedValueInsert();
-        
+
         NamedValue nv = new NamedValue("", "");
         try {
             findNamedValueId(nv);
@@ -50,7 +50,7 @@ public class JdbcNamedValueDao extends
     private void createTables() throws SQLException {
         getJdbcTemplate().execute(getProperty("createTable.named_values"));
     }
-    
+
     public Integer findNamedValueId(NamedValue nv) {
         return namedValueIdQuery.getId(nv);
     }
@@ -87,7 +87,7 @@ public class JdbcNamedValueDao extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
          *      int)
          */
@@ -117,7 +117,7 @@ public class JdbcNamedValueDao extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
          *      int)
          */

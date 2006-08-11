@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -17,7 +17,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 		FindingDao {
@@ -29,7 +29,7 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	@Override
@@ -48,7 +48,7 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.FindingDao#get(java.lang.Integer)
 	 */
 	@SuppressWarnings("unchecked")
@@ -62,7 +62,7 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.FindingDao#update(org.owasp.webscarab.Finding)
 	 */
 	public void update(Finding finding) {
@@ -94,7 +94,7 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.dao.FindingDao#getAll()
 	 */
 	@SuppressWarnings("unchecked")
@@ -133,7 +133,7 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 		};
 		jt.batchUpdate(query, bpss);
 	}
-	
+
 	private int deleteConversations(Integer id) {
 		JdbcTemplate jt = getJdbcTemplate();
 		String statement = "DELETE FROM findings_conversations WHERE finding_id = ?";

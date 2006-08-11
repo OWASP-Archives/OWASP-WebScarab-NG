@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -15,7 +15,7 @@ import org.springframework.jdbc.object.SqlUpdate;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class JdbcHeadersDao extends
         PropertiesJdbcDaoSupport implements HeadersDao {
@@ -36,7 +36,7 @@ public class JdbcHeadersDao extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.dao.support.DaoSupport#initDao()
      */
     @Override
@@ -45,7 +45,7 @@ public class JdbcHeadersDao extends
 
         headersQuery = new HeadersQuery();
         headersInsert = new HeaderInsert();
-        
+
         try {
             findHeaders(new Integer(0), REQUEST_HEADERS);
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public class JdbcHeadersDao extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.owasp.webscarab.jdbc.HeadersDao#saveHeaders(java.lang.Integer,
      *      java.lang.Integer, org.owasp.webscarab.NamedValue[])
      */
@@ -102,7 +102,7 @@ public class JdbcHeadersDao extends
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.springframework.jdbc.object.MappingSqlQuery#mapRow(java.sql.ResultSet,
          *      int)
          */

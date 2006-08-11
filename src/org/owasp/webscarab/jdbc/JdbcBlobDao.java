@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.jdbc;
 
@@ -20,23 +20,23 @@ import org.springframework.jdbc.object.SqlUpdate;
 public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
     private BlobQuery blobQuery;
-    
+
     private BlobInsert blobInsert;
-    
+
     private void createTables() throws SQLException {
         getJdbcTemplate().execute(getProperty("createTable.blobs"));
     }
-    
+
     /* (non-Javadoc)
      * @see org.springframework.dao.support.DaoSupport#initDao()
      */
     @Override
     protected void initDao() throws Exception {
         super.initDao();
-        
+
         blobQuery = new BlobQuery();
         blobInsert = new BlobInsert();
-        
+
         try {
             findBlob("");
         } catch (Exception e) {
