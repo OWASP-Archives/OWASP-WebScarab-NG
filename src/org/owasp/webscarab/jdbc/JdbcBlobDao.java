@@ -23,7 +23,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
     private BlobInsert blobInsert;
 
-    private void createTables() throws SQLException {
+    private void createTables() {
         getJdbcTemplate().execute(getProperty("createTable.blobs"));
     }
 

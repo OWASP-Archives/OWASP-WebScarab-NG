@@ -66,7 +66,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 		}
 	}
 
-	protected void checkTables() throws SQLException {
+	protected void checkTables() {
 		Integer id = new Integer(0);
 		getMethod("GET");
 		getMessage("Ok");
@@ -75,7 +75,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 		conversationSummaryQuery.getSummary(id);
 	}
 
-	protected void createTables() throws SQLException {
+	protected void createTables() {
 		getJdbcTemplate().execute(getProperty("createTable.methods"));
 		getJdbcTemplate().execute(getProperty("createTable.conversations"));
 		getJdbcTemplate().execute(getProperty("createTable.messages"));

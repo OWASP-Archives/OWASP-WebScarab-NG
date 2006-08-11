@@ -47,7 +47,7 @@ public class JdbcNamedValueDao extends
         }
     }
 
-    private void createTables() throws SQLException {
+    private void createTables() {
         getJdbcTemplate().execute(getProperty("createTable.named_values"));
     }
 

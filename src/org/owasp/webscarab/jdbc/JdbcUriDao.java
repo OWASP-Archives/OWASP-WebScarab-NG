@@ -73,7 +73,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
         return uriInsert.insert(uri);
     }
 
-    protected void checkTables() throws SQLException {
+    protected void checkTables() {
         try {
             findUriId(new URI("http://localhost/"));
         } catch (URISyntaxException use) {}

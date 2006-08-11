@@ -22,7 +22,7 @@ import org.springframework.jdbc.core.RowMapper;
 public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 		FindingDao {
 
-	private void createTables() throws SQLException {
+	private void createTables() {
 		getJdbcTemplate().execute(getProperty("createTable.findings"));
 		getJdbcTemplate().execute(getProperty("createTable.findings_conversations"));
 	}

@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.RowMapper;
 public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 		AnnotationDao {
 
-	private void createTables() throws SQLException {
+	private void createTables() {
 		getJdbcTemplate().execute(getProperty("createTable.annotations"));
 	}
 

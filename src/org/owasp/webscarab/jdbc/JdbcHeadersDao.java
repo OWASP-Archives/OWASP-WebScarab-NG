@@ -30,7 +30,7 @@ public class JdbcHeadersDao extends
         this.namedValueDao = namedValueDao;
     }
 
-    private void createTables() throws SQLException {
+    private void createTables() {
         getJdbcTemplate().execute(getProperty("createTable.headers"));
     }
 
