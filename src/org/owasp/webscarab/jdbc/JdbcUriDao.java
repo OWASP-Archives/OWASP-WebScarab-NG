@@ -80,7 +80,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
         findUri(new Integer(0));
     }
 
-    private void createTables() throws SQLException {
+    private void createTables() {
         getJdbcTemplate().execute(getProperty("createTable.uris"));
     }
 
