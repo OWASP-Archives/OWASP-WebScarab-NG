@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui;
 
@@ -11,7 +11,7 @@ import org.springframework.richclient.command.support.ApplicationWindowAwareComm
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class WebScarabLifecycleAdvisor extends
 		DefaultApplicationLifecycleAdvisor {
@@ -28,13 +28,8 @@ public class WebScarabLifecycleAdvisor extends
 	@Override
 	public void onPostStartup() {
         ApplicationWindowAwareCommand command = (ApplicationWindowAwareCommand) getCommandBarFactory().getBean("selectSessionCommand");
-        if (command != null) 
+        if (command != null)
         	command.execute();
 	}
-
-    protected void initNewWindowCommandBarFactory() {
-    	if (getCommandBarFactory() != null) return;
-    	super.initNewWindowCommandBarFactory();
-    }
 
 }
