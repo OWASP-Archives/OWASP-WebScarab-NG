@@ -131,9 +131,9 @@ public class HexForm extends AbstractContentForm {
 				return 0;
 			}
 			if (data.length % columns == 0) {
-				return (int) (data.length / columns);
+				return (data.length / columns);
 			} else {
-				return (int) (data.length / columns) + 1;
+				return (data.length / columns) + 1;
 			}
 		}
 
