@@ -39,7 +39,6 @@ import org.owasp.webscarab.util.swing.UriTreeModel;
 import org.owasp.webscarab.util.swing.renderers.UriRenderer;
 import org.springframework.binding.form.CommitListener;
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.PageComponentContext;
 import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
@@ -78,9 +77,9 @@ public class ConversationView extends AbstractView {
 
 	private ConversationSummary selectedSummary;
 
-	private ValidatingFormModel conversationModel;
+	private FormModel conversationModel;
 
-	private ValidatingFormModel annotationModel;
+	private FormModel annotationModel;
 
 	private JPanel filterPanel;
 	
@@ -102,7 +101,6 @@ public class ConversationView extends AbstractView {
 		conversationModel = ConversationFormSupport
 				.createReadOnlyFormModel(conversation);
 		annotationModel = FormModelHelper.createFormModel(annotation, false);
-		annotationModel.setEnabled(true);
 		requestForm = new RequestForm(conversationModel);
 		responseForm = new ResponseForm(conversationModel);
 		annotationForm = new AnnotationForm(annotationModel);
