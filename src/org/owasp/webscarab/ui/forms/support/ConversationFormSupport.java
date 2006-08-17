@@ -5,7 +5,6 @@ package org.owasp.webscarab.ui.forms.support;
 
 import org.owasp.webscarab.domain.Conversation;
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.form.FormModelHelper;
 
 /**
@@ -14,17 +13,18 @@ import org.springframework.richclient.form.FormModelHelper;
  */
 public class ConversationFormSupport {
 
-	public static ValidatingFormModel createBufferedConversationFormModel(Conversation c, boolean requestEditable, boolean responseEditable) {
-		ValidatingFormModel model = FormModelHelper.createFormModel(c, true);
-		setRequestEditable(model, requestEditable);
-		setResponseEditable(model, responseEditable);
-		return model;
+	public static FormModel createBufferedConversationFormModel(Conversation c, boolean requestEditable, boolean responseEditable) {
+		return createFormModel(c, true, requestEditable, responseEditable);
 	}
 	
-	public static ValidatingFormModel createReadOnlyFormModel(Conversation c) {
-		ValidatingFormModel model = FormModelHelper.createFormModel(c, false);
-		setRequestEditable(model, false);
-		setResponseEditable(model, false);
+	public static FormModel createReadOnlyFormModel(Conversation c) {
+		return createFormModel(c, false, false, false);
+	}
+	
+	public static FormModel createFormModel(Conversation c, boolean buffered, boolean requestEditable, boolean responseEditable) {
+		FormModel model = FormModelHelper.createFormModel(c, buffered);
+		setRequestEditable(model, requestEditable);
+		setResponseEditable(model, responseEditable);
 		return model;
 	}
 	
