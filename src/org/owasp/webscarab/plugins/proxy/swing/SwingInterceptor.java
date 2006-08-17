@@ -20,7 +20,7 @@ import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.ui.forms.RequestForm;
 import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
-import org.springframework.binding.form.ValidatingFormModel;
+import org.springframework.binding.form.FormModel;
 import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
@@ -56,9 +56,9 @@ public class SwingInterceptor implements ProxyInterceptor {
 		if (uri.matches(skipRequestRegex))
 			return;
 
-		final ValidatingFormModel requestModel = ConversationFormSupport
+		final FormModel requestModel = ConversationFormSupport
 				.createBufferedConversationFormModel(conversation, true, false);
-		final ValidatingFormModel annotationModel = FormModelHelper
+		final FormModel annotationModel = FormModelHelper
 				.createFormModel(annotation, true);
 		final RequestForm requestForm = new RequestForm(requestModel);
 		final AnnotationForm annotationForm = new AnnotationForm(
@@ -98,11 +98,11 @@ public class SwingInterceptor implements ProxyInterceptor {
 		}
 		if (!intercept)
 			return;
-		final ValidatingFormModel model = FormModelHelper.createFormModel(
+		final FormModel model = FormModelHelper.createFormModel(
 				conversation, true);
 		final RequestForm requestForm = new RequestForm(model);
 		final ResponseForm responseForm = new ResponseForm(model);
-		final ValidatingFormModel annotationModel = FormModelHelper
+		final FormModel annotationModel = FormModelHelper
 				.createFormModel(annotation, true);
 		final AnnotationForm annotationForm = new AnnotationForm(
 				annotationModel);
