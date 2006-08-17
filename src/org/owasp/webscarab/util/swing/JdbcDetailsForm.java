@@ -6,7 +6,7 @@ package org.owasp.webscarab.util.swing;
 import javax.swing.JComponent;
 
 import org.owasp.webscarab.util.JdbcConnectionDetails;
-import org.springframework.binding.form.ValidatingFormModel;
+import org.springframework.binding.form.FormModel;
 import org.springframework.richclient.form.AbstractForm;
 import org.springframework.richclient.form.builder.TableFormBuilder;
 
@@ -33,7 +33,7 @@ public class JdbcDetailsForm extends AbstractForm {
     /**
      * Constructor.
      */
-    public JdbcDetailsForm(ValidatingFormModel model) {
+    public JdbcDetailsForm(FormModel model) {
     	super(model, FORM_ID);
     	jdbcDetails = (JdbcConnectionDetails) model.getFormObject();
     }
