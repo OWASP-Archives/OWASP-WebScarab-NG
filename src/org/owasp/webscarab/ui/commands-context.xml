@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
 	"http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-	
-	<bean id="windowCommandManager" 
+
+	<bean id="windowCommandManager"
 		class="org.springframework.richclient.application.support.ApplicationWindowCommandManager">
 		<property name="sharedCommandIds">
 			<list>
@@ -17,12 +17,10 @@
 				<value>deleteCommand</value>
 			</list>
 		</property>
-	</bean><!--
-	
-	<bean id="menuBar" 
+	</bean>
+
+	<bean id="menuBar"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
-	--><bean id="menuBar" 
-		class="org.owasp.webscarab.util.swing.NonSingletonCommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<ref bean="fileMenu"/>
@@ -34,32 +32,27 @@
 		</property>
 	</bean>
 
-	<bean id="showProxyControlBarCommand" 
-		class="org.springframework.richclient.command.TargetableActionCommand" singleton="true">
-		<property name="commandExecutor" ref="showProxyControlBarExecutor"/>
-	</bean>
-	
 	<bean id="showProxyConfiguration"
 		class="org.owasp.webscarab.plugins.proxy.swing.ProxyConfigCommand" singleton="false">
 		<property name="proxy" ref="proxy"/>
 	</bean>
-	
-	<bean id="toolBar" 
+
+	<bean id="toolBar"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="showProxyControlBarCommand"/>
+				<ref bean="showProxyControlBarToggle"/>
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="fileMenu" 
+
+	<bean id="fileMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<!-- <ref bean="newMenu"/> 
+				<!-- <ref bean="newMenu"/>
 				<value>separator</value>
-				<ref bean="loginCommand"/> 
+				<ref bean="loginCommand"/>
 				<ref bean="logoutCommand"/>
 				<value>separator</value>
 				<value>saveAsCommand</value>
@@ -71,9 +64,9 @@
 			</list>
 		</property>
 	</bean>
-	
+
 <!--
-	<bean id="newMenu" 
+	<bean id="newMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
@@ -81,8 +74,8 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="newOwnerCommand" 
+
+	<bean id="newOwnerCommand"
 		class="org.springframework.richclient.command.TargetableActionCommand">
 		<property name="commandExecutor">
 			<ref bean="newOwnerWizard"/>
@@ -90,7 +83,7 @@
 	</bean>
 -->
 
-	<bean id="editMenu" 
+	<bean id="editMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
@@ -108,29 +101,29 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="pluginMenu" 
+
+	<bean id="pluginMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="showProxyControlBarCommand"/>
+				<ref bean="showProxyControlBarToggle"/>
 				<ref bean="showProxyConfiguration"/>
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="windowMenu" 
+
+	<bean id="windowMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<bean class="org.springframework.richclient.command.support.NewWindowCommand"/>
 				<value>separator</value>
-				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>  
+				  <bean class="org.springframework.richclient.command.support.ShowViewMenu"/>
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="helpMenu" 
+
+	<bean id="helpMenu"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
@@ -140,11 +133,11 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="helpContentsCommand" 
+
+	<bean id="helpContentsCommand"
 		class="org.springframework.richclient.command.support.HelpContentsCommand"/>
-		
-	<bean id="aboutCommand" 
+
+	<bean id="aboutCommand"
 		class="org.springframework.richclient.command.support.AboutCommand">
 		<property name="aboutTextPath">
 			<value>org/owasp/webscarab/about.txt</value>

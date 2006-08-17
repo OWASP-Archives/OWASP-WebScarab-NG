@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
 	"http://www.springframework.org/dtd/spring-beans.dtd">
 <!-- $Id: richclient-application-context.xml,v 1.30 2005/10/25 13:58:57 lstreepy Exp $ -->
 <beans>
@@ -43,13 +43,16 @@
 	<bean id="applicationObjectConfigurer" depends-on="serviceLocator"
         class="org.springframework.richclient.application.config.DefaultApplicationObjectConfigurer">
     </bean>
-   	
+
    	<bean id="serviceLocator" class="org.springframework.richclient.application.ApplicationServicesLocator">
 		<property name="applicationServices" ref="applicationServices"/>
 	</bean>
 
+	<bean id="commandConfigurer" class="org.springframework.richclient.command.config.DefaultCommandConfigurer"/>
+
 	<bean id="applicationServices" singleton="true"
 		class="org.springframework.richclient.application.support.DefaultApplicationServices">
+		<property name="commandConfigurer" ref="commandConfigurer"/>
 		<property name="imageSource" ref="imageSource"/>
 		<property name="rulesSource" ref="rulesSource"/>
 		<property name="formComponentInterceptorFactory" ref="formComponentInterceptorFactory"/>
@@ -116,15 +119,15 @@
 					<key>
 					<value type="java.lang.Class">java.util.Date</value>
 					</key>
-					<bean 
+					<bean
 					class="org.petclinic.ui.binder.CustomDatePickerBinder"/>
 					</entry>
 					<entry>
 					<key>
-					<value type="java.lang.Class"> 
+					<value type="java.lang.Class">
 					org.petclinic.PetType</value>
 					</key>
-					<bean 
+					<bean
 					class="org.petclinic.ui.binder.PetTypeBinder">
 					<property name="clinic">
 					<ref bean="clinic"/>
@@ -169,11 +172,11 @@
 		</property>
 	</bean>
 
-	<bean id="rulesSource" 
+	<bean id="rulesSource"
 		class="org.owasp.webscarab.domain.WebScarabValidationRulesSource"/>
-		
+
 	<bean id="conversationSummaryList"
-		class="org.owasp.webscarab.ui.ConversationSummaryListFactory" singleton="true" 
+		class="org.owasp.webscarab.ui.ConversationSummaryListFactory" singleton="true"
 		lazy-init="true">
 		<property name="eventService">
 			<ref bean="eventService" />
@@ -182,7 +185,7 @@
 
 	<bean id="conversationTableFactory"
 		class="org.owasp.webscarab.ui.ConversationTableFactory" singleton="true"/>
-		
+
 	<bean id="conversationView"
 		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
 		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
@@ -190,23 +193,23 @@
 			<map>
 				<entry key="conversationSummaryList">
 					<ref bean="conversationSummaryList" />
-				</entry>	
+				</entry>
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="httpService" class="org.owasp.webscarab.services.HttpService" lazy-init="true"/>
-	
+
 	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
 		<property name="eventService" ref="eventService"/>
 		<property name="proxyInterceptor" ref="proxyInterceptor"/>
 		<property name="httpService" ref="httpService"/>
 	</bean>
 
-	<bean id="proxyInterceptor" 
+	<bean id="proxyInterceptor"
 		class="org.owasp.webscarab.plugins.proxy.swing.SwingInterceptor" singleton="true">
 	</bean>
-		
+
 	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar" singleton="true">
 		<property name="proxy" ref="proxy"/>
 		<property name="swingInterceptor" ref="proxyInterceptor"/><!--
@@ -214,10 +217,11 @@
 			<bean class="org.owasp.webscarab.ui.forms.AnnotationForm"/>
 		</property>
 	--></bean>
-	
-	<bean id="showProxyControlBarExecutor" 
-		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarExecutor" singleton="true">
+
+	<bean id="showProxyControlBarToggle"
+		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarToggleCommand" singleton="true">
 		<property name="proxyControlBar" ref="proxyControlBar"/>
+		<property name="applicationLifecycleAdvisor" ref="lifecycleAdvisor"/>
 	</bean>
-	
+
 </beans>
