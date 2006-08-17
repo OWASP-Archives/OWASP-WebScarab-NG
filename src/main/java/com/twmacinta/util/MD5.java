@@ -156,70 +156,70 @@ public class MD5 {
 
     // unrolled loop (original loop shown above)
 
-    out[0] = ((int) (buffer[shift] & 0xff)) |
-      (((int) (buffer[shift + 1] & 0xff)) << 8) |
-      (((int) (buffer[shift + 2] & 0xff)) << 16) |
-      (((int)  buffer[shift + 3]) << 24);
-    out[1] = ((int) (buffer[shift + 4] & 0xff)) |
-      (((int) (buffer[shift + 5] & 0xff)) << 8) |
-      (((int) (buffer[shift + 6] & 0xff)) << 16) |
-      (((int)  buffer[shift + 7]) << 24);
-    out[2] = ((int) (buffer[shift + 8] & 0xff)) |
-      (((int) (buffer[shift + 9] & 0xff)) << 8) |
-      (((int) (buffer[shift + 10] & 0xff)) << 16) |
-      (((int)  buffer[shift + 11]) << 24);
-    out[3] = ((int) (buffer[shift + 12] & 0xff)) |
-      (((int) (buffer[shift + 13] & 0xff)) << 8) |
-      (((int) (buffer[shift + 14] & 0xff)) << 16) |
-      (((int)  buffer[shift + 15]) << 24);
-    out[4] = ((int) (buffer[shift + 16] & 0xff)) |
-      (((int) (buffer[shift + 17] & 0xff)) << 8) |
-      (((int) (buffer[shift + 18] & 0xff)) << 16) |
-      (((int)  buffer[shift + 19]) << 24);
-    out[5] = ((int) (buffer[shift + 20] & 0xff)) |
-      (((int) (buffer[shift + 21] & 0xff)) << 8) |
-      (((int) (buffer[shift + 22] & 0xff)) << 16) |
-      (((int)  buffer[shift + 23]) << 24);
-    out[6] = ((int) (buffer[shift + 24] & 0xff)) |
-      (((int) (buffer[shift + 25] & 0xff)) << 8) |
-      (((int) (buffer[shift + 26] & 0xff)) << 16) |
-      (((int)  buffer[shift + 27]) << 24);
-    out[7] = ((int) (buffer[shift + 28] & 0xff)) |
-      (((int) (buffer[shift + 29] & 0xff)) << 8) |
-      (((int) (buffer[shift + 30] & 0xff)) << 16) |
-      (((int)  buffer[shift + 31]) << 24);
-    out[8] = ((int) (buffer[shift + 32] & 0xff)) |
-      (((int) (buffer[shift + 33] & 0xff)) << 8) |
-      (((int) (buffer[shift + 34] & 0xff)) << 16) |
-      (((int)  buffer[shift + 35]) << 24);
-    out[9] = ((int) (buffer[shift + 36] & 0xff)) |
-      (((int) (buffer[shift + 37] & 0xff)) << 8) |
-      (((int) (buffer[shift + 38] & 0xff)) << 16) |
-      (((int)  buffer[shift + 39]) << 24);
-    out[10] = ((int) (buffer[shift + 40] & 0xff)) |
-      (((int) (buffer[shift + 41] & 0xff)) << 8) |
-      (((int) (buffer[shift + 42] & 0xff)) << 16) |
-      (((int)  buffer[shift + 43]) << 24);
-    out[11] = ((int) (buffer[shift + 44] & 0xff)) |
-      (((int) (buffer[shift + 45] & 0xff)) << 8) |
-      (((int) (buffer[shift + 46] & 0xff)) << 16) |
-      (((int)  buffer[shift + 47]) << 24);
-    out[12] = ((int) (buffer[shift + 48] & 0xff)) |
-      (((int) (buffer[shift + 49] & 0xff)) << 8) |
-      (((int) (buffer[shift + 50] & 0xff)) << 16) |
-      (((int)  buffer[shift + 51]) << 24);
-    out[13] = ((int) (buffer[shift + 52] & 0xff)) |
-      (((int) (buffer[shift + 53] & 0xff)) << 8) |
-      (((int) (buffer[shift + 54] & 0xff)) << 16) |
-      (((int)  buffer[shift + 55]) << 24);
-    out[14] = ((int) (buffer[shift + 56] & 0xff)) |
-      (((int) (buffer[shift + 57] & 0xff)) << 8) |
-      (((int) (buffer[shift + 58] & 0xff)) << 16) |
-      (((int)  buffer[shift + 59]) << 24);
-    out[15] = ((int) (buffer[shift + 60] & 0xff)) |
-      (((int) (buffer[shift + 61] & 0xff)) << 8) |
-      (((int) (buffer[shift + 62] & 0xff)) << 16) |
-      (((int)  buffer[shift + 63]) << 24);
+    out[0] = ((buffer[shift] & 0xff)) |
+      (((buffer[shift + 1] & 0xff)) << 8) |
+      (((buffer[shift + 2] & 0xff)) << 16) |
+      ((buffer[shift + 3]) << 24);
+    out[1] = ((buffer[shift + 4] & 0xff)) |
+      (((buffer[shift + 5] & 0xff)) << 8) |
+      (((buffer[shift + 6] & 0xff)) << 16) |
+      ((buffer[shift + 7]) << 24);
+    out[2] = ((buffer[shift + 8] & 0xff)) |
+      (((buffer[shift + 9] & 0xff)) << 8) |
+      (((buffer[shift + 10] & 0xff)) << 16) |
+      ((buffer[shift + 11]) << 24);
+    out[3] = ((buffer[shift + 12] & 0xff)) |
+      (((buffer[shift + 13] & 0xff)) << 8) |
+      (((buffer[shift + 14] & 0xff)) << 16) |
+      ((buffer[shift + 15]) << 24);
+    out[4] = ((buffer[shift + 16] & 0xff)) |
+      (((buffer[shift + 17] & 0xff)) << 8) |
+      (((buffer[shift + 18] & 0xff)) << 16) |
+      ((buffer[shift + 19]) << 24);
+    out[5] = ((buffer[shift + 20] & 0xff)) |
+      (((buffer[shift + 21] & 0xff)) << 8) |
+      (((buffer[shift + 22] & 0xff)) << 16) |
+      ((buffer[shift + 23]) << 24);
+    out[6] = ((buffer[shift + 24] & 0xff)) |
+      (((buffer[shift + 25] & 0xff)) << 8) |
+      (((buffer[shift + 26] & 0xff)) << 16) |
+      ((buffer[shift + 27]) << 24);
+    out[7] = ((buffer[shift + 28] & 0xff)) |
+      (((buffer[shift + 29] & 0xff)) << 8) |
+      (((buffer[shift + 30] & 0xff)) << 16) |
+      ((buffer[shift + 31]) << 24);
+    out[8] = ((buffer[shift + 32] & 0xff)) |
+      (((buffer[shift + 33] & 0xff)) << 8) |
+      (((buffer[shift + 34] & 0xff)) << 16) |
+      ((buffer[shift + 35]) << 24);
+    out[9] = ((buffer[shift + 36] & 0xff)) |
+      (((buffer[shift + 37] & 0xff)) << 8) |
+      (((buffer[shift + 38] & 0xff)) << 16) |
+      ((buffer[shift + 39]) << 24);
+    out[10] = ((buffer[shift + 40] & 0xff)) |
+      (((buffer[shift + 41] & 0xff)) << 8) |
+      (((buffer[shift + 42] & 0xff)) << 16) |
+      ((buffer[shift + 43]) << 24);
+    out[11] = ((buffer[shift + 44] & 0xff)) |
+      (((buffer[shift + 45] & 0xff)) << 8) |
+      (((buffer[shift + 46] & 0xff)) << 16) |
+      ((buffer[shift + 47]) << 24);
+    out[12] = ((buffer[shift + 48] & 0xff)) |
+      (((buffer[shift + 49] & 0xff)) << 8) |
+      (((buffer[shift + 50] & 0xff)) << 16) |
+      ((buffer[shift + 51]) << 24);
+    out[13] = ((buffer[shift + 52] & 0xff)) |
+      (((buffer[shift + 53] & 0xff)) << 8) |
+      (((buffer[shift + 54] & 0xff)) << 16) |
+      ((buffer[shift + 55]) << 24);
+    out[14] = ((buffer[shift + 56] & 0xff)) |
+      (((buffer[shift + 57] & 0xff)) << 8) |
+      (((buffer[shift + 58] & 0xff)) << 16) |
+      ((buffer[shift + 59]) << 24);
+    out[15] = ((buffer[shift + 60] & 0xff)) |
+      (((buffer[shift + 61] & 0xff)) << 8) |
+      (((buffer[shift + 62] & 0xff)) << 16) |
+      ((buffer[shift + 63]) << 24);
   }
 
   private native void Transform_native (@SuppressWarnings("hiding") int[] state, byte buffer[], int shift, int length);
