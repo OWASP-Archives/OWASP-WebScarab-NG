@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.plugins.proxy;
 
@@ -47,7 +47,7 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class Proxy implements ApplicationContextAware, EventSubscriber {
 
@@ -64,13 +64,13 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 	private ConversationService conversationService = null;
 
 	private HttpService httpService = null;
-	
+
 	private EventService eventService;
 
 	private ApplicationContext applicationContext;
 
 	private ProxyInterceptor proxyInterceptor = null;
-	
+
 	public Proxy() {
 	}
 
@@ -82,6 +82,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 			startListeners();
 		} catch (IOException ioe) {
 			stopListeners();
+			throw ioe;
 		}
 	}
 
@@ -334,7 +335,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						// Get the request content (if any) from the stream, apply it
 						// to the HttpMethod, as well as to the conversation.
 						setRequestContent(conversation, is);
-						
+
 						// see if we can get an annotation for this conversation
 						Annotation annotation = null;
 						if (getAnnotator() != null)
@@ -342,14 +343,14 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 						if (annotation == null)
 							annotation = new Annotation();
-						
+
 						if (proxyInterceptor != null)
 							proxyInterceptor.editRequest(conversation, annotation);
-						
+
 						httpService.fetchResponse(conversation);
 
-						// we use a buffered conversation to record any changes made 
-						// to the response during editing since we want to save the 
+						// we use a buffered conversation to record any changes made
+						// to the response during editing since we want to save the
 						// original response as sent by the server in the archive
 						BufferedConversation bc = null;
 						if (proxyInterceptor != null) {
@@ -513,7 +514,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 				}
 				conversation.setRequestContent(baos.toByteArray());
 		    }
-		    
+
 			private void writeConversationToBrowser(Conversation conversation,
 					OutputStream os) throws IOException {
 				os.write((conversation.getResponseVersion() + " "
