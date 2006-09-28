@@ -4,9 +4,16 @@
 package org.owasp.webscarab.services;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
+import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.util.HttpMethodUtils;
 
@@ -16,13 +23,23 @@ import org.owasp.webscarab.util.HttpMethodUtils;
  */
 public class HttpService {
 
+	private HttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
+	
+	/*
+	 * We will use this method to allow the user interface to configure how the http service
+	 * behaves, e.g. timeouts, etc
+	 */
+	public HttpConnectionManagerParams getHttpConnectionManagerParams() {
+		return httpConnectionManager.getParams();
+	}
+	
+	private HttpClient getClient() {
+		return new HttpClient(httpConnectionManager);
+	}
+
     public void fetchResponse(Conversation conversation) throws IOException {
-    	// This is a very naeive implementation of this method
-    	// At the very least, we should reuse the same client when called by
-    	// a particular thread.
-		HttpClient client = new HttpClient();
 		HttpMethod method = HttpMethodUtils.constructMethod(conversation);
-		client.executeMethod(method);
+		getClient().executeMethod(method);
 		HttpMethodUtils.fillResponse(conversation, method);
     }
 
