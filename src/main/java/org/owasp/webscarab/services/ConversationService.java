@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.services;
 
@@ -18,16 +18,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class ConversationService {
 
 	private Integer session = null;
-	
+
     private ConversationDao conversationDao;
 
     private AnnotationDao annotationDao;
-    
+
     private EventService eventService = null;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -61,7 +61,7 @@ public class ConversationService {
     public EventService getEventService() {
     	return this.eventService;
     }
-    
+
     public void setEventService(EventService eventService) {
         this.eventService = eventService;
     }
@@ -131,7 +131,7 @@ public class ConversationService {
 	public void setAnnotationDao(AnnotationDao annotationDao) {
 		this.annotationDao = annotationDao;
 	}
-	
+
     public Annotation getAnnotation(Integer id) {
         Lock readLock = lock.readLock();
         readLock.lock();
