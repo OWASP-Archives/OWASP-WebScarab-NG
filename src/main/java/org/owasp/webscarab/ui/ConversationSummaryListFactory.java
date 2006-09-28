@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui;
 
@@ -24,7 +24,7 @@ import ca.odell.glazedlists.SortedList;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class ConversationSummaryListFactory extends SwingEventSubscriber
 		implements FactoryBean, ApplicationContextAware {
@@ -108,7 +108,7 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.owasp.webscarab.ui.SwingEventSubscriber#handleEventOnEDT(org.bushe.swing.event.EventServiceEvent)
 	 */
 	@Override
@@ -147,7 +147,7 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 			getSummaryList().getReadWriteLock().writeLock().unlock();
 		}
 	}
-	
+
 	public Object getObject() throws Exception {
 		return summaryList;
 	}
