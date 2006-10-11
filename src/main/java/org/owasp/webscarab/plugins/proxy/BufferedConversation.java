@@ -1,11 +1,8 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.plugins.proxy;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import org.owasp.webscarab.domain.Conversation;
@@ -18,25 +15,21 @@ import org.owasp.webscarab.domain.NamedValue;
 public class BufferedConversation extends Conversation {
 
 	private Conversation delegate;
-	
+
 	private boolean responseVersionChanged = false;
-	
+
 	private boolean responseStatusChanged = false;
-	
+
 	private boolean responseMessageChanged = false;
-	
+
 	private boolean responseHeadersChanged = false;
-	
+
 	private boolean responseContentChanged = false;
-	
+
 	private boolean responseFootersChanged = false;
-	
+
 	public BufferedConversation(Conversation conversation) {
 		this.delegate = conversation;
-	}
-
-	public void addRequestHeader(NamedValue header) {
-		throw new UnsupportedOperationException("Modifying the request is not supported");
 	}
 
 	public byte[] getProcessedRequestContent() {
@@ -74,50 +67,41 @@ public class BufferedConversation extends Conversation {
 	public byte[] getResponseContent() {
 		if (!responseContentChanged)
 			return this.delegate.getResponseContent();
-		
-		if (responseContentStream != null) {
-			flushContentStream(responseContentStream);
-			this.responseContentStream = null;
-		}
-		if (this.responseContent == null)
-			return null;
-		return this.responseContent.toByteArray();
-	}
-
-	public InputStream getResponseContentStream() {
-		if (!responseContentChanged)
-			return this.delegate.getResponseContentStream();
-		return this.responseContentStream;
+		return super.getResponseContent();
 	}
 
 	public NamedValue[] getResponseFooters() {
 		if (!responseFootersChanged)
 			return this.delegate.getResponseFooters();
-		return this.responseFooters;
+		return super.getResponseFooters();
 	}
 
 	public NamedValue[] getResponseHeaders() {
 		if (!responseHeadersChanged)
 			return this.delegate.getResponseHeaders();
-		return this.responseHeaders;
+		return super.getResponseHeaders();
 	}
 
 	public String getResponseMessage() {
 		if (!responseMessageChanged)
 			return this.delegate.getResponseMessage();
-		return this.responseMessage;
+		return super.getResponseMessage();
 	}
 
 	public String getResponseStatus() {
 		if (!responseStatusChanged)
 			return this.delegate.getResponseStatus();
-		return this.responseStatus;
+		return super.getResponseStatus();
 	}
 
 	public String getResponseVersion() {
 		if (!responseVersionChanged)
 			return this.delegate.getResponseVersion();
-		return this.responseVersion;
+		return super.getResponseVersion();
+	}
+
+	public void addRequestHeader(NamedValue header) {
+		throw new UnsupportedOperationException("Modifying the request is not supported");
 	}
 
 	public NamedValue[] removeRequestHeaders(String name) {
@@ -153,54 +137,34 @@ public class BufferedConversation extends Conversation {
 	}
 
 	public void setResponseContent(byte[] content) {
-		this.delegate.getResponseContent(); // make sure that we have read all the incoming response
-		if (content == null) {
-			this.responseContent = null;
-		} else {
-			this.responseContent = new ByteArrayOutputStream();
-			try {
-				this.responseContent.write(content);
-			} catch (IOException ioe) {
-			}
-		}
-		responseContentChanged = true;
-	}
-
-	public void setResponseContentStream(InputStream contentStream) {
-		this.delegate.getResponseContent(); // make sure that we have read all the incoming response
-		if (contentStream == null) {
-			this.responseContentStream = null;
-			this.responseContent = null;
-		} else {
-			this.responseContent = new ByteArrayOutputStream();
-			this.responseContentStream = new CopyInputStream(contentStream,
-					responseContent);
-		}
+		if (!responseContentChanged)
+			this.delegate.getResponseContent(); // make sure that we have read all the incoming response
+		super.setResponseContent(content);
 		responseContentChanged = true;
 	}
 
 	public void setResponseFooters(NamedValue[] responseFooters) {
-		this.responseFooters = responseFooters;
+		super.setResponseFooters(responseFooters);
 		responseFootersChanged = true;
 	}
 
 	public void setResponseHeaders(NamedValue[] headers) {
-		this.responseHeaders = headers;
+		super.setResponseHeaders(headers);
 		responseHeadersChanged = true;
 	}
 
 	public void setResponseMessage(String message) {
-		this.responseMessage = message;
+		super.setResponseMessage(message);
 		responseMessageChanged = true;
 	}
 
 	public void setResponseStatus(String status) {
-		this.responseStatus = status;
+		super.setResponseStatus(status);
 		responseStatusChanged = true;
 	}
 
 	public void setResponseVersion(String version) {
-		this.responseVersion = version;
+		super.setResponseVersion(version);
 		responseVersionChanged = true;
 	}
 }

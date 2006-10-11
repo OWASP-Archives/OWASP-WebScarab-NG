@@ -11,6 +11,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.StreamingConversation;
 import org.owasp.webscarab.util.HttpMethodUtils;
 
 /**
@@ -34,6 +35,12 @@ public class HttpService {
 	}
 
     public void fetchResponse(Conversation conversation) throws IOException {
+		HttpMethod method = HttpMethodUtils.constructMethod(conversation);
+		getClient().executeMethod(method);
+		HttpMethodUtils.fillResponse(conversation, method);
+    }
+
+    public void fetchResponse(StreamingConversation conversation) throws IOException {
 		HttpMethod method = HttpMethodUtils.constructMethod(conversation);
 		getClient().executeMethod(method);
 		HttpMethodUtils.fillResponse(conversation, method);

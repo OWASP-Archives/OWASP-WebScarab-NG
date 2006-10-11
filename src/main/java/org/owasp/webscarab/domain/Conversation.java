@@ -12,7 +12,6 @@ package org.owasp.webscarab.domain;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +38,11 @@ import java.util.zip.InflaterInputStream;
  * @author rdawes
  */
 
-public class Conversation extends BaseEntity {
+public class Conversation extends BaseEntity implements Comparable {
+
+	public static final String PROPERTY_CONVERSATION_DATE = "date";
+
+	public static final String PROPERTY_CONVERSATION_PLUGIN = "plugin";
 
 	public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
 
@@ -50,6 +53,8 @@ public class Conversation extends BaseEntity {
 	public static final String PROPERTY_REQUEST_HEADERS = "requestHeaders";
 
 	public static final String PROPERTY_REQUEST_CONTENT = "requestContent";
+
+	public static final String PROPERTY_REQUEST_CONTENT_SIZE = "requestContentSize";
 
 	public static final String PROPERTY_REQUEST_PROCESSED_CONTENT = "processedRequestContent";
 
@@ -63,11 +68,13 @@ public class Conversation extends BaseEntity {
 
 	public static final String PROPERTY_RESPONSE_CONTENT = "responseContent";
 
+	public static final String PROPERTY_RESPONSE_CONTENT_SIZE = "responseContentSize";
+
 	public static final String PROPERTY_RESPONSE_PROCESSED_CONTENT = "processedResponseContent";
 
 	public static final String PROPERTY_RESPONSE_FOOTERS = "responseFooters";
 
-	protected static final String ENCODING = "Content-Encoding";
+	public static final String ENCODING = "Content-Encoding";
 
 	private Date date = new Date();
 
@@ -83,19 +90,17 @@ public class Conversation extends BaseEntity {
 
 	private byte[] requestContent;
 
-	protected String responseVersion;
+	private String responseVersion;
 
-	protected String responseStatus;
+	private String responseStatus;
 
-	protected String responseMessage;
+	private String responseMessage;
 
-	protected NamedValue[] responseHeaders;
+	private NamedValue[] responseHeaders;
 
-	protected CopyInputStream responseContentStream = null;
+	private byte[] responseContent = null;
 
-	protected ByteArrayOutputStream responseContent = null;
-
-	protected NamedValue[] responseFooters;
+	private NamedValue[] responseFooters;
 
 	protected Logger logger = Logger.getLogger(getClass().getName());
 
@@ -214,6 +219,12 @@ public class Conversation extends BaseEntity {
 		return copyContent(this.requestContent);
 	}
 
+	public int getRequestContentSize() {
+		byte[] content = getRequestContent();
+		if (content == null) return 0;
+		return content.length;
+	}
+
 	public void setRequestContent(final byte[] content) {
 		this.requestContent = copyContent(content);
 	}
@@ -296,42 +307,18 @@ public class Conversation extends BaseEntity {
 		return found;
 	}
 
-	public InputStream getResponseContentStream() {
-		return responseContentStream;
-	}
-
-	public void setResponseContentStream(InputStream contentStream) {
-		if (contentStream == null) {
-			this.responseContentStream = null;
-			this.responseContent = null;
-		} else {
-			this.responseContent = new ByteArrayOutputStream();
-			this.responseContentStream = new CopyInputStream(contentStream,
-					responseContent);
-		}
-	}
-
 	public byte[] getResponseContent() {
-		if (responseContentStream != null) {
-			flushContentStream(responseContentStream);
-			this.responseContentStream = null;
-		}
-		if (this.responseContent == null)
-			return null;
-		return this.responseContent.toByteArray();
+		return copyContent(responseContent);
+	}
+
+	public int getResponseContentSize() {
+		byte[] content = getResponseContent();
+		if (content == null) return 0;
+		return content.length;
 	}
 
 	public void setResponseContent(final byte[] content) {
-		if (content == null) {
-			this.responseContent = null;
-		} else {
-			this.responseContent = new ByteArrayOutputStream();
-			try {
-				this.responseContent.write(content);
-			} catch (IOException ioe) {
-				logger.severe("Impossible IOException! " + ioe.getMessage());
-			}
-		}
+		responseContent = copyContent(content);
 	}
 
 	public byte[] getProcessedResponseContent() {
@@ -467,67 +454,12 @@ public class Conversation extends BaseEntity {
 		return result;
 	}
 
-	protected void flushContentStream(InputStream is) {
-		if (is != null) {
-			try {
-				byte[] buff = new byte[2048];
-				while (is.read(buff) > 0)
-					; // flush whatever was in the stream
-			} catch (IOException ioe) {
-			} // ignore any errors
-		}
-	}
-
-	protected class CopyInputStream extends FilterInputStream {
-
-		private OutputStream os;
-
-		public CopyInputStream(InputStream is, OutputStream os) {
-			super(is);
-			this.os = os;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see java.io.FilterInputStream#read()
-		 */
-		@Override
-		public int read() throws IOException {
-			int result = super.read();
-			if (result > -1) {
-				os.write(result);
-				// String text = getResponseHeader("Content-Type");
-				// if (text != null && text.startsWith("text"))
-				// System.out.write(result);
-				os.flush();
-			} else {
-				// we close to signal downstream readers that the inputstream
-				// has closed
-				os.close();
-			}
-			return result;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see java.io.FilterInputStream#read(byte[], int, int)
-		 */
-		@Override
-		public int read(byte[] b, int off, int len) throws IOException {
-			int num = super.read(b, off, len);
-			if (num > 0) {
-				os.write(b, off, num);
-				// String text = getResponseHeader("Content-Type");
-				// if (text != null && text.startsWith("text"))
-				// System.out.write(b, off, num);
-				os.flush();
-			} else {
-				os.close();
-			}
-			return num;
-		}
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Object o) {
+		Conversation that = (Conversation) o;
+        return this.getDate().compareTo(that.getDate());
 	}
 
 }

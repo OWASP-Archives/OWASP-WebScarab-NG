@@ -40,6 +40,7 @@ import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.domain.SessionEvent;
+import org.owasp.webscarab.domain.StreamingConversation;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.services.HttpService;
 import org.springframework.context.ApplicationContext;
@@ -424,7 +425,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 			}
 
 			private Conversation readRequest(InputStream is) throws IOException {
-				Conversation conversation = new Conversation();
+				StreamingConversation conversation = new StreamingConversation();
 				String requestLine;
 				try {
 					do {
@@ -536,8 +537,9 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 					cos = new ChunkedOutputStream(os);
 					os = cos;
 				}
-				InputStream cs = conversation.getResponseContentStream();
-				if (cs != null) {
+				if (conversation instanceof StreamingConversation) {
+					StreamingConversation sc = (StreamingConversation) conversation;
+					InputStream cs = sc.getResponseContentStream();
 					byte[] buff = new byte[4096];
 					int got;
 					while ((got = cs.read(buff)) > -1)
