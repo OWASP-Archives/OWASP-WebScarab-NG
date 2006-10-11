@@ -308,7 +308,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 					boolean close;
 					do {
 						close = false;
-						Conversation conversation = readRequest(is);
+						StreamingConversation conversation = readRequest(is);
 
 						// empty request line, connection closed?
 						if (conversation == null)
@@ -374,7 +374,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 							summary.setPlugin("Proxy");
 							getConversationService().addConversation(
 									conversation, summary);
-							if (!"".equals(annotation.getAnnotation().trim())) {
+							if (!"".equals(annotation.getAnnotation())) {
 								annotation.setId(summary.getId());
 								getConversationService().updateAnnotation(
 										annotation);
@@ -424,7 +424,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 				return line.toString();
 			}
 
-			private Conversation readRequest(InputStream is) throws IOException {
+			private StreamingConversation readRequest(InputStream is) throws IOException {
 				StreamingConversation conversation = new StreamingConversation();
 				String requestLine;
 				try {
@@ -432,7 +432,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 						requestLine = readLine(is);
 					} while (requestLine.trim().equals(""));
 				} catch (IOException ioe) {
-					System.err.println("Error reading requestLine");
+					logger.info("Error reading requestLine - incomplete SSL connection?");
 					return null;
 				}
 				int first = requestLine.indexOf(" ");
