@@ -4,11 +4,7 @@
 package org.owasp.webscarab.services;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
@@ -24,7 +20,7 @@ import org.owasp.webscarab.util.HttpMethodUtils;
 public class HttpService {
 
 	private HttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
-	
+
 	/*
 	 * We will use this method to allow the user interface to configure how the http service
 	 * behaves, e.g. timeouts, etc
@@ -32,7 +28,7 @@ public class HttpService {
 	public HttpConnectionManagerParams getHttpConnectionManagerParams() {
 		return httpConnectionManager.getParams();
 	}
-	
+
 	private HttpClient getClient() {
 		return new HttpClient(httpConnectionManager);
 	}

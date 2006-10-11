@@ -373,8 +373,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 							summary.setPlugin("Proxy");
 							getConversationService().addConversation(
 									conversation, summary);
-							if (annotation != null
-									&& !"".equals(annotation.getAnnotation())) {
+							if (!"".equals(annotation.getAnnotation().trim())) {
 								annotation.setId(summary.getId());
 								getConversationService().updateAnnotation(
 										annotation);

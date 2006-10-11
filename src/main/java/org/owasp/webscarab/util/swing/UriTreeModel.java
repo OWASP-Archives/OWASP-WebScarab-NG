@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.util.swing;
 
@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class UriTreeModel extends AbstractTreeModel {
 
@@ -134,7 +134,7 @@ public class UriTreeModel extends AbstractTreeModel {
 		if (parent == getRoot()) {
 			children = nodes.get(null);
 		} else {
-			children = nodes.get((URI) parent);
+			children = nodes.get(parent);
 		}
 		if (children == null)
 			children = NO_CHILDREN;

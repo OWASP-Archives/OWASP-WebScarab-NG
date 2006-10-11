@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui.forms.support;
 
@@ -23,19 +23,19 @@ public class ConversationValidator {
 
 	public static final Validator REQUEST_VALIDATOR = new RequestValidator();
 	public static final Validator RESPONSE_VALIDATOR = new ResponseValidator();
-	
+
 	private ConversationValidator() {}
-	
+
 	private static class RequestValidator implements Validator {
 
 		private Set<String> methods = new HashSet<String>(Arrays.asList(new String[] {
-				"GET", "POST", "HEAD", "TRACE", "OPTIONS"	
+				"GET", "POST", "HEAD", "TRACE", "OPTIONS"
 			}));
-			
+
 		private Set<String> versions = new HashSet<String>(Arrays.asList(new String[] {
 				"HTTP/1.0", "HTTP/1.1"
 			}));
-			
+
 		public ValidationResults validate(Object object) {
 			DefaultValidationResults results = new DefaultValidationResults();
 			Conversation c = (Conversation) object;
@@ -58,22 +58,22 @@ public class ConversationValidator {
 				results.addMessage(Conversation.PROPERTY_REQUEST_VERSION, Severity.ERROR, "Invalid request version");
 			}
 			NamedValue[] headers = c.getRequestHeaders();
-			boolean hostRequired = version.equals("HTTP/1.1");
+			boolean hostRequired = version != null && version.equals("HTTP/1.1");
 			if (headers != null)
 				for (int i=0; i<headers.length; i++) {
 					if (headers[i].getName() == null || headers[i].getName().equals("")) {
 						results.addMessage(Conversation.PROPERTY_REQUEST_HEADERS, Severity.ERROR, "Header name may not be empty");
-					} else if (headers[i].getValue() == null || headers[i].getValue().equals("")) { 
+					} else if (headers[i].getValue() == null || headers[i].getValue().equals("")) {
 						results.addMessage(Conversation.PROPERTY_REQUEST_HEADERS, Severity.ERROR, "Header value may not be empty");
 					} else if (headers[i].getName().equalsIgnoreCase("host")) {
 						hostRequired = false;
-						if (!uri.getHost().equalsIgnoreCase(headers[i].getValue()))
+						if (uri != null && !uri.getHost().equalsIgnoreCase(headers[i].getValue()))
 							results.addMessage(Conversation.PROPERTY_REQUEST_HEADERS, Severity.WARNING, "Host header does not match URI");
 					}
 				}
-			if (hostRequired) 
+			if (hostRequired)
 				results.addMessage(Conversation.PROPERTY_REQUEST_HEADERS, Severity.WARNING, "The selected HTTP version requires a Host header");
-			
+
 			byte[] content = c.getRequestContent();
 			if ("GET".equals(method) && content != null && content.length > 0)
 				results.addMessage(Conversation.PROPERTY_REQUEST_CONTENT, Severity.ERROR, "GET Requests cannot have a body");
@@ -84,11 +84,11 @@ public class ConversationValidator {
 	}
 
 	private static class ResponseValidator implements Validator {
-		
+
 		private Set<String> versions = new HashSet<String>(Arrays.asList(new String[] {
 				"HTTP/1.0", "HTTP/1.1"
 			}));
-			
+
 		public ValidationResults validate(Object object) {
 			DefaultValidationResults results = new DefaultValidationResults();
 			Conversation c = (Conversation) object;
@@ -108,18 +108,18 @@ public class ConversationValidator {
 			if (message == null || message.equals("")) {
 				results.addMessage(Conversation.PROPERTY_RESPONSE_STATUS, Severity.ERROR, "Response message cannot be empty");
 			}
-			
+
 			NamedValue[] headers = c.getResponseHeaders();
 			if (headers != null)
 				for (int i=0; i<headers.length; i++) {
 					if (headers[i].getName() == null || headers[i].getName().equals("")) {
 						results.addMessage(Conversation.PROPERTY_RESPONSE_HEADERS, Severity.ERROR, "Header name may not be empty");
-					} else if (headers[i].getValue() == null || headers[i].getValue().equals("")) { 
+					} else if (headers[i].getValue() == null || headers[i].getValue().equals("")) {
 						results.addMessage(Conversation.PROPERTY_RESPONSE_HEADERS, Severity.ERROR, "Header value may not be empty");
 					}
 				}
-			
+
 			return results;
-		}		
+		}
 	}
 }

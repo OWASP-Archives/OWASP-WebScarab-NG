@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui;
 
@@ -39,7 +39,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 
 	private CompoundConversationTableFormat tableFormat = new CompoundConversationTableFormat();
 	private ConversationService conversationService;
-	
+
 	public ConversationTableFactory() {
 		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
 			public Class getAttributeClass() {
@@ -159,7 +159,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 	}
-	
+
 	/**
 	 * @return Returns the conversationService.
 	 */
@@ -181,7 +181,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			table.setDefaultRenderer(klass, renderer);
 		}
 	}
-	
+
 	public JTable getConversationTable(SortedList<ConversationSummary> conversationSummaryList) {
 		JTable table = getComponentFactory().createTable();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -197,15 +197,15 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		registerRenderersForTable(table, colorProvider);
 		return table;
 	}
-	
+
 	private class CompoundConversationTableFormat implements WritableTableFormat<ConversationSummary>, AdvancedTableFormat<ConversationSummary> {
 
 		private List<ObjectAttribute<ConversationSummary>> columns = new ArrayList<ObjectAttribute<ConversationSummary>>();
-		
+
 		public void addColumn(ObjectAttribute<ConversationSummary> column) {
 			columns.add(column);
 		}
-		
+
 		public Class getColumnClass(int column) {
 			return columns.get(column).getAttributeClass();
 		}
@@ -225,7 +225,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		}
 
 		public Object getColumnValue(ConversationSummary summary, int column) {
-			return columns.get(column).getValue((ConversationSummary) summary);
+			return columns.get(column).getValue(summary);
 		}
 
 		public boolean isEditable(ConversationSummary summary, int column) {
@@ -235,17 +235,17 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		public ConversationSummary setColumnValue(ConversationSummary summary, Object value, int column) {
 			return columns.get(column).setAttribute(summary, value);
 		}
-		
+
 	}
-	
+
 	private class AnnotationColorProvider implements TableColorProvider {
-		
+
 		private EventList<ConversationSummary> conversations;
-		
+
 		public AnnotationColorProvider(EventList<ConversationSummary> conversations) {
 			this.conversations = conversations;
 		}
-		
+
 		public Color getBackGroundColor(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			ConversationSummary summary = conversations.get(row);
 			if (getConversationService().getAnnotation(summary.getId()) != null) {
@@ -258,6 +258,6 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		public Color getForegroundColor(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			return table.getForeground();
 		}
-		
+
 	}
 }
