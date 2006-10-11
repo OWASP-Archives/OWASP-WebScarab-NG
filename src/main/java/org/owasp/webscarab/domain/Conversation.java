@@ -28,14 +28,14 @@ import java.util.zip.InflaterInputStream;
  * The <code>Conversation</code> is the basic element used by WebScarab. It
  * represents a request sent to the server, and the response that was returned
  * from the server
- * 
+ *
  * It provides a number of self-explanatory getters and setters for the various
  * attributes of a request and response
- * 
+ *
  * Possibly worthy of some explanation are the "processedContent" methods. These
  * methods handle raw content, possibly gzipped, or otherwise encoded, and
  * provide a handy way of getting to the useful content inside
- * 
+ *
  * @author rdawes
  */
 
@@ -71,6 +71,8 @@ public class Conversation extends BaseEntity {
 
 	private Date date = new Date();
 
+	private String plugin;
+
 	private String requestMethod;
 
 	private URI requestUri;
@@ -104,7 +106,7 @@ public class Conversation extends BaseEntity {
 	/**
 	 * This value is automatically initialised to the current time when the
 	 * Conversation is constructed
-	 * 
+	 *
 	 * @return Returns the date.
 	 */
 	public Date getDate() {
@@ -124,6 +126,21 @@ public class Conversation extends BaseEntity {
 			this.date = new Date(date.getTime());
 		}
 	}
+
+    /**
+     * @return Returns the plugin.
+     */
+    public String getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * @param plugin
+     *            The plugin to set.
+     */
+    public void setPlugin(String plugin) {
+        this.plugin = plugin;
+    }
 
 	public String getRequestMethod() {
 		return this.requestMethod;
@@ -472,7 +489,7 @@ public class Conversation extends BaseEntity {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.io.FilterInputStream#read()
 		 */
 		@Override
@@ -494,7 +511,7 @@ public class Conversation extends BaseEntity {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.io.FilterInputStream#read(byte[], int, int)
 		 */
 		@Override
