@@ -56,7 +56,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 
 	private List<Listener> listeners = new ArrayList<Listener>();
 
-	private List<ListenerConfiguration> configuration = new ArrayList<ListenerConfiguration>();
+	private List<ListenerConfiguration> configurations = new ArrayList<ListenerConfiguration>();
 
 	private Annotator annotator;
 
@@ -78,7 +78,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 	public void setListeners(List<ListenerConfiguration> listeners)
 			throws IOException {
 		stopListeners();
-		configuration = copy(listeners);
+		configurations = copy(listeners);
 		try {
 			startListeners();
 		} catch (IOException ioe) {
@@ -88,7 +88,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 	}
 
 	public List<ListenerConfiguration> getListeners() {
-		List<ListenerConfiguration> copy = copy(configuration);
+		List<ListenerConfiguration> copy = copy(configurations);
 		if (copy.size() == 0) {
 			ListenerConfiguration config = new ListenerConfiguration();
 			config.setHostName("localhost");
@@ -236,7 +236,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 			serverSocket.setSoTimeout(100);
 
 			// we force an exception on the creating thread
-			// if the configuration is bad
+			// if the configurations is bad
 			logger.info("Listening on " + configuration.getSocketAddress());
 			serverSocket.bind(configuration.getSocketAddress(), 5);
 		}
@@ -292,8 +292,6 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 			private Socket socket;
 
 			private String base;
-
-			private Logger logger = Logger.getLogger(getClass().getName());
 
 			public ConnectionHandler(Socket socket, String base) {
 				this.socket = socket;
@@ -502,7 +500,9 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 		    				ioe.initCause(nfe);
 		    				throw ioe;
 		    			}
-		    		}
+		    		} else {
+		    		    return;
+                    }
 		    	} else {
 		    		throw new IOException("Can " + conversation.getRequestMethod() + " have a body or not? Not implemented yet!");
 		    	}
