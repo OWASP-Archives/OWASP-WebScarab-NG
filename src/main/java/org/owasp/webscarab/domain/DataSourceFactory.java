@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.owasp.webscarab.jdbc;
+package org.owasp.webscarab.domain;
 
 import java.sql.SQLException;
 
