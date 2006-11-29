@@ -4,7 +4,7 @@
 <beans>
 
 
-	<bean id="conversationServiceTarget"
+	<!--bean id="conversationServiceTarget"
 		class="org.owasp.webscarab.services.ConversationService" lazy-init="true">
 		<property name="session">
 			<value>0</value>
@@ -18,9 +18,9 @@
 		<property name="eventService">
 			<ref bean="eventService" />
 		</property>
-	</bean>
+	</bean-->
 
-	<bean id="conversationService"
+	<!--bean id="conversationService"
 		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
 		lazy-init="true">
 		<property name="transactionManager">
@@ -38,6 +38,26 @@
 					PROPAGATION_REQUIRED, ISOLATION_READ_UNCOMMITTED
 				</prop>
 			</props>
+		</property>
+	</bean -->
+
+	<bean name="conversationService"
+		class="org.owasp.webscarab.services.TransactionManagedConversationService"
+		lazy-init="true">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="session">
+			<value>0</value>
+		</property>
+		<property name="conversationDao">
+			<ref bean="conversationDao" />
+		</property>
+		<property name="annotationDao">
+			<ref bean="annotationDao" />
+		</property>
+		<property name="eventService">
+			<ref bean="eventService" />
 		</property>
 	</bean>
 
