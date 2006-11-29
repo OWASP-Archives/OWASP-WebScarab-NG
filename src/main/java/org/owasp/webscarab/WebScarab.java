@@ -13,7 +13,7 @@ package org.owasp.webscarab;
 import org.springframework.richclient.application.ApplicationLauncher;
 
 /**
- * 
+ *
  * @author rdawes
  */
 public class WebScarab {
@@ -39,6 +39,9 @@ public class WebScarab {
                     richclientApplicationContextPath });
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ie) {}
             System.exit(1);
         }
     }
