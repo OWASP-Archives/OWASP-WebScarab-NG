@@ -6,8 +6,8 @@ package org.owasp.webscarab.util.swing;
 import javax.swing.JOptionPane;
 
 import org.bushe.swing.event.EventService;
+import org.owasp.webscarab.domain.DataSourceFactory;
 import org.owasp.webscarab.domain.SessionEvent;
-import org.owasp.webscarab.jdbc.DataSourceFactory;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.Application;
