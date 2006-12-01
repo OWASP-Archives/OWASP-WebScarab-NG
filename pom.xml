@@ -36,6 +36,83 @@
     <name>The OWASP Foundation</name>
     <url>http://www.owasp.org</url>
   </organization>
+  <pluginRepositories>
+  <pluginRepository>
+    <id>codehaus snapshot repository</id>
+    <url>http://snapshots.repository.codehaus.org/</url>
+    <releases>
+      <enabled>true</enabled>
+    </releases>
+  </pluginRepository>
+  </pluginRepositories>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>webstart-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jnlp</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+           <!--outputDirectory></outputDirectory--> <!-- not required?? -->
+
+           <!-- JNLP generation -->
+           <jnlp>
+             <resources>${project.basedir}/src/main/jnlp</resources>
+             <inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath>
+             <inputTemplate>src/main/jnlp/template.vm</inputTemplate> <!-- relative to inputTemplateResourcePath -->
+             <!--outputFile>WebScarab-ng.jnlp</outputFile--> <!-- defaults to launch.jnlp -->
+
+             <!-- used to automatically identify the jar containing the main class. -->
+             <!-- this is perhaps going to change -->
+             <mainClass>org.owasp.webscarab.WebScarab</mainClass>
+           </jnlp>
+
+
+           <!-- SIGNING -->
+           <!-- defining this will automatically sign the jar and its dependencies, if necessary -->
+           <sign>
+             <keystore>${keystore}</keystore>
+             <keypass>${keypass}</keypass>  <!-- we need to override passwords easily from the command line. ${keypass} -->
+             <storepass>${storepass}</storepass> <!-- ${storepass} -->
+             <storetype>pkcs12</storetype>
+             <alias>${alias}</alias>
+             <verify>true</verify>
+           </sign>
+
+           <!-- BUILDING PROCESS -->
+           <!--usejnlpservlet>true</usejnlpservlet--> <!-- not yet supported -->
+
+           <!-- should we have some more configurations here? E.g. compression level (aka packing effort) -->
+           <!-- not yet implemented -->
+           <pack200>true</pack200>
+           <gzip>true</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
+
+           <!-- misc -->
+           <!-- if there are multiple apps, do we need to mark one as default? (app/ redirects to app/default.jnlp in jnlp servlet ??)-->
+           <!-- -->
+
+           <!--install>false</install--> <!-- not yet supported -->
+           <verbose>true</verbose>
+
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
   <dependencies>
     <dependency>
       <groupId>cglib</groupId>
