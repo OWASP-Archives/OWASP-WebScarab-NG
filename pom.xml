@@ -80,7 +80,11 @@
              <!-- this is perhaps going to change -->
              <mainClass>org.owasp.webscarab.WebScarab</mainClass>
            </jnlp>
-
+	   <dependencies>
+               <includes></includes>
+               <excludes></excludes>
+               
+           </dependencies>
 
            <!-- SIGNING -->
            <!-- defining this will automatically sign the jar and its dependencies, if necessary -->
@@ -98,8 +102,8 @@
 
            <!-- should we have some more configurations here? E.g. compression level (aka packing effort) -->
            <!-- not yet implemented -->
-           <pack200>true</pack200>
-           <gzip>true</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
+           <pack200>false</pack200>
+           <gzip>false</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
 
            <!-- misc -->
            <!-- if there are multiple apps, do we need to mark one as default? (app/ redirects to app/default.jnlp in jnlp servlet ??)-->
@@ -114,11 +118,6 @@
   </build>
   
   <dependencies>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.1_3</version>
-    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -188,11 +187,6 @@
       <groupId>net.sourceforge.jchardet</groupId>
       <artifactId>chardet</artifactId>
       <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>1.2.7</version>
     </dependency>
   </dependencies>
 </project>
