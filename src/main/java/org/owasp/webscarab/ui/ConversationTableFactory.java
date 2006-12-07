@@ -16,7 +16,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.owasp.webscarab.domain.Annotation;
-import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.renderers.DateRenderer;
@@ -41,118 +41,118 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 	private ConversationService conversationService;
 
 	public ConversationTableFactory() {
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.id";
+				return "conversation.id";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getId();
+			public Object getValue(Conversation conversation) {
+				return conversation.getId();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return Date.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.date";
+				return "conversation.date";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getDate();
+			public Object getValue(Conversation conversation) {
+				return conversation.getDate();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.requestMethod";
+				return "conversation.requestMethod";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getRequestMethod();
+			public Object getValue(Conversation conversation) {
+				return conversation.getRequestMethod();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.requestUri.host";
+				return "conversation.requestUri.host";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return UrlUtils.getSchemeHostPort(summary.getRequestUri());
+			public Object getValue(Conversation conversation) {
+				return UrlUtils.getSchemeHostPort(conversation.getRequestUri());
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.requestUri.path";
+				return "conversation.requestUri.path";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getRequestUri().getPath();
+			public Object getValue(Conversation conversation) {
+				return conversation.getRequestUri().getPath();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.requestUri.parameters";
+				return "conversation.requestUri.parameters";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getRequestUri().getQuery();
+			public Object getValue(Conversation conversation) {
+				return conversation.getRequestUri().getQuery();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.responseStatus";
+				return "conversation.responseStatus";
 			}
-			public Object getValue(ConversationSummary summary) {
-				return summary.getResponseStatus() + " " + summary.getResponseMessage();
+			public Object getValue(Conversation conversation) {
+				return conversation.getResponseStatus() + " " + conversation.getResponseMessage();
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.requestContentSize";
+				return "conversation.requestContentSize";
 			}
-			public Object getValue(ConversationSummary summary) {
-				int size = summary.getRequestContentSize();
+			public Object getValue(Conversation conversation) {
+				int size = conversation.getRequestContentSize();
 				if (size == 0) return null;
 				return new Integer(size);
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
-				return "conversationSummary.responseContentSize";
+				return "conversation.responseContentSize";
 			}
-			public Object getValue(ConversationSummary summary) {
-				int size = summary.getResponseContentSize();
+			public Object getValue(Conversation conversation) {
+				int size = conversation.getResponseContentSize();
 				if (size == 0) return null;
 				return new Integer(size);
 			}
 		});
-		tableFormat.addColumn(new ObjectAttribute<ConversationSummary>() {
+		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
 			public Class getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
 				return "annotation.annotation";
 			}
-			public Object getValue(ConversationSummary summary) {
-				Annotation annotation = getConversationService().getAnnotation(summary.getId());
+			public Object getValue(Conversation conversation) {
+				Annotation annotation = getConversationService().getAnnotation(conversation.getId());
 				if (annotation != null)
 					return annotation.getAnnotation();
 				return null;
@@ -182,7 +182,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 		}
 	}
 
-	public JTable getConversationTable(SortedList<ConversationSummary> conversationSummaryList) {
+	public JTable getConversationTable(SortedList<Conversation> conversationList) {
 		JTable table = getComponentFactory().createTable();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		if (table instanceof JXTable) {
@@ -190,19 +190,19 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			jx.setColumnControlVisible(true);
 			jx.setSortable(false);
 		}
-		table.setModel(new EventTableModel<ConversationSummary>(conversationSummaryList, tableFormat));
-		new TableComparatorChooser<ConversationSummary>(table, conversationSummaryList, true);
+		table.setModel(new EventTableModel<Conversation>(conversationList, tableFormat));
+		new TableComparatorChooser<Conversation>(table, conversationList, true);
 		table.setDefaultRenderer(Date.class, new DateRenderer());
-		TableColorProvider colorProvider = new AnnotationColorProvider(conversationSummaryList);
+		TableColorProvider colorProvider = new AnnotationColorProvider(conversationList);
 		registerRenderersForTable(table, colorProvider);
 		return table;
 	}
 
-	private class CompoundConversationTableFormat implements WritableTableFormat<ConversationSummary>, AdvancedTableFormat<ConversationSummary> {
+	private class CompoundConversationTableFormat implements WritableTableFormat<Conversation>, AdvancedTableFormat<Conversation> {
 
-		private List<ObjectAttribute<ConversationSummary>> columns = new ArrayList<ObjectAttribute<ConversationSummary>>();
+		private List<ObjectAttribute<Conversation>> columns = new ArrayList<ObjectAttribute<Conversation>>();
 
-		public void addColumn(ObjectAttribute<ConversationSummary> column) {
+		public void addColumn(ObjectAttribute<Conversation> column) {
 			columns.add(column);
 		}
 
@@ -224,31 +224,31 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			return columns.get(column).getAttributeId();
 		}
 
-		public Object getColumnValue(ConversationSummary summary, int column) {
-			return columns.get(column).getValue(summary);
+		public Object getColumnValue(Conversation conversation, int column) {
+			return columns.get(column).getValue(conversation);
 		}
 
-		public boolean isEditable(ConversationSummary summary, int column) {
+		public boolean isEditable(Conversation conversation, int column) {
 			return columns.get(column).isAttributeEditable();
 		}
 
-		public ConversationSummary setColumnValue(ConversationSummary summary, Object value, int column) {
-			return columns.get(column).setAttribute(summary, value);
+		public Conversation setColumnValue(Conversation conversation, Object value, int column) {
+			return columns.get(column).setAttribute(conversation, value);
 		}
 
 	}
 
 	private class AnnotationColorProvider implements TableColorProvider {
 
-		private EventList<ConversationSummary> conversations;
+		private EventList<Conversation> conversations;
 
-		public AnnotationColorProvider(EventList<ConversationSummary> conversations) {
+		public AnnotationColorProvider(EventList<Conversation> conversations) {
 			this.conversations = conversations;
 		}
 
 		public Color getBackGroundColor(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			ConversationSummary summary = conversations.get(row);
-			if (getConversationService().getAnnotation(summary.getId()) != null) {
+			Conversation conversation = conversations.get(row);
+			if (getConversationService().getAnnotation(conversation.getId()) != null) {
 				return Color.PINK.darker();
 			} else {
 				return table.getBackground();

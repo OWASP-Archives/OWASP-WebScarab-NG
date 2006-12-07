@@ -5,7 +5,7 @@ package org.owasp.webscarab.services;
 
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
-import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.Session;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -27,11 +27,10 @@ public class TransactionManagedConversationService extends ConversationService {
 
     }
 
-    public void addConversation(Conversation conversation,
-            ConversationSummary summary) {
+    public void addConversation(Session session, Conversation conversation) {
         TransactionStatus status = getTransactionManager().getTransaction(def);
         try {
-            super.addConversation(conversation, summary);
+            super.addConversation(session, conversation);
         } catch (Exception t) {
             getTransactionManager().rollback(status);
             return;

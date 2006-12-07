@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui;
 
@@ -29,7 +29,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
-import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.ui.forms.RequestForm;
@@ -59,7 +58,7 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class ConversationView extends AbstractView {
 
@@ -69,27 +68,27 @@ public class ConversationView extends AbstractView {
 
 	private Form annotationForm;
 
-	private EventList<ConversationSummary> conversationSummaryList;
+	private EventList<Conversation> conversationList;
 
 	private ConversationService conversationService;
 
 	private ConversationTableFactory conversationTableFactory;
 
-	private ConversationSummary selectedSummary;
+	private Conversation selectedConversation;
 
 	private FormModel conversationModel;
 
 	private FormModel annotationModel;
 
 	private JPanel filterPanel;
-	
+
 	private FindExecutor findExecutor = new FindExecutor();
-	
+
 	private UriTreeModel uriTreeModel;
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.richclient.application.support.AbstractView#createControl()
 	 */
 	@SuppressWarnings("unchecked")
@@ -114,33 +113,33 @@ public class ConversationView extends AbstractView {
 		uriTree.setShowsRootHandles(true);
 		uriTree.setCellRenderer(new UriRenderer());
 		UriMatcher uriMatcher = new UriMatcher(uriTree);
-		
-		EventList<ConversationSummary> conversationList = getConversationSummaryList();
-		FilterList<ConversationSummary> uriFilterList = new FilterList(conversationList, uriMatcher);
-		TextFilterator<ConversationSummary> filterator = new ConversationSummaryFilter();
-		MatcherEditor<ConversationSummary> matcher = new TextComponentMatcherEditor<ConversationSummary>(filterField, filterator);
-		FilterList<ConversationSummary> filterList = new FilterList(uriFilterList, matcher);
-		SortedList<ConversationSummary> sortedList = new SortedList<ConversationSummary>(filterList);
-		
+
+		EventList<Conversation> conversationList = getConversationList();
+		FilterList<Conversation> uriFilterList = new FilterList(conversationList, uriMatcher);
+		TextFilterator<Conversation> filterator = new ConversationFilter();
+		MatcherEditor<Conversation> matcher = new TextComponentMatcherEditor<Conversation>(filterField, filterator);
+		FilterList<Conversation> filterList = new FilterList(uriFilterList, matcher);
+		SortedList<Conversation> sortedList = new SortedList<Conversation>(filterList);
+
 		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
 		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		mainSplitPane.setResizeWeight(0.5);
-		
+
 		JSplitPane topSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		topSplitPane.setResizeWeight(0.2);
 		topSplitPane.setOneTouchExpandable(true);
 
-		new UriTreeManager(getConversationSummaryList(), uriTreeModel);
+		new UriTreeManager(getConversationList(), uriTreeModel);
 		JScrollPane treeScrollPane = getComponentFactory().createScrollPane(uriTree);
 		treeScrollPane.setMinimumSize(new Dimension(200, 30));
 		topSplitPane.setLeftComponent(treeScrollPane);
-		
+
 		filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		filterPanel.add(getComponentFactory().createLabelFor("filter", filterField));
 		filterPanel.add(filterField);
-		
+
 		JTable table = getConversationTableFactory().getConversationTable(sortedList);
-		final EventSelectionModel<ConversationSummary> conversationSelectionModel = new EventSelectionModel<ConversationSummary>(
+		final EventSelectionModel<Conversation> conversationSelectionModel = new EventSelectionModel<Conversation>(
 				sortedList);
 		table.setSelectionModel(conversationSelectionModel);
 		JScrollPane tableScrollPane = getComponentFactory().createScrollPane(
@@ -157,7 +156,7 @@ public class ConversationView extends AbstractView {
 				public void valueChanged(ListSelectionEvent e) {
 					if (e.getValueIsAdjusting())
 						return;
-					EventList<ConversationSummary> selected = conversationSelectionModel
+					EventList<Conversation> selected = conversationSelectionModel
 							.getSelected();
 					if (selected.isEmpty() || selected.size() > 1) {
 						updateSelection(null);
@@ -186,13 +185,13 @@ public class ConversationView extends AbstractView {
 		mainSplitPane.setBottomComponent(conversationSplitPane);
 		panel.add(mainSplitPane, BorderLayout.CENTER);
 		panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
-		if (getSelectedSummary() != null) {
-			conversationSelectionModel.getSelected().add(getSelectedSummary());
+		if (getSelectedConversation() != null) {
+			conversationSelectionModel.getSelected().add(getSelectedConversation());
 		}
 		return panel;
 	}
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see org.springframework.richclient.application.support.AbstractView#registerLocalCommandExecutors(org.springframework.richclient.application.PageComponentContext)
 	 */
@@ -202,17 +201,17 @@ public class ConversationView extends AbstractView {
 	}
 
 
-	private void updateSelection(ConversationSummary summary) {
+	private void updateSelection(Conversation conversation) {
 		if (annotationModel.isDirty())
 			annotationModel.commit();
-		if (summary != null) {
+		if (conversation != null) {
 			conversationModel.setFormObject(getConversationService()
-					.getConversation(summary.getId()));
+					.getConversation(conversation.getId()));
 			Annotation annotation = getConversationService().getAnnotation(
-					summary.getId());
+					conversation.getId());
 			if (annotation == null) {
 				annotation = new Annotation();
-				annotation.setId(summary.getId());
+				annotation.setId(conversation.getId());
 			}
 			annotationModel.setFormObject(annotation);
 		} else {
@@ -221,21 +220,21 @@ public class ConversationView extends AbstractView {
 		}
 	}
 
-	public EventList<ConversationSummary> getConversationSummaryList() {
-		return this.conversationSummaryList;
+	public EventList<Conversation> getConversationList() {
+		return this.conversationList;
 	}
 
-	public void setConversationSummaryList(
-			EventList<ConversationSummary> conversationList) {
-		this.conversationSummaryList = conversationList;
+	public void setConversationList(
+			EventList<Conversation> conversationList) {
+		this.conversationList = conversationList;
 	}
 
-	public ConversationSummary getSelectedSummary() {
-		return this.selectedSummary;
+	public Conversation getSelectedConversation() {
+		return this.selectedConversation;
 	}
 
-	public void setSelectedSummary(ConversationSummary selectedSummary) {
-		this.selectedSummary = selectedSummary;
+	public void setSelectedConversation(Conversation selectedConversation) {
+		this.selectedConversation = selectedConversation;
 	}
 
 	/**
@@ -266,46 +265,46 @@ public class ConversationView extends AbstractView {
 		public void preCommit(FormModel formModel) {
 		}
 	}
-	
-	private class ConversationSummaryFilter implements TextFilterator<ConversationSummary> {
 
-		public void getFilterStrings(List<String> list, ConversationSummary summary) {
-			list.add(summary.getRequestMethod());
-			list.add(summary.getRequestUri().toString());
-			list.add(summary.getResponseStatus());
-			list.add(summary.getResponseMessage());
-			list.add(summary.getPlugin());
-			Annotation annotation = getConversationService().getAnnotation(summary.getId());
+	private class ConversationFilter implements TextFilterator<Conversation> {
+
+		public void getFilterStrings(List<String> list, Conversation conversation) {
+			list.add(conversation.getRequestMethod());
+			list.add(conversation.getRequestUri().toString());
+			list.add(conversation.getResponseStatus());
+			list.add(conversation.getResponseMessage());
+			list.add(conversation.getSource());
+			Annotation annotation = getConversationService().getAnnotation(conversation.getId());
 			if (annotation != null && !"".equals(annotation.getAnnotation()))
 				list.add(annotation.getAnnotation());
 		}
-		
+
 	}
-	
+
 	private class FindExecutor extends AbstractActionCommandExecutor {
 		public void execute() {
 			filterPanel.setVisible(true);
 		}
 	}
-	
-	private class UriTreeManager implements ListEventListener<ConversationSummary> {
 
-		private EventList<ConversationSummary> list;
+	private class UriTreeManager implements ListEventListener<Conversation> {
+
+		private EventList<Conversation> list;
 		private List<URI> uriList = new ArrayList<URI>();
 		private UriTreeModel uriTree;
-		
-		public UriTreeManager(EventList<ConversationSummary> list, UriTreeModel uriTree) {
+
+		public UriTreeManager(EventList<Conversation> list, UriTreeModel uriTree) {
 			this.list = list;
 			this.uriTree = uriTree;
 			populateExisting();
 			// the conversationSummary list is only ever updated on the EDT
-			list.addListEventListener(this); 
+			list.addListEventListener(this);
 		}
-		
+
 		private void populateExisting() {
 			list.getReadWriteLock().readLock().lock();
 			uriList.clear();
-			Iterator<ConversationSummary> it = list.iterator();
+			Iterator<Conversation> it = list.iterator();
 			while (it.hasNext()) {
 				URI uri = it.next().getRequestUri();
 				uriList.add(uri);
@@ -313,8 +312,8 @@ public class ConversationView extends AbstractView {
 			}
 			list.getReadWriteLock().readLock().unlock();
 		}
-		
-		public void listChanged(ListEvent<ConversationSummary> evt) {
+
+		public void listChanged(ListEvent<Conversation> evt) {
 			while (evt.next()) {
 				int index = evt.getIndex();
 				if (evt.getType() == ListEvent.DELETE) {
@@ -326,25 +325,25 @@ public class ConversationView extends AbstractView {
 				}
 			}
 		}
-		
+
 	}
-	
-	private class UriMatcher extends AbstractMatcherEditor<ConversationSummary> implements TreeSelectionListener {
+
+	private class UriMatcher extends AbstractMatcherEditor<Conversation> implements TreeSelectionListener {
 
 		private TreeSelectionModel tsm;
-		private Matcher<ConversationSummary> matcher;
-		
+		private Matcher<Conversation> matcher;
+
 		public UriMatcher(JTree tree) {
 			this.tsm = tree.getSelectionModel();
-			matcher = new Matcher<ConversationSummary>() {
-				public boolean matches(ConversationSummary summary) {
+			matcher = new Matcher<Conversation>() {
+				public boolean matches(Conversation conversation) {
 					if (tsm.getSelectionCount() == 0) return true;
-					TreePath[] selection = tsm.getSelectionPaths(); 
+					TreePath[] selection = tsm.getSelectionPaths();
 					for (int i=0; i<selection.length; i++) {
-						Object lastComponent = selection[i].getLastPathComponent(); 
+						Object lastComponent = selection[i].getLastPathComponent();
 						if (!(lastComponent instanceof URI)) continue;
 						URI uri = (URI) lastComponent;
-						if (summary.getRequestUri().toString().startsWith(uri.toString()))
+						if (conversation.getRequestUri().toString().startsWith(uri.toString()))
 							return true;
 					}
 					return false;
@@ -352,7 +351,7 @@ public class ConversationView extends AbstractView {
 			};
 			tree.addTreeSelectionListener(this);
 		}
-		
+
 		/* (non-Javadoc)
 		 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 		 */
@@ -368,9 +367,9 @@ public class ConversationView extends AbstractView {
 		 * @see ca.odell.glazedlists.matchers.AbstractMatcherEditor#getMatcher()
 		 */
 		@Override
-		public Matcher<ConversationSummary> getMatcher() {
+		public Matcher<Conversation> getMatcher() {
 			return matcher;
 		}
-		
+
 	}
 }

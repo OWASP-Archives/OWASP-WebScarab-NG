@@ -37,8 +37,8 @@ import org.bushe.swing.event.EventServiceEvent;
 import org.bushe.swing.event.EventSubscriber;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
-import org.owasp.webscarab.domain.ConversationSummary;
 import org.owasp.webscarab.domain.NamedValue;
+import org.owasp.webscarab.domain.Session;
 import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.domain.StreamingConversation;
 import org.owasp.webscarab.services.ConversationService;
@@ -71,6 +71,8 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 	private ApplicationContext applicationContext;
 
 	private ProxyInterceptor proxyInterceptor = null;
+
+    private Session session;
 
 	public Proxy() {
 	}
@@ -208,6 +210,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 		if (evt instanceof SessionEvent) {
 			SessionEvent event = (SessionEvent) evt;
 			if (event.getType() == SessionEvent.SESSION_CHANGED) {
+                setSession(event.getSession());
 				try {
 					startListeners();
 				} catch (IOException ioe) {
@@ -367,13 +370,10 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 							close = true;
 						}
 						if (getConversationService() != null) {
-							ConversationSummary summary = new ConversationSummary(
-									conversation);
-							summary.setPlugin("Proxy");
-							getConversationService().addConversation(
-									conversation, summary);
+							conversation.setSource("Proxy");
+							getConversationService().addConversation(getSession(), conversation);
 							if (!"".equals(annotation.getAnnotation())) {
-								annotation.setId(summary.getId());
+								annotation.setId(conversation.getId());
 								getConversationService().updateAnnotation(
 										annotation);
 							}
@@ -582,5 +582,19 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
 	public void setHttpService(HttpService httpService) {
 		this.httpService = httpService;
 	}
+
+    /**
+     * @return the session
+     */
+    public Session getSession() {
+        return this.session;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession(Session session) {
+        this.session = session;
+    }
 
 }

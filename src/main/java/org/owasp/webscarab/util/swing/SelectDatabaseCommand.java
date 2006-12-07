@@ -1,13 +1,16 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.util.swing;
+
+import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
 import org.bushe.swing.event.EventService;
-import org.owasp.webscarab.domain.DataSourceFactory;
+import org.owasp.webscarab.domain.Session;
 import org.owasp.webscarab.domain.SessionEvent;
+import org.owasp.webscarab.jdbc.DataSourceFactory;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.Application;
@@ -36,21 +39,21 @@ import org.springframework.richclient.form.FormModelHelper;
  * action is taken other than closing the dialog.
  * <p>
  * A typical configuration for this component might look like this:
- * 
+ *
  * <pre>
- *           &lt;bean id=&quot;placeholderConfigurer&quot; 
+ *           &lt;bean id=&quot;placeholderConfigurer&quot;
  *                class=&quot;org.springframework.beans.factory.config.PropertiesPlaceholderConfigurer&quot;/&gt;
- *         
+ *
  *            &lt;bean id=&quot;selectDatabaseCommand&quot;
  *                class=&quot;org.owasp.webscarab.util.swing.SelectDatabaseCommand&quot;&gt;
  *                &lt;property name=&quot;displaySuccess&quot; value=&quot;false&quot;/&gt;
  *                &lt;property name=&quot;defaultUserName&quot; value=&quot;${user.name}&quot;/&gt;
  *            &lt;/bean&gt;
  * </pre>
- * 
+ *
  * @author Ben Alex
  * @author Larry Streepy
- * 
+ *
  * @see LoginForm
  * @see LoginDetails
  * @see ApplicationSecurityManager
@@ -68,7 +71,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	private DataSourceFactory dataSourceFactory = null;
 
 	private EventService eventService = null;
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -79,7 +82,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	/**
 	 * Indicates whether an information message is displayed to the user upon
 	 * successful authentication. Defaults to true.
-	 * 
+	 *
 	 * @param displaySuccessMessage
 	 *            displays an information message upon successful login if true,
 	 *            otherwise false
@@ -145,21 +148,25 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	/**
 	 * Construct the Form to place in the dialog.
-	 * 
+	 *
 	 * @return form to use
 	 */
 	protected JdbcDetailsForm createJdbcDetailsForm() {
 		JdbcConnectionDetails jcd = new JdbcConnectionDetails();
     	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
-    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab");
+    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab/;hsqldb.default_table_type=cached");
     	jcd.setUsername("sa");
+        Properties properties = new Properties();
+        properties.setProperty("hsqldb.default_table_type", "cached");
+        properties.setProperty("default_table_type", "cached");
+        jcd.setConnectionProperties(properties);
 		ValidatingFormModel model = FormModelHelper.createUnbufferedFormModel(jcd);
 		return new JdbcDetailsForm(model);
 	}
 
 	/**
 	 * Get the dialog in use, if available.
-	 * 
+	 *
 	 * @return dialog instance in use
 	 */
 	protected ApplicationDialog getDialog() {
@@ -170,14 +177,17 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * Called to give subclasses control after a successful selection.
 	 */
 	protected void postSelection() {
-		if (getEventService() != null)
-			eventService.publish(new SessionEvent(this));
+		if (getEventService() != null) {
+            Session session = new Session();
+            session.setId(0);
+			eventService.publish(new SessionEvent(this, session));
+        }
 	}
 
 	/**
 	 * Report a login failure. Base implementation just displays a message
 	 * dialog with the localized message from the security exception.
-	 * 
+	 *
 	 * @param authentication
 	 *            token that failed to authenticate
 	 * @param exception
@@ -196,7 +206,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	/**
 	 * Get the "close on cancel" setting.
-	 * 
+	 *
 	 * @return close on cancel
 	 */
 	public boolean isCloseOnCancel() {
@@ -206,7 +216,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	/**
 	 * Indicates if the application should be closed if the user cancels the
 	 * selection operation. Default is true.
-	 * 
+	 *
 	 * @param closeOnCancel
 	 */
 	public void setCloseOnCancel(boolean closeOnCancel) {

@@ -42,7 +42,7 @@ public class Conversation extends BaseEntity implements Comparable {
 
 	public static final String PROPERTY_CONVERSATION_DATE = "date";
 
-	public static final String PROPERTY_CONVERSATION_PLUGIN = "plugin";
+	public static final String PROPERTY_CONVERSATION_SOURCE = "source";
 
 	public static final String PROPERTY_REQUEST_METHOD = "requestMethod";
 
@@ -78,7 +78,7 @@ public class Conversation extends BaseEntity implements Comparable {
 
 	private Date date = new Date();
 
-	private String plugin;
+	private String source;
 
 	private String requestMethod;
 
@@ -133,18 +133,18 @@ public class Conversation extends BaseEntity implements Comparable {
 	}
 
     /**
-     * @return Returns the plugin.
+     * @return Returns the source.
      */
-    public String getPlugin() {
-        return plugin;
+    public String getSource() {
+        return source;
     }
 
     /**
-     * @param plugin
-     *            The plugin to set.
+     * @param source
+     *            The source to set.
      */
-    public void setPlugin(String plugin) {
-        this.plugin = plugin;
+    public void setSource(String plugin) {
+        this.source = plugin;
     }
 
 	public String getRequestMethod() {

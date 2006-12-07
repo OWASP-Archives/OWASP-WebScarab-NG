@@ -3,15 +3,21 @@
  */
 package org.owasp.webscarab.jdbc;
 
+import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.owasp.webscarab.dao.BlobDao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.jdbc.object.SqlUpdate;
+
+import com.twmacinta.util.MD5;
 
 /**
  * @author rdawes
@@ -23,8 +29,23 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
     private BlobInsert blobInsert;
 
+    private Map<String, WeakReference<byte[]>> cache;
+
+    public JdbcBlobDao() {
+        cache = new LinkedHashMap<String, WeakReference<byte[]>>(40, 0.75f, true) {
+
+            /* (non-Javadoc)
+             * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
+             */
+            @Override
+            protected boolean removeEldestEntry(Entry<String, WeakReference<byte[]>> eldest) {
+                return size()>50;
+            }
+
+        };
+    }
     private void createTables() {
-        getJdbcTemplate().execute(getProperty("createTable.blobs"));
+        getJdbcTemplate().execute(getProperty("blobs.createTable"));
     }
 
     /* (non-Javadoc)
@@ -60,15 +81,31 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
      * @see org.owasp.webscarab.dao.BlobDao#findBlob(java.lang.String)
      */
     public byte[] findBlob(String key) {
-        return blobQuery.getBlob(key);
+        byte[] blob = null;
+        WeakReference<byte[]> ref = cache.get(key);
+        if (ref != null) {
+            blob = ref.get();
+            if (blob != null)
+                return blob;
+        }
+        blob = blobQuery.getBlob(key);
+        ref = new WeakReference<byte[]>(blob);
+        cache.put(key, ref);
+        return blob;
     }
 
     /* (non-Javadoc)
      * @see org.owasp.webscarab.dao.BlobDao#saveBlob(java.lang.String, byte[])
      */
-    public synchronized void saveBlob(String key, byte[] blob) {
+    public synchronized String saveBlob(byte[] blob) {
+        if (blob == null || blob.length == 0)
+            return null;
+        MD5 md5 = new MD5();
+        md5.Update(blob);
+        String key = md5.asHex();
         if (!exists(key))
             blobInsert.insert(key, blob);
+        return key;
     }
 
     private class BlobQuery extends MappingSqlQuery {
@@ -93,8 +130,9 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
         protected BlobInsert() {
             super(getDataSource(),
-                    "INSERT INTO blobs (key, blob) VALUES (?,?)");
+                    "INSERT INTO blobs (key, size, blob) VALUES (?,?,?)");
             declareParameter(new SqlParameter(Types.VARCHAR));
+            declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.LONGVARBINARY));
             compile();
         }
@@ -102,7 +140,8 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
         protected void insert(String key, byte[] blob) {
             if (blob == null || blob.length == 0)
                 return;
-            Object[] objs = new Object[] { key, blob };
+            Integer size = new Integer(blob.length);
+            Object[] objs = new Object[] { key, size, blob };
             super.update(objs);
         }
     }

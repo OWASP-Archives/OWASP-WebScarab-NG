@@ -48,7 +48,7 @@ public class JdbcNamedValueDao extends
     }
 
     private void createTables() {
-        getJdbcTemplate().execute(getProperty("createTable.named_values"));
+        getJdbcTemplate().execute(getProperty("named_values.createTable"));
     }
 
     public Integer findNamedValueId(NamedValue nv) {

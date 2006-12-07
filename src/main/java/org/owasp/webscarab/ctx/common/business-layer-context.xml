@@ -47,9 +47,6 @@
 		<property name="transactionManager">
 			<ref bean="transactionManager" />
 		</property>
-		<property name="session">
-			<value>0</value>
-		</property>
 		<property name="conversationDao">
 			<ref bean="conversationDao" />
 		</property>

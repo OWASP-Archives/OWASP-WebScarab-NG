@@ -9,7 +9,8 @@ import java.util.Iterator;
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceEvent;
 import org.owasp.webscarab.domain.Annotation;
-import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.Conversation;
+import org.owasp.webscarab.domain.Session;
 import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.services.ConversationEvent;
 import org.owasp.webscarab.services.ConversationService;
@@ -26,10 +27,10 @@ import ca.odell.glazedlists.SortedList;
  * @author rdawes
  *
  */
-public class ConversationSummaryListFactory extends SwingEventSubscriber
+public class ConversationListFactory extends SwingEventSubscriber
 		implements FactoryBean, ApplicationContextAware {
 
-	private EventList<ConversationSummary> summaryList;
+	private EventList<Conversation> conversationList;
 
 	private EventService eventService;
 
@@ -37,9 +38,9 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 
 	private ApplicationContext applicationContext = null;
 
-	public ConversationSummaryListFactory() {
-		summaryList = new SortedList<ConversationSummary>(
-				new BasicEventList<ConversationSummary>());
+	public ConversationListFactory() {
+		conversationList = new SortedList<Conversation>(
+				new BasicEventList<Conversation>());
 	}
 
 	/**
@@ -60,18 +61,18 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 		this.conversationService = conversationService;
 	}
 
-	private void updateSummaryList() {
-		getSummaryList().getReadWriteLock().writeLock().lock();
-		getSummaryList().clear();
-		Collection ids = getConversationService().getConversationIds();
+	private void updateSummaryList(Session session) {
+		getConversationList().getReadWriteLock().writeLock().lock();
+		getConversationList().clear();
+		Collection ids = getConversationService().getConversationIds(session);
 		Iterator it = ids.iterator();
 		while (it.hasNext()) {
 			Integer id = (Integer) it.next();
-			ConversationSummary summary = getConversationService()
-					.getConversationSummary(id);
-			getSummaryList().add(summary);
+			Conversation conversation = getConversationService()
+					.getConversation(id);
+			getConversationList().add(conversation);
 		}
-		getSummaryList().getReadWriteLock().writeLock().unlock();
+		getConversationList().getReadWriteLock().writeLock().unlock();
 	}
 
 	/**
@@ -100,10 +101,10 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 	}
 
 	/**
-	 * @return Returns the summaryList.
+	 * @return Returns the conversationList.
 	 */
-	public EventList<ConversationSummary> getSummaryList() {
-		return summaryList;
+	public EventList<Conversation> getConversationList() {
+		return conversationList;
 	}
 
 	/*
@@ -115,19 +116,19 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 	protected void handleEventOnEDT(EventServiceEvent evt) {
 		if (evt instanceof ConversationEvent) {
 			ConversationEvent event = (ConversationEvent) evt;
-			if (getSummaryList() != null) {
-				getSummaryList().getReadWriteLock().writeLock().lock();
+			if (getConversationList() != null) {
+				getConversationList().getReadWriteLock().writeLock().lock();
 				try {
 					if (event.getType() == ConversationEvent.CONVERSATION_ADDED)
-						getSummaryList().add(event.getSummary());
+						getConversationList().add(event.getConversation());
 				} finally {
-					getSummaryList().getReadWriteLock().writeLock().unlock();
+					getConversationList().getReadWriteLock().writeLock().unlock();
 				}
 			}
 		} else if (evt instanceof SessionEvent) {
 			SessionEvent event = (SessionEvent) evt;
 			if (event.getType() == SessionEvent.SESSION_CHANGED) {
-				updateSummaryList();
+				updateSummaryList(event.getSession());
 			}
 		}
 	}
@@ -137,19 +138,19 @@ public class ConversationSummaryListFactory extends SwingEventSubscriber
 			Annotation annotation = (Annotation) data;
 			Integer id = annotation.getId();
 			if (id == null) return;
-			getSummaryList().getReadWriteLock().writeLock().lock();
-			for (int i=0; i<getSummaryList().size(); i++) {
-				if (getSummaryList().get(i).getId().equals(id)) {
-					getSummaryList().set(i, getSummaryList().get(i));
+			getConversationList().getReadWriteLock().writeLock().lock();
+			for (int i=0; i<getConversationList().size(); i++) {
+				if (getConversationList().get(i).getId().equals(id)) {
+					getConversationList().set(i, getConversationList().get(i));
 					break;
 				}
 			}
-			getSummaryList().getReadWriteLock().writeLock().unlock();
+			getConversationList().getReadWriteLock().writeLock().unlock();
 		}
 	}
 
 	public Object getObject() throws Exception {
-		return summaryList;
+		return conversationList;
 	}
 
 	public Class getObjectType() {

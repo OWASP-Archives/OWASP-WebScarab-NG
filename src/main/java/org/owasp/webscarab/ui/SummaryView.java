@@ -31,7 +31,7 @@ import javax.swing.tree.TreeModel;
 import org.bushe.swing.event.EventService;
 import org.jdesktop.swingx.JXTable;
 import org.owasp.webscarab.domain.Annotation;
-import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.util.UrlUtils;
 import org.owasp.webscarab.util.swing.UriTreeModel;
@@ -59,23 +59,23 @@ import ca.odell.glazedlists.impl.swing.SwingThreadProxyEventList;
 import ca.odell.glazedlists.swing.EventTableModel;
 
 /**
- * 
+ *
  * @author rdawes
  */
 public class SummaryView extends AbstractView implements ApplicationListener {
 
 	private EventService eventService;
-	
+
 	private ConversationService conversationService = null;
 
 	private ConversationTableFormat format = new ConversationTableFormat();
 
-	private EventList<ConversationSummary> conversationSummaryList;
+	private EventList<Conversation> conversationList;
 
 	private JTable conversationTable;
 
 	private TableMemento tableMemento;
-	
+
 	private TableModel tableModel;
 
 	private JTree uriTree;
@@ -85,7 +85,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	private ShowConversationExecutor showConversationExecutor = new ShowConversationExecutor();
 
 	private SettingsManager settingsManager;
-	
+
 	/** Creates a new instance of SummaryView */
 	public SummaryView() {
 	}
@@ -93,8 +93,8 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	/**
 	 * @return Returns the conversationSummaryList.
 	 */
-	public EventList<ConversationSummary> getConversationSummaryList() {
-		return conversationSummaryList;
+	public EventList<Conversation> getConversationList() {
+		return conversationList;
 	}
 
 	protected void registerLocalCommandExecutors(PageComponentContext context) {
@@ -104,11 +104,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	@SuppressWarnings("unchecked")
 	private TableModel getTableModel() {
 		if (tableModel == null) {
-			if (getConversationSummaryList() == null) {
+			if (getConversationList() == null) {
 				tableModel = new DefaultTableModel(2, 2);
 			} else {
-				tableModel = new EventTableModel<ConversationSummary>(
-						conversationSummaryList, format);
+				tableModel = new EventTableModel<Conversation>(
+						conversationList, format);
 			}
 		}
 		return tableModel;
@@ -117,11 +117,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	@SuppressWarnings("unchecked")
 	private TreeModel getTreeModel() {
 		if (treeModel == null) {
-			if (getConversationSummaryList() == null) {
+			if (getConversationList() == null) {
 				tableModel = new DefaultTableModel(2, 2);
 			} else {
 				treeModel = new UriTreeModel();
-				new TreeBuilder(treeModel, getConversationSummaryList());
+				new TreeBuilder(treeModel, getConversationList());
 			}
 		}
 		return treeModel;
@@ -130,13 +130,13 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 	 * @param conversationSummaryList
 	 *            The conversationSummaryList to set.
 	 */
-	public void setConversationSummaryList(
-			EventList<ConversationSummary> conversationSummaryList) {
-		this.conversationSummaryList = conversationSummaryList;
+	public void setConversationList(
+			EventList<Conversation> conversationList) {
+		this.conversationList = conversationList;
 		this.tableModel = null;
 		getConversationTable().setModel(getTableModel());
 	}
-	
+
 	protected javax.swing.JComponent createControl() {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setResizeWeight(0.3);
@@ -172,11 +172,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 					});
 			conversationTable.addMouseListener(new PopupMenuMouseListener() {
 				protected boolean onAboutToShow(MouseEvent e) {
-					return getSelectedSummary() != null;
+					return getSelectedConversation() != null;
 				}
 
 				protected JPopupMenu getPopupMenu() {
-					return getSelectedSummary() != null
+					return getSelectedConversation() != null
 							? createConversationPopupContextMenu()
 							: null;
 				}
@@ -233,11 +233,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return conversationService;
 	}
 
-	private ConversationSummary getSelectedSummary() {
+	private Conversation getSelectedConversation() {
 		int row = conversationTable.getSelectedRow();
 		if (row == -1)
 			return null;
-		return conversationSummaryList.get(row);
+		return conversationList.get(row);
 	}
 
 	private JPopupMenu createConversationPopupContextMenu() {
@@ -254,7 +254,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see ca.odell.glazedlists.gui.TableFormat#getColumnCount()
 		 */
 		public int getColumnCount() {
@@ -263,7 +263,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see ca.odell.glazedlists.gui.TableFormat#getColumnName(int)
 		 */
 		public String getColumnName(int column) {
@@ -272,31 +272,31 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see ca.odell.glazedlists.gui.TableFormat#getColumnValue(E, int)
 		 */
 		public Object getColumnValue(Object object, int column) {
-			ConversationSummary summary = (ConversationSummary) object;
-			if (summary == null)
+			Conversation conversation = (Conversation) object;
+			if (conversation == null)
 				return "NULL!";
 			switch (column) {
 				case 0 :
-					return summary.getId();
+					return conversation.getId();
 				case 1 :
-					return summary.getDate();
+					return conversation.getDate();
 				case 2 :
-					return summary.getRequestMethod();
+					return conversation.getRequestMethod();
 				case 3 :
-					return UrlUtils.getSchemeHostPort(summary.getRequestUri());
+					return UrlUtils.getSchemeHostPort(conversation.getRequestUri());
 				case 4 :
-					return summary.getRequestUri().getPath();
+					return conversation.getRequestUri().getPath();
 				case 5 :
-					return summary.getRequestUri().getQuery();
+					return conversation.getRequestUri().getQuery();
 				case 6 :
-					return summary.getResponseStatus() + " "
-							+ summary.getResponseMessage();
-				case 7 : 
-					Annotation a = getConversationService().getAnnotation(summary.getId());
+					return conversation.getResponseStatus() + " "
+							+ conversation.getResponseMessage();
+				case 7 :
+					Annotation a = getConversationService().getAnnotation(conversation.getId());
 					if (a == null) return a;
 					return a.getAnnotation();
 			}
@@ -312,9 +312,9 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		public void execute() {
 			DefaultViewDescriptor viewDescriptor = (DefaultViewDescriptor) getApplicationContext().getBean("conversationView");
 			Map<String, Object> viewProperties = new HashMap<String, Object>();
-			viewProperties.put("conversationList", getConversationSummaryList());
+			viewProperties.put("conversationList", getConversationList());
 			viewProperties.put("conversationService", getConversationService());
-			viewProperties.put("selectedSummary", getSelectedSummary());
+			viewProperties.put("selectedSummary", getSelectedConversation());
 			viewDescriptor.setViewProperties(viewProperties);
 			PageDescriptor pageDescriptor = new SingleViewPageDescriptor(viewDescriptor);
 			DescriptorApplicationWindow window = new DescriptorApplicationWindow();
@@ -324,23 +324,23 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 
 	private static class TreeBuilder
 			implements
-				ListEventListener<ConversationSummary> {
+				ListEventListener<Conversation> {
 
 		private UriTreeModel model;
-		private ThreadProxyEventList<ConversationSummary> list;
-		
+		private ThreadProxyEventList<Conversation> list;
+
 		public TreeBuilder(UriTreeModel model,
-				EventList<ConversationSummary> list) {
+				EventList<Conversation> list) {
 			for (int i = 0; i < list.size(); i++) {
-				ConversationSummary summary = list.get(i);
-				model.add(summary.getRequestUri());
+				Conversation conversation= list.get(i);
+				model.add(conversation.getRequestUri());
 			}
-			this.list = new SwingThreadProxyEventList<ConversationSummary>(list);
+			this.list = new SwingThreadProxyEventList<Conversation>(list);
 			this.model = model;
 			this.list.addListEventListener(this);
 		}
 
-		public void listChanged(ListEvent<ConversationSummary> listChanges) {
+		public void listChanged(ListEvent<Conversation> listChanges) {
 			while (listChanges.next()) {
 				// get the current change info
 				int unsortedIndex = listChanges.getIndex();
@@ -348,11 +348,11 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 				// handle change with the specified index and type
 				// we don't handle delete or change events, since changes don't happen
 				// and for delete's we can't get the Summary that existed at that position
-				// This is a bit of a lose, since it means that we cannot remove 
+				// This is a bit of a lose, since it means that we cannot remove
 				if (changeType == ListEvent.INSERT) {
-					ConversationSummary summary = listChanges.getSourceList()
+					Conversation conversation = listChanges.getSourceList()
 							.get(unsortedIndex);
-					model.add(summary.getRequestUri());
+					model.add(conversation.getRequestUri());
 				}
 			}
 		}

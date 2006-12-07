@@ -23,8 +23,8 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 		FindingDao {
 
 	private void createTables() {
-		getJdbcTemplate().execute(getProperty("createTable.findings"));
-		getJdbcTemplate().execute(getProperty("createTable.findings_conversations"));
+		getJdbcTemplate().execute(getProperty("findings.createTable"));
+		getJdbcTemplate().execute(getProperty("findings_conversations.createTable"));
 	}
 
 	/*

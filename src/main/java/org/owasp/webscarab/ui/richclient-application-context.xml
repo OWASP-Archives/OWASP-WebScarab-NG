@@ -175,8 +175,8 @@
 	<bean id="rulesSource"
 		class="org.owasp.webscarab.domain.WebScarabValidationRulesSource"/>
 
-	<bean id="conversationSummaryList"
-		class="org.owasp.webscarab.ui.ConversationSummaryListFactory" singleton="true"
+	<bean id="conversationList"
+		class="org.owasp.webscarab.ui.ConversationListFactory" singleton="true"
 		lazy-init="true">
 		<property name="eventService">
 			<ref bean="eventService" />
@@ -191,8 +191,8 @@
 		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
 		<property name="viewProperties">
 			<map>
-				<entry key="conversationSummaryList">
-					<ref bean="conversationSummaryList" />
+				<entry key="conversationList">
+					<ref bean="conversationList" />
 				</entry>
 			</map>
 		</property>

@@ -10,7 +10,7 @@ import org.owasp.webscarab.dao.AnnotationDao;
 import org.owasp.webscarab.dao.ConversationDao;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
-import org.owasp.webscarab.domain.ConversationSummary;
+import org.owasp.webscarab.domain.Session;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -22,8 +22,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ConversationService {
 
-	private Integer session = null;
-
     private ConversationDao conversationDao;
 
     private AnnotationDao annotationDao;
@@ -31,17 +29,6 @@ public class ConversationService {
     private EventService eventService = null;
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
-
-    public ConversationService() {
-    }
-
-	public Integer getSession() {
-		return this.session;
-	}
-
-	public void setSession(Integer session) {
-		this.session = session;
-	}
 
     /**
      * @return Returns the conversationDao.
@@ -66,12 +53,11 @@ public class ConversationService {
         this.eventService = eventService;
     }
 
-    public void addConversation(Conversation conversation,
-            ConversationSummary summary) {
+    public void addConversation(Session session, Conversation conversation) {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            getConversationDao().update(session, conversation, summary);
+            getConversationDao().add(session, conversation);
         } catch (Exception e) {
         	e.printStackTrace();
         	return;
@@ -79,13 +65,12 @@ public class ConversationService {
             writeLock.unlock();
         }
         if (eventService != null) {
-            ConversationEvent evt = new ConversationEvent(this, conversation,
-                    summary);
+            ConversationEvent evt = new ConversationEvent(this, session, conversation);
             eventService.publish(evt);
         }
     }
 
-    public Collection getConversationIds() {
+    public Collection getConversationIds(Session session) {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {
@@ -103,19 +88,6 @@ public class ConversationService {
         readLock.lock();
         try {
             return getConversationDao().get(id);
-        } catch (Exception e) {
-        	e.printStackTrace();
-        	return null;
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    public ConversationSummary getConversationSummary(Integer id) {
-        Lock readLock = lock.readLock();
-        readLock.lock();
-        try {
-            return getConversationDao().getSummary(id);
         } catch (Exception e) {
         	e.printStackTrace();
         	return null;

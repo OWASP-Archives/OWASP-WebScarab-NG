@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.dao;
 
@@ -10,9 +10,9 @@ package org.owasp.webscarab.dao;
 public interface BlobDao {
 
     boolean exists(String key);
-    
+
     byte[] findBlob(String key);
-    
-    void saveBlob(String key, byte[] blob);
-    
+
+    String saveBlob(byte[] blob);
+
 }

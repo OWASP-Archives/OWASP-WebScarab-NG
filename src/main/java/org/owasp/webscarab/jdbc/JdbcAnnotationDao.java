@@ -21,7 +21,7 @@ public class JdbcAnnotationDao extends PropertiesJdbcDaoSupport implements
 		AnnotationDao {
 
 	private void createTables() {
-		getJdbcTemplate().execute(getProperty("createTable.annotations"));
+		getJdbcTemplate().execute(getProperty("annotations.createTable"));
 	}
 
 	/*

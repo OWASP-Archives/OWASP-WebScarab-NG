@@ -46,7 +46,7 @@ public class JdbcSessionDao extends PropertiesJdbcDaoSupport implements
 	}
 
 	protected void createTables() {
-		getJdbcTemplate().execute(getProperty("createTable.sessions"));
+		getJdbcTemplate().execute(getProperty("sessions.createTable"));
 	}
 
 	/*

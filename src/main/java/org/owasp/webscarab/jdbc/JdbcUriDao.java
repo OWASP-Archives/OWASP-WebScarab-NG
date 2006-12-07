@@ -81,7 +81,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
     }
 
     private void createTables() {
-        getJdbcTemplate().execute(getProperty("createTable.uris"));
+        getJdbcTemplate().execute(getProperty("uris.createTable"));
     }
 
     private class UriInsert extends SqlUpdate {
