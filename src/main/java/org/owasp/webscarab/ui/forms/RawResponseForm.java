@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui.forms;
 
@@ -26,7 +26,7 @@ import org.springframework.richclient.form.AbstractForm;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class RawResponseForm extends AbstractForm {
 
@@ -46,11 +46,11 @@ public class RawResponseForm extends AbstractForm {
 	private Listener listener = new Listener();
 
 	private String charset;
-	
+
 	private boolean updating = false;
 
 	private boolean readOnly;
-	
+
 	public RawResponseForm(FormModel formModel) {
 		super(formModel, FORM_ID);
 		readOnly = false;
@@ -207,7 +207,7 @@ public class RawResponseForm extends AbstractForm {
 			// in that case, it makes sense to reset the caret position
 			// we also have to flag the update, so that we don't try to reparse
 			// the text area unnecessarily, when the change is external
-			if (textArea != null) {
+			if (textArea != null && textArea.isShowing()) {
 				updateFormControl();
 				upToDate = true;
 			}
