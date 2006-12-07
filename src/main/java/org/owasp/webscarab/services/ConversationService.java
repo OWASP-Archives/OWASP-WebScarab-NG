@@ -57,7 +57,7 @@ public class ConversationService {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            getConversationDao().add(session, conversation);
+            conversation = getConversationDao().add(session, conversation);
         } catch (Exception e) {
         	e.printStackTrace();
         	return;

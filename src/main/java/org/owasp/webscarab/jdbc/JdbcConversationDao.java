@@ -108,9 +108,8 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
      *
      * @see org.owasp.webscarab.dao.ConversationDao#getId(org.owasp.webscarab.Conversation)
      */
-    public void add(Session session, Conversation conversation) {
-        Integer id = conversationInsert.insert(session.getId(), conversation);
-        conversation.setId(id);
+    public Conversation add(Session session, Conversation conversation) {
+        return conversationInsert.insert(session.getId(), conversation);
     }
 
     private Integer getMethod(String method) {
@@ -248,7 +247,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             compile();
         }
 
-        protected Integer insert(Integer session, Conversation conversation) {
+        protected JdbcConversation insert(Integer session, Conversation conversation) {
             Integer uriId;
             synchronized (uriDao) {
                 uriId = uriDao.findUriId(conversation.getRequestUri());
@@ -275,7 +274,21 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             headersDao.saveHeaders(id, HeadersDao.RESPONSE_HEADERS, nv);
             nv = conversation.getResponseFooters();
             headersDao.saveHeaders(id, HeadersDao.RESPONSE_FOOTERS, nv);
-            return id;
+            JdbcConversation c = new JdbcConversation();
+            c.setId(conversation.getId());
+            c.setSource(conversation.getSource());
+            c.setDate(conversation.getDate());
+            c.setRequestMethod(conversation.getRequestMethod());
+            c.setRequestUri(conversation.getRequestUri());
+            c.setRequestVersion(conversation.getRequestVersion());
+            c.setRequestBlob(requestContentKey);
+            c.setResponseVersion(conversation.getResponseVersion());
+            c.setResponseStatus(conversation.getResponseStatus());
+            c.setResponseMessage(conversation.getResponseMessage());
+            c.setResponseBlob(responseContentKey);
+            c.setHeadersDao(headersDao);
+            c.setBlobDao(blobDao);
+            return c;
         }
     }
 

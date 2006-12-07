@@ -10,6 +10,6 @@ public interface ConversationDao {
 
 	Conversation get(Integer id);
 
-	void add(Session session, Conversation conversation);
+	Conversation add(Session session, Conversation conversation);
 
 }
