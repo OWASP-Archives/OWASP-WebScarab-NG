@@ -44,8 +44,10 @@ public class JdbcConversation extends Conversation {
      */
     @Override
     public NamedValue[] getRequestHeaders() {
-        if (headersDao == null)
+        if (headersDao == null) {
+            System.out.println("HeadersDAO is null!");
             System.exit(1);
+        }
         return headersDao.findHeaders(getId(), HeadersDao.REQUEST_HEADERS);
     }
 
@@ -70,8 +72,10 @@ public class JdbcConversation extends Conversation {
      */
     @Override
     public NamedValue[] getResponseHeaders() {
-        if (headersDao == null)
+        if (headersDao == null) {
+            System.out.println("HeadersDAO is null!");
             System.exit(1);
+        }
         return headersDao.findHeaders(getId(), HeadersDao.RESPONSE_HEADERS);
     }
 
