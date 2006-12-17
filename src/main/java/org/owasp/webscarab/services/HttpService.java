@@ -10,7 +10,6 @@ import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -72,8 +71,7 @@ public class HttpService {
             proxies = pc.select(uri);
         }
         if (proxies == null) {
-            proxies = new LinkedList<Proxy>();
-            proxies.add(Proxy.NO_PROXY);
+            throw new IOException("Invalid List<Proxy> from ProxyChooser: null");
         }
         Iterator<Proxy> it = proxies.iterator();
         ConnectException ce = null;
@@ -101,13 +99,15 @@ public class HttpService {
                 return method;
             } catch (ConnectException ce2) {
                 ce = ce2;
-                if (pc != null)
+                if (pc != null && !Proxy.NO_PROXY.equals(proxy)) {
+                    LOG.debug("Error fetching " + uri + " via " + proxy, ce2);
                     pc.connectFailed(uri, proxy.address(), ce2);
+                }
             } catch (ProtocolException pe) {
                 LOG.error("Request for " + uri + " failed", pe);
             }
         } while (it.hasNext());
-        IOException ioe = new IOException("Could not connect to the server");
+        IOException ioe = new IOException("Could not access " + uri);
         ioe.initCause(ce);
         throw ioe;
     }
