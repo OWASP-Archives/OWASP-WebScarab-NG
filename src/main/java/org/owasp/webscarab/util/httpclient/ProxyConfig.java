@@ -9,6 +9,12 @@ package org.owasp.webscarab.util.httpclient;
  */
 public class ProxyConfig {
 
+    public final static String PROPERTY_HTTP_PROXYHOST = "httpProxyHost";
+    public final static String PROPERTY_HTTP_PROXYPORT = "httpProxyPort";
+    public final static String PROPERTY_HTTPS_PROXYHOST = "httpsProxyHost";
+    public final static String PROPERTY_HTTPS_PROXYPORT = "httpsProxyPort";
+    public final static String PROPERTY_NO_PROXY = "noProxy";
+
     private String httpProxyHost;
 
     private Integer httpProxyPort;

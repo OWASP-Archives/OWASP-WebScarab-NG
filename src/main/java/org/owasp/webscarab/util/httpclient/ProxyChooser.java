@@ -47,7 +47,7 @@ public class ProxyChooser extends ProxySelector {
     }
 
     private boolean isNoProxy(URI uri) {
-        if (proxyConfig.getNoProxy() == null) return true;
+        if (proxyConfig.getNoProxy() == null) return false;
         String[] noProxy = proxyConfig.getNoProxy().split("[ ,;] *");
         String host = uri.getHost().toLowerCase();
         for (int i=0; i<noProxy.length; i++) {
@@ -60,6 +60,20 @@ public class ProxyChooser extends ProxySelector {
 
     public void connectFailed(URI uri, SocketAddress address, IOException ioe) {
         // we do nothing at this stage
+    }
+
+    /**
+     * @return the proxyConfig
+     */
+    public ProxyConfig getProxyConfig() {
+        return this.proxyConfig;
+    }
+
+    /**
+     * @param proxyConfig the proxyConfig to set
+     */
+    public void setProxyConfig(ProxyConfig proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
 }
