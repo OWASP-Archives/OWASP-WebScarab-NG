@@ -117,10 +117,12 @@
 				<!--
 					<entry>
 					<key>
-					<value type="java.lang.Class">java.util.Date</value>
+					<value type="java.lang.Class">java.lang.Integer</value>
 					</key>
 					<bean
-					class="org.petclinic.ui.binder.CustomDatePickerBinder"/>
+					class="org.springframework.richclient.form.binding.swing.NumberBinding">
+						<property name=""></property>
+					</bean>
 					</entry>
 					<entry>
 					<key>
@@ -198,11 +200,22 @@
 		</property>
 	</bean>
 
-	<bean id="httpService" class="org.owasp.webscarab.services.HttpService" lazy-init="default">
-		<property name="proxyChooser">
-			<bean class="org.owasp.webscarab.util.httpclient.ProxyChooser"/>
-		</property>
+	<bean id="trustManager" class="org.owasp.webscarab.util.httpclient.ConfigurableTrustManager"/>
+
+	<bean id="sslProtocolSocketFactory" class="org.owasp.webscarab.util.httpclient.ConfigurableSSLProtocolSocketFactory">
+		<property name="trustManager" ref="trustManager"/>
 	</bean>
+
+	<bean id="httpService" class="org.owasp.webscarab.services.HttpService" lazy-init="default">
+		<property name="sslProtocolSocketFactory" ref="sslProtocolSocketFactory"/>
+		<property name="proxyChooser" ref="proxyChooser"/>
+	</bean>
+
+	<bean id="proxyChooser" class="org.owasp.webscarab.util.httpclient.ProxyChooser">
+		<property name="proxyConfig" ref="proxyConfig"/>
+	</bean>
+
+	<bean id="proxyConfig" class="org.owasp.webscarab.util.httpclient.PreferencesProxyConfig"/>
 
 	<bean id="proxy" class="org.owasp.webscarab.plugins.proxy.Proxy" lazy-init="true">
 		<property name="eventService" ref="eventService"/>

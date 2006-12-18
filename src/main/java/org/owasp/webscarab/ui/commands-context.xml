@@ -26,6 +26,7 @@
 				<ref bean="fileMenu"/>
 				<ref bean="editMenu"/>
 				<ref bean="pluginMenu"/>
+				<ref bean="toolMenu"/>
 				<ref bean="windowMenu"/>
 				<ref bean="helpMenu"/>
 			</list>
@@ -108,6 +109,17 @@
 			<list>
 				<ref bean="showProxyControlBarToggle"/>
 				<ref bean="showProxyConfiguration"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="toolMenu"
+		class="org.springframework.richclient.command.CommandGroupFactoryBean">
+		<property name="members">
+			<list>
+				<bean class="org.owasp.webscarab.util.httpclient.swing.UpstreamProxyConfigCommand">
+					<property name="proxyConfig" ref="proxyConfig"></property>
+				</bean>
 			</list>
 		</property>
 	</bean>

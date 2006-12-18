@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.ProtocolException;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.owasp.webscarab.domain.Conversation;
@@ -36,6 +38,10 @@ public class HttpService {
     private ProxyChooser proxyChooser;
 
 	private HttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
+
+    public void setSslProtocolSocketFactory(ProtocolSocketFactory protocolSocketFactory) {
+        Protocol.registerProtocol("https", new Protocol("https", protocolSocketFactory, 443));
+    }
 
 	/*
 	 * We will use this method to allow the user interface to configure how the http service
