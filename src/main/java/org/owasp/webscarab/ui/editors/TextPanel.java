@@ -59,33 +59,33 @@ import java.io.UnsupportedEncodingException;
  * @author  rdawes
  */
 public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
-    
+
 	private static final long serialVersionUID = 7243325169523584635L;
 	private static boolean _findVisible = false;
     private static String _find = "";
     private static boolean _caseSensitive = false;
     private int _start = 0;
-    
+
     private boolean _editable = false;
     private boolean _modified = false;
-    
+
     private String _text = null;
-    
+
     private DocumentChangeListener _dcl = new DocumentChangeListener();
-    
+
     private RegexSearcher searcher;
-    
+
     /** Creates new form HexEditor */
     public TextPanel() {
         initComponents();
         findCaseCheckBox.setSelected(_caseSensitive);
-        
+
         setName("Text");
-        
+
         searcher = new RegexSearcher(textTextArea, DefaultHighlighter.DefaultPainter);
-        
+
         InputMap inputMap = getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        
+
         getActionMap().put("TOGGLEWRAP", new AbstractAction() {
 			private static final long serialVersionUID = -3377262704983025730L;
 
@@ -95,7 +95,7 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
         });
         // Ctrl-W to toggle wordwrap
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK), "TOGGLEWRAP");
-        
+
         getActionMap().put("TOGGLEFIND", new AbstractAction() {
 			private static final long serialVersionUID = 3839729022016588962L;
 
@@ -109,7 +109,7 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
         });
         // Ctrl-F to toggle the find bar
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, Event.CTRL_MASK), "TOGGLEFIND");
-        
+
         findPanel.setVisible(_findVisible);
         findTextField.setText(_find);
         findTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -128,12 +128,12 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             }
         });
     }
-    
+
     public void setEditable(boolean editable) {
         _editable = editable;
         textTextArea.setEditable(editable);
     }
-    
+
     public void setBytes(String contentType, byte[] bytes) {
         if (bytes == null) {
             setText(contentType, "");
@@ -145,11 +145,11 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             }
         }
     }
-    
+
     public void setText(String contentType, String text) {
         String wrap = "false";
         if (wrap != null && wrap.equals("true")) textTextArea.setLineWrap(true);
-        
+
         _text = text;
         textTextArea.getDocument().removeDocumentListener(_dcl);
         _modified = false;
@@ -160,17 +160,17 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             textTextArea.getDocument().addDocumentListener(_dcl);
         _start = doFind(_find, 0, _caseSensitive) + 1;
     }
-    
+
     public String getText() {
         if (_text == null)
             _text = textTextArea.getText();
         return _text;
     }
-    
+
     public boolean isModified() {
         return _editable && _modified;
     }
-    
+
     public byte[] getBytes() {
         try {
             return getText().getBytes("UTF-8");
@@ -179,7 +179,7 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             return null;
         }
     }
-    
+
     private int doFind(String pattern, int start, boolean caseSensitive) {
         findMessageLabel.setText("");
         try {
@@ -200,7 +200,7 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             return -1;
         }
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -269,17 +269,17 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
 
     }
     // </editor-fold>//GEN-END:initComponents
-    
+
     private void findCaseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findCaseCheckBoxActionPerformed
         _caseSensitive = findCaseCheckBox.isSelected();
         _start = doFind(_find, 0, _caseSensitive) + 1;
     }//GEN-LAST:event_findCaseCheckBoxActionPerformed
-    
+
     private void findNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findNextButtonActionPerformed
         _start = doFind(_find, _start, _caseSensitive) + 1;
     }//GEN-LAST:event_findNextButtonActionPerformed
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox findCaseCheckBox;
     private javax.swing.JLabel findLabel;
@@ -290,35 +290,7 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
     private javax.swing.JScrollPane textScrollPane;
     private javax.swing.JTextArea textTextArea;
     // End of variables declaration//GEN-END:variables
-    
-    
-    public static void main(String[] args) {
-        javax.swing.JFrame top = new javax.swing.JFrame("Text Editor");
-        top.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                System.exit(0);
-            }
-        });
-        
-        TextPanel tp = new TextPanel();
-        top.getContentPane().add(tp);
-        top.setBounds(100,100,600,400);
-        try {
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            java.io.FileInputStream fis = new java.io.FileInputStream("/etc/passwd");
-            byte[] buff = new byte[1024];
-            int got;
-            while ((got = fis.read(buff))>-1) baos.write(buff, 0, got);
-            fis.close(); baos.close();
-            tp.setBytes("text", baos.toByteArray());
-//            tp.setBytes("text", "ABCDEFGHIJKLMNOP\nABCDEFGHIJKLMNOP".getBytes());
-            tp.setEditable(true);
-            top.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
+
     private class DocumentChangeListener implements DocumentListener {
         public void changedUpdate(DocumentEvent evt) {
             _modified = true;
@@ -333,5 +305,5 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
             _text = null;
         }
     }
-    
+
 }
