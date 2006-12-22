@@ -20,7 +20,7 @@ public class WebScarab {
 
     public static void main(String[] args) {
         try {
-            String rootContextDirectoryClassPath = "/org/owasp/webscarab";
+            String rootContextDirectoryClassPath = "/ctx";
 
             String startupContextPath = rootContextDirectoryClassPath
                     + "/ui/richclient-startup-context.xml";
@@ -29,7 +29,7 @@ public class WebScarab {
                     + "/jdbc/data-layer-context.xml";
 
             String businessLayerContextPath = rootContextDirectoryClassPath
-                    + "/ctx/common/business-layer-context.xml";
+                    + "/common/business-layer-context.xml";
 
             String richclientApplicationContextPath = rootContextDirectoryClassPath
                     + "/ui/richclient-application-context.xml";

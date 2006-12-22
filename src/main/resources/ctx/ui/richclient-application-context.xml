@@ -73,7 +73,7 @@
 	<bean id="lifecycleAdvisor"
 		class="org.owasp.webscarab.ui.WebScarabLifecycleAdvisor">
 		<property name="windowCommandBarDefinitions">
-			<value>org/owasp/webscarab/ui/commands-context.xml</value>
+			<value>ctx/ui/commands-context.xml</value>
 		</property>
 		<property name="startingPageId">
 			<value>conversationView</value>

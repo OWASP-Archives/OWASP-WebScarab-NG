@@ -71,19 +71,22 @@
 
            <!-- JNLP generation -->
            <jnlp>
-             <resources>${project.basedir}/src/main/jnlp</resources>
+             <resources>${project.basedir}/src/main/jnlp/resources</resources>
              <inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath>
              <inputTemplate>src/main/jnlp/template.vm</inputTemplate> <!-- relative to inputTemplateResourcePath -->
-             <!--outputFile>WebScarab-ng.jnlp</outputFile--> <!-- defaults to launch.jnlp -->
+             <outputFile>WebScarab-ng.jnlp</outputFile> <!-- defaults to launch.jnlp -->
 
              <!-- used to automatically identify the jar containing the main class. -->
              <!-- this is perhaps going to change -->
              <mainClass>org.owasp.webscarab.WebScarab</mainClass>
            </jnlp>
-	   <dependencies>
-               <includes></includes>
-               <excludes></excludes>
-               
+		   <dependencies>
+               <!--includes>
+				   <include>hsqldb:hsqldb</include>
+               </includes-->
+               <excludes>
+				  <exclude>javax.help:jhelp</exclude>
+               </excludes>
            </dependencies>
 
            <!-- SIGNING -->
@@ -94,7 +97,7 @@
              <storepass>${storepass}</storepass> <!-- ${storepass} -->
              <storetype>pkcs12</storetype>
              <alias>${alias}</alias>
-             <verify>true</verify>
+             <verify>false</verify>
            </sign>
 
            <!-- BUILDING PROCESS -->
@@ -102,15 +105,15 @@
 
            <!-- should we have some more configurations here? E.g. compression level (aka packing effort) -->
            <!-- not yet implemented -->
-           <pack200>false</pack200>
-           <gzip>false</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
+           <pack200>true</pack200>
+           <gzip>true</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
 
            <!-- misc -->
            <!-- if there are multiple apps, do we need to mark one as default? (app/ redirects to app/default.jnlp in jnlp servlet ??)-->
            <!-- -->
 
            <!--install>false</install--> <!-- not yet supported -->
-           <verbose>true</verbose>
+           <verbose>false</verbose>
 
         </configuration>
       </plugin>
