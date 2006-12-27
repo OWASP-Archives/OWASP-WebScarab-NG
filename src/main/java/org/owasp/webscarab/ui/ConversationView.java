@@ -215,8 +215,8 @@ public class ConversationView extends AbstractView {
 			}
 			annotationModel.setFormObject(annotation);
 		} else {
-			conversationModel.setFormObject(null);
-			annotationModel.setFormObject(null);
+			conversationModel.setFormObject(new Conversation());
+			annotationModel.setFormObject(new Annotation());
 		}
 	}
 

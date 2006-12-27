@@ -204,7 +204,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
         @Override
         protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
         int rownum) throws SQLException {
-            JdbcConversation conversation = new JdbcConversation();
+            JdbcConversation conversation = new JdbcConversation(headersDao, blobDao);
             conversation.setId(new Integer(rs.getInt("id")));
             conversation.setDate(rs.getTimestamp("date"));
             conversation.setRequestMethod(rs.getString("request_method"));
@@ -218,8 +218,6 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             conversation.setResponseMessage(rs.getString("response_message"));
             conversation.setRequestBlob(rs.getString("request_content_key"));
             conversation.setResponseBlob(rs.getString("response_content_key"));
-            conversation.setBlobDao(blobDao);
-            conversation.setHeadersDao(headersDao);
             return conversation;
         }
     }
@@ -274,7 +272,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             headersDao.saveHeaders(id, HeadersDao.RESPONSE_HEADERS, nv);
             nv = conversation.getResponseFooters();
             headersDao.saveHeaders(id, HeadersDao.RESPONSE_FOOTERS, nv);
-            JdbcConversation c = new JdbcConversation();
+            JdbcConversation c = new JdbcConversation(headersDao, blobDao);
             c.setId(conversation.getId());
             c.setSource(conversation.getSource());
             c.setDate(conversation.getDate());
@@ -286,8 +284,6 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             c.setResponseStatus(conversation.getResponseStatus());
             c.setResponseMessage(conversation.getResponseMessage());
             c.setResponseBlob(responseContentKey);
-            c.setHeadersDao(headersDao);
-            c.setBlobDao(blobDao);
             return c;
         }
     }

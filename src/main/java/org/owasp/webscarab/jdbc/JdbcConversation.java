@@ -3,6 +3,8 @@
  */
 package org.owasp.webscarab.jdbc;
 
+import java.lang.ref.WeakReference;
+
 import org.owasp.webscarab.dao.BlobDao;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
@@ -19,24 +21,33 @@ public class JdbcConversation extends Conversation {
     private HeadersDao headersDao;
     private BlobDao blobDao;
 
-    /**
-     * @param blobDao the blobDao to set
-     */
-    public void setBlobDao(BlobDao blobDao) {
+    WeakReference<NamedValue[]> requestHeaders = new WeakReference<NamedValue[]>(null);
+    WeakReference<NamedValue[]> responseHeaders = new WeakReference<NamedValue[]>(null);
+    WeakReference<byte[]> requestContent = new WeakReference<byte[]>(null);
+    WeakReference<byte[]> responseContent = new WeakReference<byte[]>(null);
+
+    public JdbcConversation(HeadersDao headersDao, BlobDao blobDao) {
+        if (headersDao == null || blobDao == null)
+            throw new NullPointerException("Headers or Blob DAO is null");
+        this.headersDao = headersDao;
         this.blobDao = blobDao;
     }
-    /**
-     * @param headersDao the headersDao to set
-     */
-    public void setHeadersDao(HeadersDao headerDao) {
-        this.headersDao = headerDao;
-    }
+
     /* (non-Javadoc)
      * @see org.owasp.webscarab.domain.Conversation#getRequestContent()
      */
     @Override
     public byte[] getRequestContent() {
-        return blobDao.findBlob(requestBlob);
+        if (requestContent == null) return null;
+        byte[] content = requestContent.get();
+        if (content != null) return content;
+        content = blobDao.findBlob(requestBlob);
+        if (content == null) {
+            requestContent = null;
+        } else {
+            requestContent = new WeakReference<byte[]>(content);
+        }
+        return content;
     }
 
     /* (non-Javadoc)
@@ -45,10 +56,18 @@ public class JdbcConversation extends Conversation {
     @Override
     public NamedValue[] getRequestHeaders() {
         if (headersDao == null) {
-            System.out.println("HeadersDAO is null!");
-            System.exit(1);
+            throw new NullPointerException("HeadersDAO is null in conversation " + getId());
         }
-        return headersDao.findHeaders(getId(), HeadersDao.REQUEST_HEADERS);
+        if (requestHeaders == null) return null;
+        NamedValue[] headers = requestHeaders.get();
+        if (headers != null) return headers;
+        headers = headersDao.findHeaders(getId(), HeadersDao.REQUEST_HEADERS);
+        if (headers == null) {
+            requestHeaders = null;
+        } else {
+            requestHeaders = new WeakReference<NamedValue[]>(headers);
+        }
+        return headers;
     }
 
     /* (non-Javadoc)
@@ -56,7 +75,16 @@ public class JdbcConversation extends Conversation {
      */
     @Override
     public byte[] getResponseContent() {
-        return blobDao.findBlob(responseBlob);
+        if (responseContent == null) return null;
+        byte[] content = responseContent.get();
+        if (content != null) return content;
+        content = blobDao.findBlob(responseBlob);
+        if (content == null) {
+            responseContent = null;
+        } else {
+            responseContent = new WeakReference<byte[]>(content);
+        }
+        return content;
     }
 
     /* (non-Javadoc)
@@ -73,10 +101,18 @@ public class JdbcConversation extends Conversation {
     @Override
     public NamedValue[] getResponseHeaders() {
         if (headersDao == null) {
-            System.out.println("HeadersDAO is null!");
-            System.exit(1);
+            throw new NullPointerException("HeadersDAO is null in conversation " + getId());
         }
-        return headersDao.findHeaders(getId(), HeadersDao.RESPONSE_HEADERS);
+        if (responseHeaders == null) return null;
+        NamedValue[] headers = responseHeaders.get();
+        if (headers != null) return headers;
+        headers = headersDao.findHeaders(getId(), HeadersDao.RESPONSE_HEADERS);
+        if (headers == null) {
+            responseHeaders = null;
+        } else {
+            responseHeaders = new WeakReference<NamedValue[]>(headers);
+        }
+        return headers;
     }
 
     /**
