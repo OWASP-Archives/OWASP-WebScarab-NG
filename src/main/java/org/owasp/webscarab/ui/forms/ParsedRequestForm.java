@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui.forms;
 
@@ -33,7 +33,7 @@ import org.springframework.richclient.tree.AbstractTreeModel;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class ParsedRequestForm extends AbstractParsedContentForm {
 
@@ -189,7 +189,7 @@ public class ParsedRequestForm extends AbstractParsedContentForm {
 								for (int j = 0; j < oldCookies.length; j++) {
 									if (!oldCookies[j].equals(newCookies[j]))
 										fireTreeNodeChanged(cookiePath, j,
-												newCookies[i]);
+												newCookies[j]);
 								}
 							}
 						}
