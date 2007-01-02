@@ -1,4 +1,4 @@
-<jnlp spec="1.0+" codebase="file:." href="$outputFile">
+<jnlp spec="1.0+" codebase="$$codebase" href="$$name">
     <information>
         <title>WebScarab-NG</title>
         <description>An advanced web application proxy</description>
