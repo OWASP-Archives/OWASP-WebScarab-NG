@@ -223,6 +223,18 @@
 		</property>
 	</bean>
 
+	<bean id="siteMapView"
+		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
+		<property name="viewClass"><value>org.owasp.webscarab.ui.SiteMapView</value></property>
+		<property name="viewProperties">
+			<map>
+				<entry key="conversationList">
+					<ref bean="conversationList" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 	<bean id="trustManager" class="org.owasp.webscarab.util.httpclient.ConfigurableTrustManager"/>
 
 	<bean id="sslProtocolSocketFactory" class="org.owasp.webscarab.util.httpclient.ConfigurableSSLProtocolSocketFactory">
