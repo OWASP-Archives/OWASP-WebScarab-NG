@@ -106,6 +106,12 @@ public class UriTreeModel extends AbstractTreeModel {
 
 	}
 
+    public void clear() {
+        nodes.clear();
+        implied.clear();
+        fireRootNodeChanged(getRoot());
+    }
+
 	private int removeChild(URI parent, URI child) {
 		URI[] children = getChildren(parent);
 		int position = getIndexOfChild(parent, child);
