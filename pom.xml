@@ -189,6 +189,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.richclient</groupId>
+      <artifactId>spring-richclient-vldocking</artifactId>
+      <version>0.3.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.richclient</groupId>
       <artifactId>spring-richclient-resources</artifactId>
       <version>0.3.0-SNAPSHOT</version>
     </dependency>
