@@ -216,11 +216,30 @@
 		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
 		<property name="viewProperties">
 			<map>
+				<entry key="eventService">
+					<ref bean="eventService" />
+				</entry>
+			</map>
+		</property>
+		<property name="autoHideEnabled"><value>true</value></property>
+		<property name="closeEnabled"><value>true</value></property>
+		<property name="floatEnabled"><value>true</value></property>
+		<property name="maximizeEnabled"><value>true</value></property>
+	</bean>
+
+	<bean id="conversationListView"
+		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
+		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationListView</value></property>
+		<property name="viewProperties">
+			<map>
 				<entry key="conversationList">
 					<ref bean="conversationList" />
 				</entry>
 				<entry key="eventService">
 					<ref bean="eventService" />
+				</entry>
+				<entry key="conversationTableFactory">
+					<ref bean="conversationTableFactory" />
 				</entry>
 			</map>
 		</property>
