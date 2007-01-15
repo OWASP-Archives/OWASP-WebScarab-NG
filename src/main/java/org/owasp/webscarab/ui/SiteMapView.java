@@ -4,6 +4,7 @@
 package org.owasp.webscarab.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +13,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
+import org.bushe.swing.event.EventService;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.util.swing.UriTreeModel;
 import org.owasp.webscarab.util.swing.renderers.UriRenderer;
@@ -32,7 +37,11 @@ public class SiteMapView extends AbstractView {
 
     private EventList<Conversation> conversationList;
 
+    private EventService eventService;
+
     private Listener listener = new Listener();
+
+    private JTree uriTree;
 
     private UriTreeModel uriTreeModel;
 
@@ -49,13 +58,15 @@ public class SiteMapView extends AbstractView {
     @Override
     protected JComponent createControl() {
         JPanel panel = getComponentFactory().createPanel(new BorderLayout());
-        JTree uriTree = new JTree(uriTreeModel);
+        uriTree = new JTree(uriTreeModel);
         uriTree.setRootVisible(false);
         uriTree.setShowsRootHandles(true);
         uriTree.setCellRenderer(new UriRenderer());
+        uriTree.addTreeSelectionListener(listener);
         JScrollPane scrollPane = getComponentFactory().createScrollPane(
                 uriTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setMinimumSize(new Dimension(200, 30));
         panel.add(scrollPane, BorderLayout.CENTER);
         return panel;
     }
@@ -74,6 +85,10 @@ public class SiteMapView extends AbstractView {
         }
     }
 
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
+    }
+
     private void populateExisting() {
         conversationList.getReadWriteLock().readLock().lock();
         uriTreeModel.clear();
@@ -87,7 +102,22 @@ public class SiteMapView extends AbstractView {
         conversationList.getReadWriteLock().readLock().unlock();
     }
 
-    private class Listener implements ListEventListener<Conversation> {
+    private class Listener implements ListEventListener<Conversation>, TreeSelectionListener {
+
+        public void valueChanged(TreeSelectionEvent e) {
+            TreePath[] paths = uriTree.getSelectionPaths();
+            URISelectionEvent use = null;
+            if (paths == null || paths.length == 0) {
+                use = new URISelectionEvent(SiteMapView.this, new URI[0]);
+            } else {
+                URI[] sel = new URI[paths.length];
+                for (int i=0; i<paths.length; i++) {
+                    sel[i] = (URI) paths[i].getLastPathComponent();
+                }
+                use = new URISelectionEvent(SiteMapView.this, sel);
+            }
+            eventService.publish(use);
+        }
 
         /*
          * (non-Javadoc)

@@ -212,27 +212,41 @@
 		class="org.owasp.webscarab.ui.ConversationTableFactory" singleton="true"/>
 
 	<bean id="conversationView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
+		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
 		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="conversationList">
 					<ref bean="conversationList" />
 				</entry>
+				<entry key="eventService">
+					<ref bean="eventService" />
+				</entry>
 			</map>
 		</property>
+		<property name="autoHideEnabled"><value>true</value></property>
+		<property name="closeEnabled"><value>true</value></property>
+		<property name="floatEnabled"><value>true</value></property>
+		<property name="maximizeEnabled"><value>true</value></property>
 	</bean>
 
 	<bean id="siteMapView"
-		class="org.springframework.richclient.application.support.DefaultViewDescriptor" lazy-init="true">
+		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
 		<property name="viewClass"><value>org.owasp.webscarab.ui.SiteMapView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="conversationList">
 					<ref bean="conversationList" />
 				</entry>
+				<entry key="eventService">
+					<ref bean="eventService" />
+				</entry>
 			</map>
 		</property>
+		<property name="autoHideEnabled"><value>true</value></property>
+		<property name="closeEnabled"><value>true</value></property>
+		<property name="floatEnabled"><value>true</value></property>
+		<property name="maximizeEnabled"><value>true</value></property>
 	</bean>
 
 	<bean id="trustManager" class="org.owasp.webscarab.util.httpclient.ConfigurableTrustManager"/>

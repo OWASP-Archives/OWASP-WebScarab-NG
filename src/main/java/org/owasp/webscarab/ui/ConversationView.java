@@ -9,8 +9,6 @@ import java.awt.FlowLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -19,14 +17,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
+import org.bushe.swing.event.EventService;
+import org.bushe.swing.event.EventServiceEvent;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.services.ConversationService;
@@ -34,10 +29,9 @@ import org.owasp.webscarab.ui.forms.AnnotationForm;
 import org.owasp.webscarab.ui.forms.RequestForm;
 import org.owasp.webscarab.ui.forms.ResponseForm;
 import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
-import org.owasp.webscarab.util.swing.UriTreeModel;
-import org.owasp.webscarab.util.swing.renderers.UriRenderer;
 import org.springframework.binding.form.CommitListener;
 import org.springframework.binding.form.FormModel;
+import org.springframework.richclient.application.PageComponent;
 import org.springframework.richclient.application.PageComponentContext;
 import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
@@ -48,8 +42,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.AbstractMatcherEditor;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.matchers.MatcherEditor;
@@ -70,6 +62,8 @@ public class ConversationView extends AbstractView {
 
 	private EventList<Conversation> conversationList;
 
+    private EventService eventService;
+
 	private ConversationService conversationService;
 
 	private ConversationTableFactory conversationTableFactory;
@@ -83,8 +77,6 @@ public class ConversationView extends AbstractView {
 	private JPanel filterPanel;
 
 	private FindExecutor findExecutor = new FindExecutor();
-
-	private UriTreeModel uriTreeModel;
 
 	/*
 	 * (non-Javadoc)
@@ -107,12 +99,7 @@ public class ConversationView extends AbstractView {
 		annotationModel.addCommitListener(new AnnotationListener());
 
 		JTextField filterField = getComponentFactory().createTextField();
-		uriTreeModel = new UriTreeModel();
-		JTree uriTree = new JTree(uriTreeModel);
-		uriTree.setRootVisible(false);
-		uriTree.setShowsRootHandles(true);
-		uriTree.setCellRenderer(new UriRenderer());
-		UriMatcher uriMatcher = new UriMatcher(uriTree);
+		UriMatcher uriMatcher = new UriMatcher();
 
 		EventList<Conversation> conversationList = getConversationList();
 		FilterList<Conversation> uriFilterList = new FilterList(conversationList, uriMatcher);
@@ -124,15 +111,6 @@ public class ConversationView extends AbstractView {
 		JPanel panel = getComponentFactory().createPanel(new BorderLayout());
 		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		mainSplitPane.setResizeWeight(0.5);
-
-		JSplitPane topSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		topSplitPane.setResizeWeight(0.2);
-		topSplitPane.setOneTouchExpandable(true);
-
-		new UriTreeManager(getConversationList(), uriTreeModel);
-		JScrollPane treeScrollPane = getComponentFactory().createScrollPane(uriTree);
-		treeScrollPane.setMinimumSize(new Dimension(200, 30));
-		topSplitPane.setLeftComponent(treeScrollPane);
 
 		filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		filterPanel.add(getComponentFactory().createLabelFor("filter", filterField));
@@ -148,8 +126,7 @@ public class ConversationView extends AbstractView {
 		JPanel topPanel = new JPanel(new BorderLayout());
 		topPanel.add(tableScrollPane, BorderLayout.CENTER);
 		topPanel.add(filterPanel, BorderLayout.SOUTH);
-		topSplitPane.setRightComponent(topPanel);
-		mainSplitPane.setTopComponent(topSplitPane);
+		mainSplitPane.setTopComponent(topPanel);
 
 		table.getSelectionModel().addListSelectionListener(
 			new ListSelectionListener() {
@@ -287,80 +264,45 @@ public class ConversationView extends AbstractView {
 		}
 	}
 
-	private class UriTreeManager implements ListEventListener<Conversation> {
+	private class UriMatcher extends AbstractMatcherEditor<Conversation> {
 
-		private EventList<Conversation> list;
-		private List<URI> uriList = new ArrayList<URI>();
-		private UriTreeModel uriTree;
-
-		public UriTreeManager(EventList<Conversation> list, UriTreeModel uriTree) {
-			this.list = list;
-			this.uriTree = uriTree;
-			populateExisting();
-			// the conversationSummary list is only ever updated on the EDT
-			list.addListEventListener(this);
-		}
-
-		private void populateExisting() {
-			list.getReadWriteLock().readLock().lock();
-			uriList.clear();
-			Iterator<Conversation> it = list.iterator();
-			while (it.hasNext()) {
-				URI uri = it.next().getRequestUri();
-				uriList.add(uri);
-				uriTree.add(uri);
-			}
-			list.getReadWriteLock().readLock().unlock();
-		}
-
-		public void listChanged(ListEvent<Conversation> evt) {
-			while (evt.next()) {
-				int index = evt.getIndex();
-				if (evt.getType() == ListEvent.DELETE) {
-					uriTree.remove(uriList.remove(index));
-				} else if (evt.getType() == ListEvent.INSERT) {
-					URI uri = list.get(index).getRequestUri();
-					uriList.add(index, uri);
-					uriTree.add(uri);
-				}
-			}
-		}
-
-	}
-
-	private class UriMatcher extends AbstractMatcherEditor<Conversation> implements TreeSelectionListener {
-
-		private TreeSelectionModel tsm;
 		private Matcher<Conversation> matcher;
 
-		public UriMatcher(JTree tree) {
-			this.tsm = tree.getSelectionModel();
+        private URI[] selection = new URI[0];
+
+		public UriMatcher() {
 			matcher = new Matcher<Conversation>() {
 				public boolean matches(Conversation conversation) {
-					if (tsm.getSelectionCount() == 0) return true;
-					TreePath[] selection = tsm.getSelectionPaths();
+					if (selection.length == 0) return true;
 					for (int i=0; i<selection.length; i++) {
-						Object lastComponent = selection[i].getLastPathComponent();
-						if (!(lastComponent instanceof URI)) continue;
-						URI uri = (URI) lastComponent;
-						if (conversation.getRequestUri().toString().startsWith(uri.toString()))
+						if (conversation.getRequestUri().toString().startsWith(selection[i].toString()))
 							return true;
 					}
 					return false;
 				}
 			};
-			tree.addTreeSelectionListener(this);
-		}
+            eventService.subscribeStrongly(URISelectionEvent.class, new SwingEventSubscriber() {
+                protected void handleEventOnEDT(EventServiceEvent evt) {
+                    if (evt instanceof URISelectionEvent) {
+                        URISelectionEvent use = (URISelectionEvent) evt;
+                        Object source = use.getSource();
+                        if (source instanceof PageComponent) {
+                            PageComponent pc = (PageComponent) source;
+                            if (pc.getContext().getPage().equals(getContext().getPage())) {
+                                selection = use.getSelection();
+                                for (int i=0; i<selection.length; i++)
+                                    System.out.println("Sel["+i+"] : " + selection[i]);
+                                if (selection.length == 0) {
+                                    fireMatchNone();
+                                } else {
+                                    fireChanged(matcher);
+                                }
+                            }
+                        }
+                    }
+                }
 
-		/* (non-Javadoc)
-		 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
-		 */
-		public void valueChanged(TreeSelectionEvent e) {
-			if (tsm.getSelectionCount() == 0) {
-				fireMatchAll();
-			} else {
-				fireChanged(matcher);
-			}
+            });
 		}
 
 		/* (non-Javadoc)
@@ -372,4 +314,11 @@ public class ConversationView extends AbstractView {
 		}
 
 	}
+
+    /**
+     * @param eventService the eventService to set
+     */
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
+    }
 }
