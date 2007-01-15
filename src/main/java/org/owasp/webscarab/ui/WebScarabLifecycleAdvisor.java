@@ -29,7 +29,7 @@ public class WebScarabLifecycleAdvisor extends
 	 * @see org.springframework.richclient.application.config.ApplicationLifecycleAdvisor#onPreStartup()
 	 */
 	@Override
-	public void onPreStartup() {
+	public void onPostStartup() {
         ApplicationWindowAwareCommand command = (ApplicationWindowAwareCommand) getCommandBarFactory().getBean("selectSessionCommand");
         if (command != null)
         	command.execute();
