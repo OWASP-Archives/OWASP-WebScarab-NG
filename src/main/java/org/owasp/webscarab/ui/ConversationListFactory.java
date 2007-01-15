@@ -46,7 +46,7 @@ public class ConversationListFactory extends SwingEventSubscriber
 	/**
 	 * @return Returns the conversationService.
 	 */
-	public ConversationService getConversationService() {
+	private ConversationService getConversationService() {
 		if (conversationService == null)
 			conversationService = (ConversationService) applicationContext
 					.getBean("conversationService");
