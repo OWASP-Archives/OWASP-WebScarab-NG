@@ -5,7 +5,7 @@
 
 	<bean id="windowCommandManager"
 		class="org.springframework.richclient.application.support.ApplicationWindowCommandManager">
-		<property name="sharedCommandIds">
+		<!--property name="sharedCommandIds">
 			<list>
 				<value>propertiesCommand</value>
 				<value>undoCommand</value>
@@ -16,7 +16,7 @@
 				<value>selectAllCommand</value>
 				<value>deleteCommand</value>
 			</list>
-		</property>
+		</property-->
 	</bean>
 
 	<bean id="menuBar"
@@ -24,7 +24,7 @@
 		<property name="members">
 			<list>
 				<ref bean="fileMenu"/>
-				<ref bean="editMenu"/>
+				<!--ref bean="editMenu"/-->
 				<ref bean="pluginMenu"/>
 				<ref bean="toolMenu"/>
 				<ref bean="windowMenu"/>
@@ -58,9 +58,9 @@
 				<value>separator</value>
 				<value>saveAsCommand</value>
 				<value>separator</value>
-				-->
 				<value>propertiesCommand</value>
 				<value>separator</value>
+				-->
 				<bean class="org.springframework.richclient.command.support.ExitCommand"/>
 			</list>
 		</property>
