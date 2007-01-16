@@ -5,9 +5,14 @@
 
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	</bean>
-	
+
 	<bean id="dataSource"
 		class="org.owasp.webscarab.jdbc.DataSourceFactory" lazy-init="true">
+		<property name="jdbcConnectionDetails">
+			<bean class="org.owasp.webscarab.util.PreferencesJdbcConnectionDetails">
+				<constructor-arg><value>/org/owasp/webscarab/datasource</value></constructor-arg>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="transactionManager"
@@ -21,7 +26,7 @@
 	<bean id="jdbcProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="location"><value>/org/owasp/webscarab/jdbc/database.properties</value></property>
 	</bean>
-	
+
 	<bean id="uriDao" class="org.owasp.webscarab.jdbc.JdbcUriDao"
 		lazy-init="true">
 		<property name="dataSource">

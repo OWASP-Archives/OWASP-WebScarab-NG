@@ -19,7 +19,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 public class DataSourceFactory implements FactoryBean, DisposableBean {
 
-	private DataSource dataSource = null;
+	private DriverManagerDataSource dataSource = null;
+
+    private JdbcConnectionDetails jdbcConnectionDetails = null;
 
 	public Class getObjectType() {
 		return DataSource.class;
@@ -35,15 +37,27 @@ public class DataSourceFactory implements FactoryBean, DisposableBean {
 		return dataSource;
 	}
 
+    /**
+     * @return the jdbcConnectionDetails
+     */
+    public JdbcConnectionDetails getJdbcConnectionDetails() {
+        return this.jdbcConnectionDetails;
+    }
+
 	public void setJdbcConnectionDetails(JdbcConnectionDetails jdbcConnectionDetails) throws SQLException {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(jdbcConnectionDetails.getDriverClassName());
-		dataSource.setUrl(jdbcConnectionDetails.getUrl());
-		dataSource.setUsername(jdbcConnectionDetails.getUsername());
-		dataSource.setPassword(jdbcConnectionDetails.getPassword());
-        dataSource.setConnectionProperties(jdbcConnectionDetails.getConnectionProperties());
-		dataSource.getConnection().close();
-		this.dataSource = dataSource;
+		try {
+            this.jdbcConnectionDetails = jdbcConnectionDetails;
+            dataSource = new DriverManagerDataSource();
+    		dataSource.setDriverClassName(jdbcConnectionDetails.getDriverClassName());
+    		dataSource.setUrl(jdbcConnectionDetails.getUrl());
+    		dataSource.setUsername(jdbcConnectionDetails.getUsername());
+    		dataSource.setPassword(jdbcConnectionDetails.getPassword());
+            dataSource.setConnectionProperties(jdbcConnectionDetails.getConnectionProperties());
+    		dataSource.getConnection().close();
+        } catch (SQLException se) {
+            this.dataSource = null;
+            throw se;
+        }
 	}
 
 	public void destroy() throws Exception {

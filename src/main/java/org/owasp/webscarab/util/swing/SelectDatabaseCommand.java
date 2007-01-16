@@ -3,8 +3,6 @@
  */
 package org.owasp.webscarab.util.swing;
 
-import java.util.Properties;
-
 import javax.swing.JOptionPane;
 
 import org.bushe.swing.event.EventService;
@@ -152,15 +150,10 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 * @return form to use
 	 */
 	protected JdbcDetailsForm createJdbcDetailsForm() {
-		JdbcConnectionDetails jcd = new JdbcConnectionDetails();
-    	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
-    	jcd.setUrl("jdbc:hsqldb:file:" + System.getProperty("java.io.tmpdir") + "webscarab;hsqldb.default_table_type=cached");
-    	jcd.setUsername("sa");
-        Properties properties = new Properties();
-        properties.setProperty("hsqldb.default_table_type", "cached");
-        properties.setProperty("default_table_type", "cached");
-        jcd.setConnectionProperties(properties);
-		ValidatingFormModel model = FormModelHelper.createUnbufferedFormModel(jcd);
+		JdbcConnectionDetails jcd = getDataSourceFactory().getJdbcConnectionDetails();
+        if (jcd == null)
+            jcd = new JdbcConnectionDetails();
+		ValidatingFormModel model = FormModelHelper.createFormModel(jcd, true);
 		return new JdbcDetailsForm(model);
 	}
 
