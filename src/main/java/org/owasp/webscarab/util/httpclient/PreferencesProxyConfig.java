@@ -24,7 +24,6 @@ public class PreferencesProxyConfig extends ProxyConfig {
         prefs = Preferences.userNodeForPackage(ProxyConfig.class);
         super.setHttpProxyHost(prefs.get(PROPERTY_HTTP_PROXYHOST, null));
         int port = prefs.getInt(PROPERTY_HTTP_PROXYPORT, -1);
-        System.out.println("http port is " + port);
         super.setHttpProxyPort(port == -1 ? null : new Integer(port));
         super.setHttpsProxyHost(prefs.get(PROPERTY_HTTPS_PROXYHOST, null));
         port = prefs.getInt(PROPERTY_HTTPS_PROXYPORT, -1);
