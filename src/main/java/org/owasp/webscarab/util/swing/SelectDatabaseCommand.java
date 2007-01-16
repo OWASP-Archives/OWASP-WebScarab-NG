@@ -154,7 +154,7 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	protected JdbcDetailsForm createJdbcDetailsForm() {
 		JdbcConnectionDetails jcd = new JdbcConnectionDetails();
     	jcd.setDriverClassName("org.hsqldb.jdbcDriver");
-    	jcd.setUrl("jdbc:hsqldb:file:c:/temp/webscarab/;hsqldb.default_table_type=cached");
+    	jcd.setUrl("jdbc:hsqldb:file:" + System.getProperty("java.io.tmpdir") + "webscarab;hsqldb.default_table_type=cached");
     	jcd.setUsername("sa");
         Properties properties = new Properties();
         properties.setProperty("hsqldb.default_table_type", "cached");
