@@ -207,6 +207,7 @@ public class RawResponseForm extends AbstractForm {
 			// in that case, it makes sense to reset the caret position
 			// we also have to flag the update, so that we don't try to reparse
 			// the text area unnecessarily, when the change is external
+		    upToDate = false;
 			if (textArea != null && textArea.isShowing()) {
 				updateFormControl();
 				upToDate = true;
