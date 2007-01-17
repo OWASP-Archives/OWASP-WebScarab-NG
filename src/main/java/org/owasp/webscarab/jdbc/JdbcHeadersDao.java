@@ -114,7 +114,7 @@ public class JdbcHeadersDao extends
 
         public HeadersQuery() {
             super(getDataSource(), "SELECT named_value " + "FROM headers "
-                    + "WHERE headers.conversation = ? "
+                    + "WHERE headers.conversation_id = ? "
                     + "AND headers.type = ? " + "ORDER BY id ASC");
             declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.INTEGER));
@@ -144,7 +144,7 @@ public class JdbcHeadersDao extends
 
         protected HeaderInsert() {
             super(getDataSource(),
-                    "INSERT INTO headers (conversation, type, named_value) VALUES (?,?,?)");
+                    "INSERT INTO headers (conversation_id, type, named_value) VALUES (?,?,?)");
             declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.INTEGER));

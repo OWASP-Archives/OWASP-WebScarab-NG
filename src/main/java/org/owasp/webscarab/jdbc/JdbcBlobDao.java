@@ -72,7 +72,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
     public boolean exists(String key) {
         JdbcTemplate template = new JdbcTemplate(getDataSource());
         int count = template.queryForInt(
-                "SELECT COUNT(key) FROM blobs WHERE key = ?",
+                "SELECT COUNT(id) FROM blobs WHERE id = ?",
                 new Object[] { key });
         return count > 0;
     }
@@ -111,7 +111,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
     private class BlobQuery extends MappingSqlQuery {
 
         protected BlobQuery() {
-            super(getDataSource(), "SELECT blob FROM blobs WHERE key = ?");
+            super(getDataSource(), "SELECT blob_content FROM blobs WHERE id = ?");
             declareParameter(new SqlParameter(Types.VARCHAR));
             compile();
         }
@@ -122,7 +122,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
         protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
         int rownum) throws SQLException {
-            return rs.getBytes("blob");
+            return rs.getBytes("blob_content");
         }
     }
 
@@ -130,7 +130,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
         protected BlobInsert() {
             super(getDataSource(),
-                    "INSERT INTO blobs (key, size, blob) VALUES (?,?,?)");
+                    "INSERT INTO blobs (id, blob_size, blob_content) VALUES (?,?,?)");
             declareParameter(new SqlParameter(Types.VARCHAR));
             declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.LONGVARBINARY));

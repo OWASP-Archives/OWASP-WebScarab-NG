@@ -158,7 +158,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
 
         protected ConversationIdQuery() {
             super(getDataSource(),
-                    "SELECT id FROM conversations WHERE session = ? ORDER BY id ASC");
+                    "SELECT id FROM conversations WHERE session_id = ? ORDER BY id ASC");
             declareParameter(new SqlParameter(Types.INTEGER));
             compile();
         }
@@ -180,12 +180,12 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             super(
                     getDataSource(),
                     "SELECT "
-                            + "id, date, source, methods.method as request_method, request_uri, request_version, "
-                            + "request_content_key, response_version, response_status, "
-                            + "messages.message as response_message, response_content_key "
+                            + "id, request_date, source_id, methods.method as request_method, request_uri_id, request_version_id, "
+                            + "request_content_id, response_version_id, response_status, "
+                            + "messages.message as response_message, response_content_id "
                             + "FROM conversations, methods, messages "
-                            + "WHERE methods.id = conversations.request_method "
-                            + "AND messages.id = conversations.response_message "
+                            + "WHERE methods.id = conversations.request_method_id "
+                            + "AND messages.id = conversations.response_message_id "
                             + "AND conversations.id = ?");
             declareParameter(new SqlParameter(Types.INTEGER));
             compile();
@@ -206,18 +206,18 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
         int rownum) throws SQLException {
             JdbcConversation conversation = new JdbcConversation(headersDao, blobDao);
             conversation.setId(new Integer(rs.getInt("id")));
-            conversation.setDate(rs.getTimestamp("date"));
+            conversation.setDate(rs.getTimestamp("request_date"));
             conversation.setRequestMethod(rs.getString("request_method"));
-            Integer uri = new Integer(rs.getInt("request_uri"));
+            Integer uri = new Integer(rs.getInt("request_uri_id"));
             conversation.setRequestUri(uriDao.findUri(uri));
-            Integer version = new Integer(rs.getInt("request_version"));
+            Integer version = new Integer(rs.getInt("request_version_id"));
             conversation.setRequestVersion(versionDao.getVersion(version));
-            version = new Integer(rs.getInt("response_version"));
+            version = new Integer(rs.getInt("response_version_id"));
             conversation.setResponseVersion(versionDao.getVersion(version));
             conversation.setResponseStatus(rs.getString("response_status"));
             conversation.setResponseMessage(rs.getString("response_message"));
-            conversation.setRequestBlob(rs.getString("request_content_key"));
-            conversation.setResponseBlob(rs.getString("response_content_key"));
+            conversation.setRequestBlob(rs.getString("request_content_id"));
+            conversation.setResponseBlob(rs.getString("response_content_id"));
             return conversation;
         }
     }
@@ -228,8 +228,8 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             super(
                     getDataSource(),
                     "INSERT INTO conversations ("
-                            + "session, source, date, request_method, request_uri, request_version, request_content_key, "
-                            + "response_version, response_status, response_message, response_content_key) "
+                            + "session_id, source_id, request_date, request_method_id, request_uri_id, request_version_id, request_content_id, "
+                            + "response_version_id, response_status, response_message_id, response_content_id) "
                             + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
             declareParameter(new SqlParameter(Types.INTEGER));
             declareParameter(new SqlParameter(Types.INTEGER));
