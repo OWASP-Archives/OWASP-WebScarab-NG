@@ -3,14 +3,12 @@
  */
 package org.owasp.webscarab.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -60,7 +58,6 @@ public class SiteMapView extends AbstractView {
      */
     @Override
     protected JComponent createControl() {
-        JPanel panel = getComponentFactory().createPanel(new BorderLayout());
         uriTree = new JTree(uriTreeModel);
         uriTree.setRootVisible(false);
         uriTree.setShowsRootHandles(true);
@@ -70,8 +67,7 @@ public class SiteMapView extends AbstractView {
                 uriTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setMinimumSize(new Dimension(200, 30));
-        panel.add(scrollPane, BorderLayout.CENTER);
-        return panel;
+        return scrollPane;
     }
 
     /**
