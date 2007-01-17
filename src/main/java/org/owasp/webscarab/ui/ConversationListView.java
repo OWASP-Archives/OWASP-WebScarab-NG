@@ -192,8 +192,6 @@ public class ConversationListView extends AbstractView {
                                             getContext().getPage())) {
                                         selection = use.getSelection();
                                         for (int i = 0; i < selection.length; i++)
-                                            System.out.println("Sel[" + i
-                                                    + "] : " + selection[i]);
                                         if (selection.length == 0) {
                                             fireMatchNone();
                                         } else {
