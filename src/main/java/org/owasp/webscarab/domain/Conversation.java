@@ -462,4 +462,20 @@ public class Conversation extends BaseEntity implements Comparable {
         return this.getDate().compareTo(that.getDate());
 	}
 
+    public Conversation clone() {
+        Conversation conversation = new Conversation();
+        conversation.setRequestMethod(getRequestMethod());
+        conversation.setRequestUri(getRequestUri());
+        conversation.setRequestVersion(getRequestVersion());
+        conversation.setRequestHeaders(getRequestHeaders());
+        conversation.setRequestContent(getRequestContent());
+        conversation.setResponseVersion(getResponseVersion());
+        conversation.setResponseStatus(getResponseStatus());
+        conversation.setResponseMessage(getResponseMessage());
+        conversation.setResponseHeaders(getResponseHeaders());
+        conversation.setResponseContent(getResponseContent());
+        conversation.setResponseFooters(getResponseFooters());
+        return conversation;
+    }
+
 }
