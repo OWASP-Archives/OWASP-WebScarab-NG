@@ -1,14 +1,14 @@
 <jnlp spec="1.0+" codebase="$$codebase" href="$$name">
-    <information>
-        <title>WebScarab-NG</title>
-        <description>An advanced web application proxy</description>
-        <description kind="tooltip">WebScarab-NG</description>
-        <homepage href="http://www.owasp.org/index.php/OWASP_WebScarab_Project" />
-        <vendor>OWASP</vendor>
-        <icon kind="splash" href="splashscreen.gif"/>
-        <icon href="webscarab_logo.gif" width="64" height="64" />
+	<information>
+		<title>WebScarab-NG</title>
+		<description>An advanced web application proxy</description>
+		<description kind="tooltip">WebScarab-NG</description>
+		<homepage href="http://www.owasp.org/index.php/OWASP_WebScarab_Project" />
+		<vendor>OWASP</vendor>
+		<icon kind="splash" href="splashscreen.gif"/>
+		<icon href="webscarab_logo.gif" width="64" height="64" />
 
-        <offline-allowed/>
+		<offline-allowed/>
 		<!-- hints for setting up shortcuts -->
 		<!-- Prefer a shortcut for online operation -->
 		<shortcut online="true">
@@ -18,17 +18,17 @@
 			<menu submenu="WebScarab-NG"/>
 		</shortcut>
 
-    </information>
-    <security>
+	</information>
+	<security>
 		<all-permissions/>
 	</security>
-    <resources>
+	<resources>
 		<property name="com.apple.macos.useScreenMenuBar" value="true"/>
 		<property name="apple.laf.useScreenMenuBar" value="true"/>
 		<property name="com.apple.mrj.application.apple.menu.about.name" value="WebScarab"/>
-        <j2se version="1.5+" max-heap-size="128m" />
+		<j2se version="1.5+" max-heap-size="128m" />
 		$dependencies
-        <extension name="Java Help" href="lib/jhelp.jnlp"/>
-    </resources>
+		<extension name="Java Help" href="lib/jhelp.jnlp"/>
+	</resources>
 	<application-desc main-class="$mainClass" />
 </jnlp>
