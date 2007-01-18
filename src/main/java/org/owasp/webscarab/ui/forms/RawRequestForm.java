@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui.forms;
 
@@ -28,7 +28,7 @@ import org.springframework.richclient.form.AbstractForm;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class RawRequestForm extends AbstractForm {
 
@@ -48,7 +48,7 @@ public class RawRequestForm extends AbstractForm {
 	private Listener listener = new Listener();
 
 	private String charset;
-	
+
 	private boolean updating = false;
 
 	private boolean readOnly;
@@ -79,11 +79,14 @@ public class RawRequestForm extends AbstractForm {
 		StringBuilder b = new StringBuilder();
 		ValueModel vm;
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_METHOD);
-		b.append(vm.getValue()).append(" ");
+        if (vm.getValue() != null)
+            b.append(vm.getValue()).append(" ");
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_URI);
-		b.append(vm.getValue()).append(" ");
+        if (vm.getValue() != null)
+            b.append(vm.getValue()).append(" ");
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_VERSION);
-		b.append(vm.getValue()).append("\n");
+        if (vm.getValue() != null)
+            b.append(vm.getValue()).append("\n");
 		vm = getValueModel(Conversation.PROPERTY_REQUEST_HEADERS);
 		NamedValue[] headers = (NamedValue[]) vm.getValue();
 		if (headers != null)
