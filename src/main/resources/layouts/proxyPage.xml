@@ -1,16 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <VLDocking version="2.1">
 	<DockingDesktop name="proxyPage">
 		<DockingPanel>
-			<Split orientation="1" location="0.24008350730688935">
+			<Split orientation="1" location="0.25">
 				<Dockable>
-					<Key dockName="siteMapView" />
+					<Key dockName="siteMapView"/>
 				</Dockable>
-				<Dockable>
-					<Key dockName="conversationView" />
-				</Dockable>
+				<Split orientation="0" location="0.40">
+					<Dockable>
+						<Key dockName="conversationListView"/>
+					</Dockable>
+					<Dockable>
+						<Key dockName="conversationView"/>
+					</Dockable>
+				</Split>
 			</Split>
 		</DockingPanel>
-		<TabGroups></TabGroups>
+		<TabGroups>
+		</TabGroups>
 	</DockingDesktop>
 </VLDocking>
