@@ -84,14 +84,25 @@ public class ManualRequestView extends AbstractView {
 	public ManualRequestView() {
 		conversationFormModel = ConversationFormSupport.createFormModel(new Conversation(), false, true, false);
 		annotationFormModel = FormModelHelper.createUnbufferedFormModel(new Annotation());
-        for (int i=0, len=requestFields.length; i<len; i++) {
-            ValueModel vm = conversationFormModel.getValueModel(requestFields[i]);
-            vm.addValueChangeListener(editListener);
-        }
+        addEditListener();
         listener = new Listener();
         fetchCommand = new FetchCommand();
         revertCommand = new RevertCommand();
 	}
+
+    private void addEditListener() {
+        for (int i=0, len=requestFields.length; i<len; i++) {
+            ValueModel vm = conversationFormModel.getValueModel(requestFields[i]);
+            vm.addValueChangeListener(editListener);
+        }
+    }
+
+    private void removeEditListener() {
+        for (int i=0, len=requestFields.length; i<len; i++) {
+            ValueModel vm = conversationFormModel.getValueModel(requestFields[i]);
+            vm.removeValueChangeListener(editListener);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see org.springframework.richclient.dialog.AbstractDialogPage#createControl()
@@ -106,10 +117,15 @@ public class ManualRequestView extends AbstractView {
 	}
 
     public void displayConversation(Conversation conversation) {
-        Conversation request = conversation.clone();
-        conversationFormModel.removePropertyChangeListener(editListener);
+        Conversation request;
+        if (conversation != null) {
+            request = conversation.clone();
+        } else {
+            request = new Conversation();
+        }
+        removeEditListener();
         conversationFormModel.setFormObject(request);
-        conversationFormModel.addPropertyChangeListener(editListener);
+        addEditListener();
     }
 
     private boolean isActiveFetcher(Fetcher fetcher) {
@@ -195,7 +211,7 @@ public class ManualRequestView extends AbstractView {
 
         private void handleEvent(SessionEvent  evt) {
             session = evt.getSession();
-            displayConversation(new Conversation());
+            displayConversation(null);
         }
     }
 
