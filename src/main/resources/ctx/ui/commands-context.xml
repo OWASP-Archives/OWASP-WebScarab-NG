@@ -5,18 +5,18 @@
 
 	<bean id="windowCommandManager"
 		class="org.springframework.richclient.application.support.ApplicationWindowCommandManager">
-		<!--property name="sharedCommandIds">
+		<property name="sharedCommandIds">
 			<list>
-				<value>propertiesCommand</value>
-				<value>undoCommand</value>
+				<value>manualRequestCommand</value>
+				<!--value>undoCommand</value>
 				<value>redoCommand</value>
 				<value>cutCommand</value>
 				<value>copyCommand</value>
 				<value>pasteCommand</value>
 				<value>selectAllCommand</value>
-				<value>deleteCommand</value>
+				<value>deleteCommand</value-->
 			</list>
-		</property-->
+		</property>
 	</bean>
 
 	<bean id="menuBar"
@@ -43,6 +43,7 @@
 		<property name="members">
 			<list>
 				<ref bean="showProxyControlBarToggle"/>
+				<value>manualRequestCommand</value>
 			</list>
 		</property>
 	</bean>

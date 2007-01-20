@@ -22,8 +22,14 @@ import org.bushe.swing.event.EventServiceEvent;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.services.ConversationService;
+import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.application.PageComponent;
+import org.springframework.richclient.application.PageComponentContext;
 import org.springframework.richclient.application.support.AbstractView;
+import org.springframework.richclient.command.GuardedActionCommandExecutor;
+import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
+import org.springframework.richclient.list.ListSelectionValueModelAdapter;
+import org.springframework.richclient.list.ListSingleSelectionGuard;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -49,6 +55,20 @@ public class ConversationListView extends AbstractView {
 
     private ConversationTableFactory conversationTableFactory;
 
+    private EventSelectionModel<Conversation> conversationSelectionModel;
+
+    private GuardedActionCommandExecutor manualRequestExecutor = new ManualRequestExecutor();
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.springframework.richclient.application.support.AbstractView#registerLocalCommandExecutors(org.springframework.richclient.application.PageComponentContext)
+     */
+    @Override
+    protected void registerLocalCommandExecutors(PageComponentContext context) {
+        context.register("manualRequestCommand", manualRequestExecutor);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -65,8 +85,8 @@ public class ConversationListView extends AbstractView {
         TextFilterator<Conversation> filterator = new ConversationFilter();
         MatcherEditor<Conversation> matcher = new TextComponentMatcherEditor<Conversation>(
                 filterField, filterator);
-        FilterList<Conversation> filterList = new FilterList<Conversation>(uriFilterList,
-                matcher);
+        FilterList<Conversation> filterList = new FilterList<Conversation>(
+                uriFilterList, matcher);
         SortedList<Conversation> sortedList = new SortedList<Conversation>(
                 filterList);
 
@@ -77,7 +97,7 @@ public class ConversationListView extends AbstractView {
 
         JTable table = getConversationTableFactory().getConversationTable(
                 sortedList);
-        final EventSelectionModel<Conversation> conversationSelectionModel = new EventSelectionModel<Conversation>(
+        conversationSelectionModel = new EventSelectionModel<Conversation>(
                 sortedList);
         table.setSelectionModel(conversationSelectionModel);
         table.getSelectionModel().addListSelectionListener(
@@ -94,6 +114,9 @@ public class ConversationListView extends AbstractView {
                         eventService.publish(cse);
                     }
                 });
+        ValueModel selectionHolder = new ListSelectionValueModelAdapter(table
+                .getSelectionModel());
+        new ListSingleSelectionGuard(selectionHolder, manualRequestExecutor);
         JScrollPane tableScrollPane = getComponentFactory().createScrollPane(
                 table);
         tableScrollPane.setMinimumSize(new Dimension(100, 60));
@@ -103,6 +126,12 @@ public class ConversationListView extends AbstractView {
         mainPanel.add(tableScrollPane, BorderLayout.CENTER);
         mainPanel.add(filterPanel, BorderLayout.SOUTH);
         return mainPanel;
+    }
+
+    public Conversation[] getSelectedConversations() {
+        EventList<Conversation> selected = conversationSelectionModel
+                .getSelected();
+        return selected.toArray(new Conversation[selected.size()]);
     }
 
     private EventList<Conversation> getConversationList() {
@@ -192,11 +221,11 @@ public class ConversationListView extends AbstractView {
                                             getContext().getPage())) {
                                         selection = use.getSelection();
                                         for (int i = 0; i < selection.length; i++)
-                                        if (selection.length == 0) {
-                                            fireMatchNone();
-                                        } else {
-                                            fireChanged(matcher);
-                                        }
+                                            if (selection.length == 0) {
+                                                fireMatchNone();
+                                            } else {
+                                                fireChanged(matcher);
+                                            }
                                     }
                                 }
                             }
@@ -217,4 +246,14 @@ public class ConversationListView extends AbstractView {
 
     }
 
+    private class ManualRequestExecutor extends AbstractActionCommandExecutor {
+        public void execute() {
+            getContext().getPage().showView("manualRequestView");
+            // This is guarded by a SingleSelection guard, so there will always be a single
+            // conversation selected when this is invoked
+            ManualRequestCopyEvent mrce = new ManualRequestCopyEvent(
+                    ConversationListView.this, getSelectedConversations()[0]);
+            getEventService().publish(mrce);
+        }
+    }
 }
