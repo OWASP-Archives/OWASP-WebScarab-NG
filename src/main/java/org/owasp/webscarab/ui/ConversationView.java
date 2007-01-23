@@ -21,7 +21,10 @@ import org.owasp.webscarab.ui.forms.support.ConversationFormSupport;
 import org.springframework.binding.form.CommitListener;
 import org.springframework.binding.form.FormModel;
 import org.springframework.richclient.application.PageComponent;
+import org.springframework.richclient.application.PageComponentContext;
 import org.springframework.richclient.application.support.AbstractView;
+import org.springframework.richclient.command.GuardedActionCommandExecutor;
+import org.springframework.richclient.command.support.AbstractActionCommandExecutor;
 import org.springframework.richclient.form.Form;
 import org.springframework.richclient.form.FormModelHelper;
 
@@ -46,6 +49,20 @@ public class ConversationView extends AbstractView {
 	private FormModel annotationModel;
 
     private Listener listener = new Listener();
+
+    private GuardedActionCommandExecutor manualRequestExecutor = new ManualRequestExecutor();
+
+    private Conversation conversation;
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.springframework.richclient.application.support.AbstractView#registerLocalCommandExecutors(org.springframework.richclient.application.PageComponentContext)
+     */
+    @Override
+    protected void registerLocalCommandExecutors(PageComponentContext context) {
+        context.register("manualRequestCommand", manualRequestExecutor);
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -79,13 +96,21 @@ public class ConversationView extends AbstractView {
 		return panel;
 	}
 
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
+        updateSelection(conversation);
+        manualRequestExecutor.setEnabled(conversation != null);
+    }
 
 	private void updateSelection(Conversation conversation) {
 		if (annotationModel.isDirty())
 			annotationModel.commit();
 		if (conversation != null) {
-			conversationModel.setFormObject(getConversationService()
-					.getConversation(conversation.getId()));
+			conversationModel.setFormObject(conversation);
 			Annotation annotation = getConversationService().getAnnotation(
 					conversation.getId());
 			if (annotation == null) {
@@ -153,12 +178,23 @@ public class ConversationView extends AbstractView {
                 return;
             Conversation[] selection = cse.getSelection();
             if (selection == null || selection.length != 1) {
-                updateSelection(null);
+                setConversation(null);
             } else {
-                updateSelection(selection[0]);
+                setConversation(selection[0]);
             }
         }
 
+    }
+
+    private class ManualRequestExecutor extends AbstractActionCommandExecutor {
+        public void execute() {
+            getContext().getPage().showView("manualRequestView");
+            // This is guarded by a SingleSelection guard, so there will always be a single
+            // conversation selected when this is invoked
+            ManualRequestCopyEvent mrce = new ManualRequestCopyEvent(
+                    ConversationView.this, getConversation());
+            getEventService().publish(mrce);
+        }
     }
 
 }
