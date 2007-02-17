@@ -319,10 +319,19 @@
 		<property name="swingInterceptor" ref="proxyInterceptor"/>
 	</bean>
 
-	<bean id="showProxyControlBarToggle"
-		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarToggleCommand" singleton="true" lazy-init="true">
+	<bean id="showProxyControlBarToggleCommand"
+		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarToggleCommand" singleton="true">
 		<property name="proxyControlBar" ref="proxyControlBar"/>
-		<property name="applicationLifecycleAdvisor" ref="lifecycleAdvisor"/>
+	</bean>
+
+	<bean id="sharedCommandConfigurer"
+		class="org.owasp.webscarab.ui.SharedCommandConfigurer" singleton="true" lazy-init="false">
+		<property name="commandConfigurer" ref="commandConfigurer"/>
+		<property name="commands">
+			<list>
+				<ref bean="showProxyControlBarToggleCommand"/>
+			</list>
+		</property>
 	</bean>
 
 </beans>

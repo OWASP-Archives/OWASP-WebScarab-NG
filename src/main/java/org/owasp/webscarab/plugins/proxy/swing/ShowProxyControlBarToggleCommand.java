@@ -5,7 +5,6 @@ package org.owasp.webscarab.plugins.proxy.swing;
 
 import javax.swing.JWindow;
 
-import org.springframework.richclient.application.config.ApplicationLifecycleAdvisor;
 import org.springframework.richclient.command.ToggleCommand;
 
 /**
@@ -36,14 +35,5 @@ public class ShowProxyControlBarToggleCommand extends ToggleCommand {
 		window.setVisible(selected);
 		return selected;
 	}
-
-	/**
-	 * @param applicationLifecycleAdvisor the applicationLifecycleAdvisor to set
-	 */
-	public void setApplicationLifecycleAdvisor(
-			ApplicationLifecycleAdvisor applicationLifecycleAdvisor) {
-		applicationLifecycleAdvisor.createWindowCommandManager().configure(this);
-	}
-
 
 }
