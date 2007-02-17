@@ -30,6 +30,8 @@ import org.owasp.webscarab.domain.StreamingConversation;
  */
 public class HttpMethodUtils {
 
+    public static String[] SUPPORTED_METHODS = new String[] { "GET", "POST", "OPTIONS", "HEAD", "DELETE", "PUT", "TRACE" };
+
 	public static HttpMethod constructMethod(Conversation conversation)
 			throws ProtocolException {
 		HttpMethod httpMethod = null;
