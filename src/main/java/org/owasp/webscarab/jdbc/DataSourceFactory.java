@@ -19,7 +19,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 public class DataSourceFactory implements FactoryBean, DisposableBean {
 
-	private DriverManagerDataSource dataSource = null;
+	private DataSource dataSource = null;
 
     private JdbcConnectionDetails jdbcConnectionDetails = null;
 
@@ -33,9 +33,37 @@ public class DataSourceFactory implements FactoryBean, DisposableBean {
 
 	public Object getObject() throws Exception {
 		if (dataSource == null)
-			throw new NullPointerException("DataSource has not yet been created");
+            dataSource = createDataSource(jdbcConnectionDetails, false);
 		return dataSource;
 	}
+
+    public DataSource createDataSource(JdbcConnectionDetails jdbcConnectionDetails, boolean test) throws SQLException {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(jdbcConnectionDetails.getDriverClassName());
+        dataSource.setUrl(jdbcConnectionDetails.getUrl());
+        dataSource.setUsername(jdbcConnectionDetails.getUsername());
+        dataSource.setPassword(jdbcConnectionDetails.getPassword());
+        dataSource.setConnectionProperties(jdbcConnectionDetails.getConnectionProperties());
+        if (test) {
+            // open a connection to make sure we can, then close it again
+            dataSource.getConnection().close();
+            // if it is a local HSQLDB, make sure we clean up after us
+            if (isLocalHsqldb(jdbcConnectionDetails)) {
+                shutdownLocalHsqldb(dataSource);
+            }
+            return null;
+        }
+        return dataSource;
+    }
+
+    private boolean isLocalHsqldb(JdbcConnectionDetails jcd) {
+        return jcd.getDriverClassName().equals("org.hsqldb.jdbcDriver") && jcd.getUrl().startsWith("jdbc:hsqldb:file:");
+    }
+
+    private void shutdownLocalHsqldb(DataSource dataSource) {
+        JdbcTemplate jt = new JdbcTemplate(dataSource);
+        jt.execute("SHUTDOWN");
+    }
 
     /**
      * @return the jdbcConnectionDetails
@@ -44,28 +72,13 @@ public class DataSourceFactory implements FactoryBean, DisposableBean {
         return this.jdbcConnectionDetails;
     }
 
-	public void setJdbcConnectionDetails(JdbcConnectionDetails jdbcConnectionDetails) throws SQLException {
-		try {
-            this.jdbcConnectionDetails = jdbcConnectionDetails;
-            dataSource = new DriverManagerDataSource();
-    		dataSource.setDriverClassName(jdbcConnectionDetails.getDriverClassName());
-    		dataSource.setUrl(jdbcConnectionDetails.getUrl());
-    		dataSource.setUsername(jdbcConnectionDetails.getUsername());
-    		dataSource.setPassword(jdbcConnectionDetails.getPassword());
-            dataSource.setConnectionProperties(jdbcConnectionDetails.getConnectionProperties());
-    		dataSource.getConnection().close();
-        } catch (SQLException se) {
-            this.dataSource = null;
-            throw se;
-        }
+	public void setJdbcConnectionDetails(JdbcConnectionDetails jdbcConnectionDetails) {
+        this.jdbcConnectionDetails = jdbcConnectionDetails;
 	}
 
 	public void destroy() throws Exception {
-		if (dataSource != null) {
-			// FIXME: This is a bit of a hack still. We should probably only
-			// do this if the Driver IS actually HSQLDB. For the moment, it is Ok
-			JdbcTemplate jt = new JdbcTemplate(dataSource);
-			jt.execute("SHUTDOWN");
+		if (dataSource != null && isLocalHsqldb(jdbcConnectionDetails)) {
+            shutdownLocalHsqldb(dataSource);
 		}
 	}
 

@@ -108,7 +108,9 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 						.getFormObject();
 
 				try {
-					getDataSourceFactory().setJdbcConnectionDetails(jdbcDetails);
+                    // do an initial test creation of the datasource
+                    getDataSourceFactory().createDataSource(jdbcDetails, true);
+                    getDataSourceFactory().setJdbcConnectionDetails(jdbcDetails);
 					postSelection();
 				} catch (Exception e) {
 					logger.error("Error opening connection", e);
