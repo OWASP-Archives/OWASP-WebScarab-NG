@@ -42,7 +42,7 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="showProxyControlBarToggle"/>
+				<ref bean="showProxyControlBarToggleCommand"/>
 				<value>manualRequestCommand</value>
 			</list>
 		</property>
@@ -108,8 +108,9 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
-				<ref bean="showProxyControlBarToggle"/>
+				<ref bean="showProxyControlBarToggleCommand"/>
 				<ref bean="showProxyConfiguration"/>
+				<ref bean="proxyInterceptRequestGroup"/>
 			</list>
 		</property>
 	</bean>

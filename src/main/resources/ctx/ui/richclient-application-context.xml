@@ -317,6 +317,7 @@
 	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar" singleton="true">
 		<property name="proxy" ref="proxy"/>
 		<property name="swingInterceptor" ref="proxyInterceptor"/>
+		<property name="interceptRequestCommandGroup" ref="proxyInterceptRequestGroup"/>
 	</bean>
 
 	<bean id="showProxyControlBarToggleCommand"
@@ -330,8 +331,66 @@
 		<property name="commands">
 			<list>
 				<ref bean="showProxyControlBarToggleCommand"/>
+				<ref bean="proxyInterceptRequestGroup"/>
+				<ref bean="interceptRequestAll"/>
+				<ref bean="interceptRequestGet"/>
+				<ref bean="interceptRequestGetPost"/>
+				<ref bean="interceptRequestNone"/>
+				<ref bean="interceptRequestPost"/>
 			</list>
 		</property>
+	</bean>
+
+	<bean id="interceptRequestNone"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
+		<property name="interceptRequestMethods">
+			<value>null</value>
+		</property>
+	</bean>
+
+	<bean id="interceptRequestGet"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
+		<property name="interceptRequestMethods">
+			<list><value>GET</value></list>
+		</property>
+	</bean>
+
+	<bean id="interceptRequestPost"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
+		<property name="interceptRequestMethods">
+			<list><value>POST</value></list>
+		</property>
+	</bean>
+
+	<bean id="interceptRequestGetPost"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
+		<property name="interceptRequestMethods">
+			<list><value>GET</value><value>POST</value></list>
+		</property>
+	</bean>
+
+	<bean id="interceptRequestAll"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
+	</bean>
+
+	<bean id="proxyInterceptRequestGroup"
+		class="org.springframework.richclient.command.CommandGroupFactoryBean">
+		<property name="exclusive"><value>true</value></property>
+		<property name="members">
+			<list>
+				<ref bean="interceptRequestNone"/>
+				<ref bean="interceptRequestGet"/>
+				<ref bean="interceptRequestPost"/>
+				<ref bean="interceptRequestGetPost"/>
+				<ref bean="interceptRequestAll"/>
+			</list>
+		</property>
+		<property name="allowsEmptySelection"><value>false</value></property>
 	</bean>
 
 </beans>
