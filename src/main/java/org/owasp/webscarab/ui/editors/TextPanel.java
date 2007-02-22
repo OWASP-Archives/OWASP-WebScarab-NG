@@ -147,8 +147,8 @@ public class TextPanel extends javax.swing.JPanel implements ByteArrayEditor {
     }
 
     public void setText(String contentType, String text) {
-        String wrap = "false";
-        if (wrap != null && wrap.equals("true")) textTextArea.setLineWrap(true);
+//        String wrap = "false";
+//        if (wrap != null && wrap.equals("true")) textTextArea.setLineWrap(true);
 
         _text = text;
         textTextArea.getDocument().removeDocumentListener(_dcl);
