@@ -229,7 +229,6 @@ public class ManualRequestView extends AbstractView {
          * @see org.owasp.webscarab.services.ConversationGenerator#errorFetchingResponse(org.owasp.webscarab.domain.Conversation, java.lang.Exception)
          */
         public void errorFetchingResponse(final Conversation request, final Exception e) {
-            executed = true;
             if (!isActiveFetcher(this)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -241,16 +240,17 @@ public class ManualRequestView extends AbstractView {
         /* (non-Javadoc)
          * @see org.owasp.webscarab.services.ConversationGenerator#getNextRequest()
          */
-        public Conversation getNextRequest() {
-            if (!executed) return request;
-            return null;
+        public synchronized Conversation getNextRequest() {
+            if (!isActiveFetcher(this)) return null;
+            if (executed) return null;
+            executed = true;
+            return request;
         }
 
         /* (non-Javadoc)
          * @see org.owasp.webscarab.services.ConversationGenerator#responseReceived(org.owasp.webscarab.domain.Conversation)
          */
         public void responseReceived(final Conversation conversation) {
-            executed = true;
             if (!isActiveFetcher(this)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -293,6 +293,7 @@ public class ManualRequestView extends AbstractView {
         }
         protected void doExecuteCommand() {
             conversationFormModel.revert();
+            annotationFormModel.revert();
         }
     }
 
