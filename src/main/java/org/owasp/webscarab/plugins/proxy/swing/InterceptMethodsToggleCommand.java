@@ -32,8 +32,6 @@ public class InterceptMethodsToggleCommand extends ToggleCommand {
      */
     @Override
     protected void onSelection() {
-        System.out.println(getId() + " executed");
-        super.onSelection();
         interceptor.setInterceptRequestMethods(interceptRequestMethods);
     }
 
