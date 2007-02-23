@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.plugins.proxy.swing;
 
@@ -29,20 +29,20 @@ import org.springframework.richclient.form.FormModelHelper;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class SwingInterceptor implements ProxyInterceptor {
 
 	private List<String> interceptRequestMethods = null;
-	
+
 	private List<Pattern> interceptResponseTypes = null;
-	
-	private String skipRequestRegex = ".*(\\.(gif|jpg|png|css|js|ico|swf|axd.*)|refresher.asp)$";
+
+	private Pattern skipRequestRegex = Pattern.compile(".*(\\.(gif|jpg|png|css|js|ico|swf|axd.*)|refresher.asp)$");
 
 	private boolean interceptResponses = false;
-	
+
 	private boolean interceptAllResponses = false;
-	
+
 	public SwingInterceptor() {
 	}
 
@@ -50,10 +50,10 @@ public class SwingInterceptor implements ProxyInterceptor {
 			Annotation annotation) throws IOException {
 		String method = conversation.getRequestMethod();
 		String uri = conversation.getRequestUri().toASCIIString();
-		
+
 		if (interceptRequestMethods == null || !interceptRequestMethods.contains(method))
 			return;
-		if (uri.matches(skipRequestRegex))
+		if (skipRequestRegex.matcher(uri).matches())
 			return;
 
 		final FormModel requestModel = ConversationFormSupport
@@ -181,11 +181,11 @@ public class SwingInterceptor implements ProxyInterceptor {
 
 	}
 
-	public String getSkipRequestRegex() {
+	public Pattern getSkipRequestRegex() {
 		return this.skipRequestRegex;
 	}
 
-	public void setSkipRequestRegex(String interceptRequestRegex) {
+	public void setSkipRequestRegex(Pattern interceptRequestRegex) {
 		this.skipRequestRegex = interceptRequestRegex;
 	}
 
