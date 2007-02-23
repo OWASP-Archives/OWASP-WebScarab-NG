@@ -111,6 +111,8 @@
 				<ref bean="showProxyControlBarToggleCommand"/>
 				<ref bean="showProxyConfiguration"/>
 				<ref bean="proxyInterceptRequestGroup"/>
+				<ref bean="excludeRegexPatternCommand"/>
+				<ref bean="interceptResponseToggleCommand"/>
 			</list>
 		</property>
 	</bean>
@@ -163,6 +165,10 @@
 		<property name="dataSourceFactory" ref="&amp;dataSource"/>
 		<property name="eventService" ref="eventService"/>
 		<property name="displaySuccessMessage"><value>false</value></property>
+	</bean>
+
+	<bean id="excludeRegexPatternCommand" class="org.owasp.webscarab.plugins.proxy.swing.ExcludeRegexPatternCommand">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
 	</bean>
 
 </beans>
