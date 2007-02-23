@@ -42,7 +42,7 @@ public class ProxyControlBar implements Annotator {
 
     private ExclusiveCommandGroup interceptRequestCommandGroup;
 
-	private ToggleCommand interceptResponses = null;
+	private ToggleCommand interceptResponseCommand = null;
 
 	private JWindow window;
 
@@ -64,13 +64,9 @@ public class ProxyControlBar implements Annotator {
 			Container pane = window.getContentPane();
 			pane.setLayout(new FlowLayout());
             JComboBox combo = interceptRequestCommandGroup.createComboBox();
-//            combo.setRenderer(new DefaultListCellRenderer());
-//            for (int i=0; i<combo.getModel().getSize(); i++) {
-//                System.out.println(combo.getItemAt(i));
-//            }
 			pane.add(combo);
-			if (interceptResponses != null)
-				pane.add(interceptResponses.createCheckBox());
+			if (interceptResponseCommand != null)
+				pane.add(interceptResponseCommand.createCheckBox());
 			JComponent component = annotationForm.getControl();
 			component.setPreferredSize(new Dimension(600, (int) component
 					.getPreferredSize().getHeight()));
@@ -131,5 +127,12 @@ public class ProxyControlBar implements Annotator {
     public void setInterceptRequestCommandGroup(
             ExclusiveCommandGroup interceptRequestCommandGroup) {
         this.interceptRequestCommandGroup = interceptRequestCommandGroup;
+    }
+
+    /**
+     * @param interceptResponseCommand the interceptResponseCommand to set
+     */
+    public void setInterceptResponseCommand(ToggleCommand interceptResponseCommand) {
+        this.interceptResponseCommand = interceptResponseCommand;
     }
 }
