@@ -23,6 +23,9 @@ public class PreferencesJdbcConnectionDetails extends JdbcConnectionDetails {
         prefs = Preferences.userRoot().node(pathName);
         super.setDriverClassName(prefs.get(DRIVER_CLASSNAME, "org.hsqldb.jdbcDriver"));
         String tmp = System.getProperty("java.io.tmpdir");
+        String slash = System.getProperty("file.separator");
+        if (! tmp.endsWith(slash))
+            tmp = tmp + slash;
         super.setUrl(prefs.get(URL, "jdbc:hsqldb:file:" + tmp + "webscarab"));
         super.setUsername(prefs.get(USERNAME, "sa"));
     }
