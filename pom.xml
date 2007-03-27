@@ -36,6 +36,16 @@
     <name>The OWASP Foundation</name>
     <url>http://www.owasp.org</url>
   </organization>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>WebScarabSnapshotRepository</id>
+      <name>WebScarab snapshot repository</name>
+      <url>http://dawes.za.net/rogan/repository</url>
+    </repository>
+  </repositories>
   <pluginRepositories>
   <pluginRepository>
     <id>codehaus snapshot repository</id>
