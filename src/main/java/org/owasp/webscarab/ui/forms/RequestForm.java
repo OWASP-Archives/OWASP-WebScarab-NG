@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.owasp.webscarab.ui.forms;
 
@@ -12,16 +12,16 @@ import org.springframework.richclient.form.Form;
 
 /**
  * @author rdawes
- * 
+ *
  */
 public class RequestForm extends AbstractForm {
 
 	private static final String FORM_ID = "requestForm";
-	
+
 	private Form rawRequestForm;
-	
+
 	private Form parsedRequestForm;
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -41,5 +41,13 @@ public class RequestForm extends AbstractForm {
 
 		return tabbedPane;
 	}
+
+    /* (non-Javadoc)
+     * @see org.springframework.richclient.form.AbstractForm#getRevertCommandFaceDescriptorId()
+     */
+    @Override
+    protected String getRevertCommandFaceDescriptorId() {
+        return "revertCommand";
+    }
 
 }
