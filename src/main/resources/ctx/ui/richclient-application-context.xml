@@ -93,9 +93,9 @@
 		class="org.springframework.richclient.application.vldocking.VLDockingPageDescriptor">
 		<property name="viewDescriptors">
 			<list>
+				<value>siteMapView</value>
+				<value>conversationListView</value>
 				<value>conversationView</value>
-				<!--value>initialView-1</value>
-				<value>initialView-2</value-->
 			</list>
 		</property>
 		<property name="initialLayout">
@@ -104,6 +104,9 @@
 					<value>/layouts/proxyPage.xml</value>
 				</constructor-arg>
 			</bean>
+		</property>
+		<property name="layoutManager">
+			<bean class="org.owasp.webscarab.util.swing.WSLayoutManager"/>
 		</property>
 	</bean>
 
