@@ -10,10 +10,10 @@ import java.util.Set;
 
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
-import org.springframework.binding.validation.Severity;
 import org.springframework.binding.validation.ValidationResults;
 import org.springframework.binding.validation.Validator;
 import org.springframework.binding.validation.support.DefaultValidationResults;
+import org.springframework.richclient.core.Severity;
 
 /**
  * @author rdawes
