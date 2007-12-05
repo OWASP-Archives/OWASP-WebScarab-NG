@@ -26,7 +26,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.springframework.binding.form.FormModel;
-import org.springframework.binding.value.ValueModel;
 
 /**
  * @author rdawes
@@ -36,12 +35,12 @@ public class HexForm extends AbstractContentForm {
 
 	private static String FORM_ID = "hexForm";
 
-	private ValueModel vm;
-
 	private HexTableModel tableModel;
 
 	private HexTable table;
 
+	private int length = 0;
+	
 	public HexForm(FormModel model, String headerPropertyName,
 			String contentPropertyName) {
 		super(model, FORM_ID, headerPropertyName, contentPropertyName);
@@ -58,6 +57,12 @@ public class HexForm extends AbstractContentForm {
 	}
 
 	protected void updateContentFormControl() {
+	    byte[] content = getContent();
+	    if (content != null) {
+	        length = content.length;
+	    } else {
+	        length = 0;
+	    }
 		tableModel.fireTableDataChanged();
 	}
 
@@ -126,14 +131,13 @@ public class HexForm extends AbstractContentForm {
 		}
 
 		public int getRowCount() {
-			byte[] data = getContent();
-			if (data == null || data.length == 0) {
+			if (length == 0) {
 				return 0;
 			}
-			if (data.length % columns == 0) {
-				return (data.length / columns);
+			if (length % columns == 0) {
+				return (length / columns);
 			} else {
-				return (data.length / columns) + 1;
+				return (length / columns) + 1;
 			}
 		}
 
@@ -174,12 +178,11 @@ public class HexForm extends AbstractContentForm {
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			if (isReadOnly())
 				return false;
-			byte[] data = (byte[]) vm.getValue();
-			if (columnIndex == 0 || columnIndex > columns) {
-				return false;
-			}
+            if (columnIndex == 0 || columnIndex > columns) {
+                return false;
+            }
 			int position = rowIndex * columns + columnIndex - 1;
-			if (position < data.length) {
+			if (position < length) {
 				return true;
 			}
 			return false;
