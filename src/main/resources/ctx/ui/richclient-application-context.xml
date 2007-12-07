@@ -87,6 +87,15 @@
 		<property name="startingPageId">
 			<value>proxyPage</value>
 		</property>
+		<property name="registerableExceptionHandler" ref="exceptionHandler"/>
+		<property name="menubarBeanName" value="menuBar" />
+		<property name="toolbarBeanName" value="toolBar" />
+
+	</bean>
+
+	<bean id="exceptionHandler" class="org.springframework.richclient.exceptionhandling.MessagesDialogExceptionHandler">
+		<property name="logLevel" value="ERROR"/>
+		<property name="shutdownPolicy" value="NONE"/>
 	</bean>
 
  	<bean id="proxyPage"
