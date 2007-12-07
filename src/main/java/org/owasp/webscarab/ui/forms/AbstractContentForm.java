@@ -3,8 +3,8 @@
  */
 package org.owasp.webscarab.ui.forms;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
@@ -51,7 +51,7 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 		if (contentListener == null) {
 			contentListener = new ContentListener();
 			contentValueModel.addValueChangeListener(contentListener);
-			c.addComponentListener(contentListener);
+			c.addHierarchyListener(contentListener);
 		}
 		return c;
 	}
@@ -70,7 +70,16 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 		NamedValue[] headers = (NamedValue[]) headerValueModel.getValue();
 		NamedValue[] ct = NamedValue.find("Content-Type", headers);
 		if (ct == null || ct.length == 0) return null;
-		return ct[0].getValue();
+		return getContentType(ct[0].getValue());
+	}
+	
+	protected String getContentType(String value) {
+	    if (value == null || value.length() == 0)
+	        return null;
+        int semi = value.indexOf(';'); 
+        if (semi > -1)
+            return value.substring(0, semi).trim();
+        return value;
 	}
 	
 	protected String getDeclaredCharacterSet() {
@@ -98,18 +107,15 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 		contentValueModel.setValueSilently(content, contentListener);
 	}
 	
-	protected String getContentAsString() {
+	protected String getContentAsString() throws UnsupportedEncodingException {
 		byte[] content = getContent();
 		if (content == null || content.length == 0) return null;
 		String cs = getDeclaredCharacterSet();
 		if (cs == null) 
 			cs = getDetectedCharacterSet();
-		if (cs != null) {
-			try {
-				return new String(content, cs);
-			} catch (Exception e) {}
-		}
-		return new String(content);
+        if (cs == null)
+            cs = "ISO-8859-1";
+		return new String(content, cs);
 	}
 	
 	protected void setContent(String content) throws UnsupportedEncodingException {
@@ -149,7 +155,7 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 		return getContentAsReader(cs);
 	}
 	
-	private class ContentListener extends ComponentAdapter implements PropertyChangeListener {
+	private class ContentListener implements HierarchyListener, PropertyChangeListener {
 
 		private boolean upToDate = false;
 		
@@ -174,14 +180,20 @@ public abstract class AbstractContentForm extends AbstractForm implements Conten
 			}
 		}
 		
-		public void componentShown(ComponentEvent e) {
-			if (!upToDate) {
-				updating = true;
-				updateContentFormControl();
-				updating = false;
-				upToDate = true;
-			}
-		}
+		
+		/* (non-Javadoc)
+         * @see java.awt.event.HierarchyListener#hierarchyChanged(java.awt.event.HierarchyEvent)
+         */
+        public void hierarchyChanged(HierarchyEvent e) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == 0)
+                return;
+            if (e.getComponent().isShowing() && !upToDate) {
+                updating = true;
+                updateContentFormControl();
+                updating = false;
+                upToDate = true;
+            }
+        }
 
 	}
 	

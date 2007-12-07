@@ -49,8 +49,8 @@ import org.springframework.util.ObjectUtils;
 
 import javax.swing.JTabbedPane;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -71,14 +71,14 @@ public class ContentTabbedPane extends JTabbedPane {
     	super();
     	forms.add(new ImageForm(model, headerProperty, contentProperty));
     	forms.add(new HtmlForm(model, headerProperty, contentProperty));
-    	forms.add(new TextForm(model, headerProperty, contentProperty));
+        forms.add(new TextForm(model, headerProperty, contentProperty));
     	forms.add(new HexForm(model, headerProperty, contentProperty));
     	listener = new Listener();
     	NamedValue[] headers = (NamedValue[]) model.getValueModel(headerProperty).getValue();
     	String contentType = NamedValue.get("Content-Type", headers);
     	showForms(contentType);
     	model.getValueModel(headerProperty).addValueChangeListener(listener);
-    	addComponentListener(listener);
+    	addHierarchyListener(listener);
     }
     
     private void showForms(String contentType) {
@@ -92,7 +92,16 @@ public class ContentTabbedPane extends JTabbedPane {
     	}
     }
     
-    private class Listener extends ComponentAdapter implements PropertyChangeListener {
+    private String getContentType(String value) {
+        if (value == null || value.length() == 0)
+            return null;
+        int semi = value.indexOf(';');
+        if (semi > -1)
+            return value.substring(0, semi).trim();
+        return value;
+    }
+    
+    private class Listener implements HierarchyListener, PropertyChangeListener {
 
     	private boolean upToDate = false;
     	
@@ -100,11 +109,12 @@ public class ContentTabbedPane extends JTabbedPane {
     	
 		public void propertyChange(PropertyChangeEvent evt) {
 			NamedValue[] headers = (NamedValue[]) evt.getOldValue();
-			String oldContentType = NamedValue.get("Content-Type", headers);
+			String oldContentType = getContentType(NamedValue.get("Content-Type", headers));
 			headers = (NamedValue[]) evt.getNewValue();
-			newContentType = NamedValue.get("Content-Type", headers);
-			if (! ObjectUtils.nullSafeEquals(oldContentType, newContentType)) {
-				upToDate = false;
+			newContentType = getContentType(NamedValue.get("Content-Type", headers));
+            if (! ObjectUtils.nullSafeEquals(oldContentType, newContentType)) {
+			    upToDate = false;
+				removeAll();
 				if (isShowing()) {
 					showForms(newContentType);
 					upToDate = true;
@@ -112,14 +122,15 @@ public class ContentTabbedPane extends JTabbedPane {
 			}
 		}
 
-		@Override
-		public void componentShown(ComponentEvent e) {
-			if (!upToDate) {
-				showForms(newContentType);
-				upToDate = true;
-			}
-		}
-    	
+        public void hierarchyChanged(HierarchyEvent e) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == 0)
+                return;
+            if (isShowing() && !upToDate) {
+                showForms(newContentType);
+                upToDate = true;
+            }
+        }
+
     }
     
 }

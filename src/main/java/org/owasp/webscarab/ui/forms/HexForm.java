@@ -67,8 +67,13 @@ public class HexForm extends AbstractContentForm {
 	}
 
 	protected void clearContentFormControl() {
-		// we can handle anything, and the table checks whether we are visible
-		// or not
+        byte[] content = getContent();
+        if (content != null) {
+            length = content.length;
+        } else {
+            length = 0;
+        }
+        tableModel.fireTableDataChanged();
 	}
 
 	public boolean canHandle(String contentType) {
@@ -204,10 +209,10 @@ public class HexForm extends AbstractContentForm {
 					fireTableCellUpdated(rowIndex, columns + 1);
 					setContent(newData);
 				} catch (NumberFormatException nfe) {
-					System.out.println("Number format error : " + nfe);
+					logger.error("Number format error : " + nfe);
 				}
 			} else {
-				System.out.println("Value is a " + aValue.getClass().getName());
+			    logger.error("Value is a " + aValue.getClass().getName());
 			}
 		}
 

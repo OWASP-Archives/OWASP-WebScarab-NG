@@ -50,9 +50,14 @@ public class TextForm extends AbstractContentForm {
 	}
 
 	protected void updateContentFormControl() {
-		textArea.setText(getContentAsString());
-		textArea.setCaretPosition(0);
-		textArea.setBackground(normalColor);
+	    try {
+    		textArea.setText(getContentAsString());
+    		textArea.setCaretPosition(0);
+    		textArea.setBackground(normalColor);
+	    } catch (UnsupportedEncodingException uee) {
+	        textArea.setText("");
+            textArea.setBackground(errorColor);
+	    }
 	}
 
 	public boolean canHandle(String contentType) {
