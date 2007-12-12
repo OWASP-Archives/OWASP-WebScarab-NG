@@ -55,6 +55,8 @@ public class XmlForm extends AbstractContentForm {
     @Override
     protected JComponent createContentFormControl() {
         treeTable = new JXTreeTable(model);
+        treeTable.setSearchable(treeTable.new TableSearchable());
+        treeTable.setRootVisible(true);
         treeTable.setTreeCellRenderer(new XMLTreeTableCellRenderer());
         updateContentFormControl();
         return getComponentFactory().createScrollPane(treeTable);
@@ -73,6 +75,7 @@ public class XmlForm extends AbstractContentForm {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             document = builder.parse(getContentAsStream());
             model.fireRootChanged();
+            treeTable.expandAll();
         } catch (ParserConfigurationException pce) {
             logger.error("Error configuring XML parser", pce);
         } catch (SAXException se) {
@@ -85,7 +88,7 @@ public class XmlForm extends AbstractContentForm {
     public boolean canHandle(String contentType) {
         if (contentType == null)
             return false;
-        if (contentType.matches("text/xml"))
+        if ("text/xml".equals(contentType))
             return true;
         return false;
     }

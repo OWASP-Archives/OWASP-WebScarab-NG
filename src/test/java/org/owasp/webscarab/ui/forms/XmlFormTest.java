@@ -3,32 +3,24 @@
  */
 package org.owasp.webscarab.ui.forms;
 
-import java.awt.Image;
-import java.io.IOException;
 import java.net.URI;
 
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
+import org.owasp.webscarab.ui.WebScarabUITestCase;
 import org.owasp.webscarab.ui.forms.ResponseForm;
-import org.owasp.webscarab.ui.forms.support.ArrayChangeDetector;
 import org.springframework.binding.form.ValidatingFormModel;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.richclient.application.support.DefaultApplicationServices;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
 import org.springframework.richclient.dialog.TitledPageApplicationDialog;
 import org.springframework.richclient.form.Form;
 import org.springframework.richclient.form.FormModelHelper;
-import org.springframework.richclient.image.AwtImageResource;
-import org.springframework.richclient.image.DefaultIconSource;
-import org.springframework.richclient.image.ImageSource;
-import org.springframework.richclient.test.SpringRichTestCase;
 
 /**
  * @author rdawes
  *
  */
-public class XmlFormTest extends SpringRichTestCase {
+public class XmlFormTest extends WebScarabUITestCase {
 
 	private Conversation c;
 	
@@ -59,34 +51,6 @@ public class XmlFormTest extends SpringRichTestCase {
 				"http://localhost/index.html"));
 		c.setResponseHeader(new NamedValue("Content-Type", "text/xml"));
 		c.setResponseContent(content.getBytes());
-	}
-
-	protected void registerAdditionalServices(
-			DefaultApplicationServices defaultapplicationservices) {
-		try {
-			ImageSource imageSource = new ImageSource() {
-				AwtImageResource brokenImageIndicatorResource = new AwtImageResource(
-						new ClassPathResource("images/alert/error_obj.gif"));
-
-				Image brokenImageIndicator = brokenImageIndicatorResource
-						.getImage();
-
-				public Image getImage(String key) {
-					return brokenImageIndicator;
-				}
-
-				public AwtImageResource getImageResource(String key) {
-					return brokenImageIndicatorResource;
-				}
-			};
-
-			defaultapplicationservices.setImageSource(imageSource);
-			defaultapplicationservices.setIconSource(new DefaultIconSource(
-					imageSource));
-			defaultapplicationservices.setValueChangeDetector(new ArrayChangeDetector());
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
 	}
 
 	private void showDialog() {
