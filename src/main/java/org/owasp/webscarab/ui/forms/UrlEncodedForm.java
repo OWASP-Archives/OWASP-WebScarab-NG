@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.httpclient.util.EncodingUtil;
 import org.owasp.webscarab.domain.NamedValue;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
@@ -26,8 +25,8 @@ import org.springframework.richclient.command.AbstractCommand;
 import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.command.config.CommandConfigurer;
 import org.springframework.richclient.factory.ComponentFactory;
+import org.springframework.richclient.list.ListMultipleSelectionGuard;
 import org.springframework.richclient.list.ListSelectionValueModelAdapter;
-import org.springframework.richclient.list.ListSingleSelectionGuard;
 
 /**
  * @author rdawes
@@ -63,7 +62,7 @@ public class UrlEncodedForm extends AbstractContentForm {
             AbstractCommand deleteRowCommand = cc.configure(new DeleteRowCommand());
             ValueModel selectionHolder = new ListSelectionValueModelAdapter(table
                     .getSelectionModel());
-            new ListSingleSelectionGuard(selectionHolder, deleteRowCommand);
+            new ListMultipleSelectionGuard(selectionHolder, deleteRowCommand);
             AbstractButton deleteButton = deleteRowCommand.createButton();
             buttonPanel.add(addButton);
             buttonPanel.add(deleteButton);
@@ -85,9 +84,13 @@ public class UrlEncodedForm extends AbstractContentForm {
 	}
 
 	protected void clearContentFormControl() {
-	    
+	    this.values.clear();
 	}
 
+	private void setContent() throws UnsupportedEncodingException {
+        setContent(NamedValue.join(values.toArray(new NamedValue[0]), "&", "="));
+	}
+	
 	public boolean canHandle(String contentType) {
 		return "application/x-www-form-urlencoded".equals(contentType);
 	}
@@ -160,7 +163,7 @@ public class UrlEncodedForm extends AbstractContentForm {
                 }  catch (UnsupportedEncodingException uee) {} // should never happen
             }
             try {
-                setContent(NamedValue.join(values.toArray(new NamedValue[0]), "&", "="));
+                setContent();
                 fireTableCellUpdated(rowIndex, columnIndex);
             } catch (UnsupportedEncodingException uee) {
                 values.set(rowIndex, old);
@@ -189,6 +192,11 @@ public class UrlEncodedForm extends AbstractContentForm {
                 values.add(row + 1, value);
                 model.fireTableRowsInserted(row + 1, row + 1);
             }
+            try {
+                setContent();
+            } catch (UnsupportedEncodingException uee) {
+                // TODO: should do something, I guess
+            }
         }
 	    
 	}
@@ -204,9 +212,16 @@ public class UrlEncodedForm extends AbstractContentForm {
          */
         @Override
         protected void doExecuteCommand() {
-            int row = table.getSelectedRow();
-            values.remove(row);
-            model.fireTableRowsDeleted(row, row);
+            int[] rows = table.getSelectedRows();
+            for (int i = rows.length-1; i>=0; i--) {
+                values.remove(rows[i]);
+                model.fireTableRowsDeleted(rows[i], rows[i]);
+            }
+            try {
+                setContent();
+            } catch (UnsupportedEncodingException uee) {
+                // shouldn't happen
+            }
         }
         
     }
