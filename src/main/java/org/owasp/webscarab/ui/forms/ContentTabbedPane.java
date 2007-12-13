@@ -72,6 +72,7 @@ public class ContentTabbedPane extends JTabbedPane {
     	forms.add(new ImageForm(model, headerProperty, contentProperty));
     	forms.add(new HtmlForm(model, headerProperty, contentProperty));
         forms.add(new UrlEncodedForm(model, headerProperty, contentProperty));
+        forms.add(new UrlEncodedJsonForm(model, headerProperty, contentProperty));
         forms.add(new JsonForm(model, headerProperty, contentProperty));
         forms.add(new XmlForm(model, headerProperty, contentProperty));
         forms.add(new TextForm(model, headerProperty, contentProperty));
