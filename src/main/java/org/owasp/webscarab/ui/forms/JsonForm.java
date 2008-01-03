@@ -5,9 +5,13 @@ package org.owasp.webscarab.ui.forms;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -22,10 +26,10 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
+import org.owasp.webscarab.util.json.JSONComplianceException;
+import org.owasp.webscarab.util.json.JSONReader;
+import org.owasp.webscarab.util.json.JSONWriter;
 import org.springframework.binding.form.FormModel;
-import org.stringtree.json.ExceptionErrorListener;
-import org.stringtree.json.JSONValidatingReader;
-import org.stringtree.json.JSONValidatingWriter;
 
 /**
  * @author rdawes
@@ -39,6 +43,8 @@ public class JsonForm extends AbstractContentForm {
 
     private JsonTreeTableModel model = new JsonTreeTableModel();
 
+    private int compliance;
+    
     public JsonForm(FormModel model, String headerPropertyName,
             String contentPropertyName) {
         super(model, FORM_ID, headerPropertyName, contentPropertyName);
@@ -60,12 +66,22 @@ public class JsonForm extends AbstractContentForm {
 
     protected void updateContentFormControl() {
         try {
-            JSONValidatingReader reader = new JSONValidatingReader(
-                    new ExceptionErrorListener());
-            Object json = reader.read(getContentAsString());
-            if (json == JSONValidatingReader.INVALID)
+            JSONReader reader = new JSONReader(getContentAsString());
+            Object json;
+            try {
+                try {
+                    json = reader.parse(JSONReader.STRICT);
+                    compliance = JSONReader.STRICT;
+                } catch (JSONComplianceException jce) {
+                    json = reader.parse(JSONReader.JS_EVAL);
+                    compliance = JSONReader.JS_EVAL;
+                }
+                model.setRoot(constructNodes(json));
+            } catch (ParseException pe) {
                 json = null;
-            model.setRoot(constructNodes(json));
+                compliance = JSONReader.STRICT;
+                model.setRoot(null);
+            }
             treeTable.expandAll();
         } catch (UnsupportedEncodingException uee) {
             logger.error("Cannot handle the character encoding!", uee);
@@ -86,14 +102,20 @@ public class JsonForm extends AbstractContentForm {
 
     private void updateConversation() {
         try {
-            JSONValidatingWriter writer = new JSONValidatingWriter(
-                    new ExceptionErrorListener(), false);
-            setContent(writer.write(model.getRoot().getUserObject()));
+            StringWriter sw = new StringWriter();
+            BufferedWriter bw = new BufferedWriter(sw);
+            JSONWriter writer = new JSONWriter(bw, compliance);
+            writer.write(model.getRoot().getUserObject());
+            bw.close();
+            setContent(sw.getBuffer().toString());
         } catch (UnsupportedEncodingException uee) {
             logger.error("Cannot handle the character encoding!", uee);
             clearContentFormControl();
-        } catch (IllegalArgumentException iae) {
-            logger.error("Invalid JSON data", iae);
+        } catch (RuntimeException re) {
+            logger.error("Invalid JSON data", re);
+            clearContentFormControl();
+        } catch (IOException ioe) {
+            logger.error("Error writing JSON", ioe);
             clearContentFormControl();
         }
     }
