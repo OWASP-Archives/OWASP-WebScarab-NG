@@ -107,7 +107,7 @@ public class ContentTabbedPane extends JTabbedPane {
     
     private class Listener implements HierarchyListener, PropertyChangeListener {
 
-    	private boolean upToDate = false;
+    	private boolean upToDate = true;
     	
     	private String newContentType = null;
     	
