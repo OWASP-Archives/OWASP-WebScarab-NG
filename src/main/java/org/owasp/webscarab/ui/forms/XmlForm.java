@@ -43,6 +43,8 @@ public class XmlForm extends AbstractContentForm {
 
     private JXTreeTable treeTable;
 
+    private Color defaultBackground, error = Color.PINK;
+    
     private XmlTreeTableModel model = new XmlTreeTableModel();
 
     private Document document = null;
@@ -55,6 +57,7 @@ public class XmlForm extends AbstractContentForm {
     @Override
     protected JComponent createContentFormControl() {
         treeTable = new JXTreeTable(model);
+        defaultBackground = treeTable.getBackground();
         treeTable.setSearchable(treeTable.new TableSearchable());
         treeTable.setRootVisible(true);
         treeTable.setTreeCellRenderer(new XMLTreeTableCellRenderer());
@@ -65,6 +68,7 @@ public class XmlForm extends AbstractContentForm {
     protected void clearContentFormControl() {
         document = null;
         model.fireRootChanged();
+        treeTable.setBackground(defaultBackground);
     }
 
     protected void updateContentFormControl() {
@@ -76,19 +80,23 @@ public class XmlForm extends AbstractContentForm {
             document = builder.parse(getContentAsStream());
             model.fireRootChanged();
             treeTable.expandAll();
+            treeTable.setBackground(defaultBackground);
         } catch (ParserConfigurationException pce) {
             logger.error("Error configuring XML parser", pce);
+            treeTable.setBackground(error);
         } catch (SAXException se) {
-            logger.error("Error parsing XML", se);
+            logger.info("Error parsing XML");
+            treeTable.setBackground(error);
         } catch (IOException ioe) {
             // should never happen
+            treeTable.setBackground(error);
         }
     }
 
     public boolean canHandle(String contentType) {
         if (contentType == null)
             return false;
-        if ("text/xml".equals(contentType))
+        if ("text/xml".equalsIgnoreCase(contentType))
             return true;
         return false;
     }
