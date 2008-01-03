@@ -54,7 +54,7 @@ public class UrlEncodedXmlForm extends XmlForm {
         ComponentFactory cf = getComponentFactory();
         JPanel panel = cf.createPanel(new BorderLayout());
         JPanel fieldPanel = cf.createPanel(new BorderLayout());
-        JLabel fieldLabel = cf.createLabel("jsonField.label");
+        JLabel fieldLabel = cf.createLabel("xmlField.label");
         JTextField textField = cf.createTextField();
         textField.setText(xmlFieldName);
         document = textField.getDocument();
