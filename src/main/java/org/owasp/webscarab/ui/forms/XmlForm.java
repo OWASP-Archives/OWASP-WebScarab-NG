@@ -5,8 +5,10 @@ package org.owasp.webscarab.ui.forms;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -31,6 +33,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,6 +45,8 @@ public class XmlForm extends AbstractContentForm {
 
     private static String FORM_ID = "xmlForm";
 
+    private static final EntityResolver nullEntityResolver = new NullEntityResolver();
+    
     private JXTreeTable treeTable;
 
     private Color defaultBackground, error = Color.PINK;
@@ -77,6 +83,7 @@ public class XmlForm extends AbstractContentForm {
                     .newInstance();
             builderFactory.setIgnoringElementContentWhitespace(true);
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            builder.setEntityResolver(nullEntityResolver);
             document = builder.parse(getContentAsStream());
             model.fireRootChanged();
             treeTable.expandAll();
@@ -312,4 +319,10 @@ public class XmlForm extends AbstractContentForm {
         }
     }
 
+    private static class NullEntityResolver implements EntityResolver {
+        private InputStream is = new ByteArrayInputStream(new byte[0]);
+        public InputSource resolveEntity(String publicId, String systemId){ 
+            return new InputSource(is); 
+        } 
+    }
 }
