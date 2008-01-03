@@ -18,7 +18,16 @@ public class SwingxTableFactory implements TableFactory {
 	 * @see org.springframework.richclient.factory.TableFactory#createTable()
 	 */
 	public JTable createTable() {
-		JXTable table = new JXTable();
+		JXTable table = new JXTable() {
+            // overridden to make the height of scroll match viewport height if smaller
+            public boolean getScrollableTracksViewportHeight() {
+                return getPreferredSize().height < getParent().getHeight();
+            }
+            // overridden to make the width of scroll match viewport width if smaller
+            public boolean getScrollableTracksViewportWidth() {
+                return getPreferredSize().width < getParent().getWidth();
+            }
+		};
 		return table;
 	}
 
@@ -26,7 +35,16 @@ public class SwingxTableFactory implements TableFactory {
 	 * @see org.springframework.richclient.factory.TableFactory#createTable(javax.swing.table.TableModel)
 	 */
 	public JTable createTable(TableModel model) {
-		JXTable table = new JXTable(model);
+        JXTable table = new JXTable(model) {
+            // overridden to make the height of scroll match viewport height if smaller
+            public boolean getScrollableTracksViewportHeight() {
+                return getPreferredSize().height < getParent().getHeight();
+            }
+            // overridden to make the width of scroll match viewport width if smaller
+            public boolean getScrollableTracksViewportWidth() {
+                return getPreferredSize().width < getParent().getWidth();
+            }
+        };
 		return table;
 	}
 
