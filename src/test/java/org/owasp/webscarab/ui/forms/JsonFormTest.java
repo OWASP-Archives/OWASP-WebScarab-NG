@@ -8,6 +8,7 @@ import java.net.URI;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
 import org.owasp.webscarab.ui.WebScarabUITestCase;
+import org.owasp.webscarab.ui.rcp.forms.ResponseForm;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;

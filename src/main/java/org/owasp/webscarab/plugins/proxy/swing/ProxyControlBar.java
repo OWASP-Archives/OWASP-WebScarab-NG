@@ -21,7 +21,7 @@ import javax.swing.JWindow;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.plugins.proxy.Annotator;
 import org.owasp.webscarab.plugins.proxy.Proxy;
-import org.owasp.webscarab.ui.forms.AnnotationForm;
+import org.owasp.webscarab.ui.rcp.forms.AnnotationForm;
 import org.owasp.webscarab.util.swing.HeapMonitor;
 import org.springframework.richclient.command.ExclusiveCommandGroup;
 import org.springframework.richclient.command.ToggleCommand;

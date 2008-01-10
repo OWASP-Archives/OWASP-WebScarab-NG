@@ -9,7 +9,8 @@ import java.net.URI;
 
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.NamedValue;
-import org.owasp.webscarab.ui.forms.support.ArrayChangeDetector;
+import org.owasp.webscarab.ui.rcp.forms.ResponseForm;
+import org.owasp.webscarab.ui.rcp.forms.support.ArrayChangeDetector;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.richclient.application.support.DefaultApplicationServices;

@@ -9,7 +9,7 @@
 		<property name="basenames">
 			<list>
 				<value>org.springframework.richclient.application.messages</value>
-				<value>org.owasp.webscarab.ui.messages</value>
+				<value>org.owasp.webscarab.ui.rcp.messages</value>
 			</list>
 		</property>
 	</bean>
@@ -19,7 +19,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:org/springframework/richclient/image/images.properties</value>
-				<value>classpath:org/owasp/webscarab/ui/images.properties</value>
+				<value>classpath:org/owasp/webscarab/ui/rcp/images.properties</value>
 			</list>
 		</property>
 		<property name="resourceBasePath">
@@ -80,7 +80,7 @@
 	</bean>
 
 	<bean id="lifecycleAdvisor"
-		class="org.owasp.webscarab.ui.WebScarabLifecycleAdvisor">
+		class="org.owasp.webscarab.ui.rcp.WebScarabLifecycleAdvisor">
 		<property name="windowCommandBarDefinitions">
 			<value>ctx/ui/commands-context.xml</value>
 		</property>
@@ -217,7 +217,7 @@
 		class="org.owasp.webscarab.domain.WebScarabValidationRulesSource"/>
 
 	<bean id="conversationList"
-		class="org.owasp.webscarab.ui.ConversationListFactory" singleton="true"
+		class="org.owasp.webscarab.ui.rcp.ConversationListFactory" singleton="true"
 		lazy-init="false">
 		<property name="eventService">
 			<ref bean="eventService" />
@@ -225,11 +225,11 @@
 	</bean>
 
 	<bean id="conversationTableFactory"
-		class="org.owasp.webscarab.ui.ConversationTableFactory" singleton="true"/>
+		class="org.owasp.webscarab.ui.rcp.ConversationTableFactory" singleton="true"/>
 
 	<bean id="conversationView"
 		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
-		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationView</value></property>
+		<property name="viewClass"><value>org.owasp.webscarab.ui.rcp.ConversationView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="eventService">
@@ -245,7 +245,7 @@
 
 	<bean id="conversationListView"
 		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
-		<property name="viewClass"><value>org.owasp.webscarab.ui.ConversationListView</value></property>
+		<property name="viewClass"><value>org.owasp.webscarab.ui.rcp.ConversationListView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="conversationList">
@@ -267,7 +267,7 @@
 
 	<bean id="siteMapView"
 		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
-		<property name="viewClass"><value>org.owasp.webscarab.ui.SiteMapView</value></property>
+		<property name="viewClass"><value>org.owasp.webscarab.ui.rcp.SiteMapView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="conversationList">
@@ -286,7 +286,7 @@
 
 	<bean id="manualRequestView"
 		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
-		<property name="viewClass"><value>org.owasp.webscarab.ui.ManualRequestView</value></property>
+		<property name="viewClass"><value>org.owasp.webscarab.ui.rcp.ManualRequestView</value></property>
 		<property name="viewProperties">
 			<map>
 				<entry key="eventService">
@@ -347,7 +347,7 @@
 	</bean>
 
 	<bean id="sharedCommandConfigurer"
-		class="org.owasp.webscarab.ui.SharedCommandConfigurer" singleton="true" lazy-init="false">
+		class="org.owasp.webscarab.ui.rcp.SharedCommandConfigurer" singleton="true" lazy-init="false">
 		<property name="commandConfigurer" ref="commandConfigurer"/>
 		<property name="commands">
 			<list>

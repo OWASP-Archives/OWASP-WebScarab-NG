@@ -6,7 +6,7 @@ package org.owasp.webscarab.ui;
 import java.awt.Image;
 import java.io.IOException;
 
-import org.owasp.webscarab.ui.forms.support.ArrayChangeDetector;
+import org.owasp.webscarab.ui.rcp.forms.support.ArrayChangeDetector;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.richclient.application.support.DefaultApplicationServices;
@@ -19,7 +19,7 @@ import org.springframework.richclient.test.SpringRichTestCase;
  * @author rdawes
  *
  */
-public class WebScarabUITestCase extends SpringRichTestCase{
+public abstract class WebScarabUITestCase extends SpringRichTestCase{
 
     protected void registerAdditionalServices(
             DefaultApplicationServices defaultapplicationservices) {
