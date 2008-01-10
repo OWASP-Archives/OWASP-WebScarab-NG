@@ -28,6 +28,7 @@ public class SwingxTableFactory implements TableFactory {
                 return getPreferredSize().width < getParent().getWidth();
             }
 		};
+		table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		return table;
 	}
 
@@ -45,6 +46,7 @@ public class SwingxTableFactory implements TableFactory {
                 return getPreferredSize().width < getParent().getWidth();
             }
         };
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		return table;
 	}
 
