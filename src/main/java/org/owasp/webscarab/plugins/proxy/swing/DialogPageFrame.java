@@ -35,8 +35,6 @@ public class DialogPageFrame {
 
 	private JFrame frame;
 
-	private boolean actionPerformed = false;
-
 	private Preferences prefs;
 
 	public DialogPageFrame(DialogPage page, ActionCommand okCommand,
@@ -44,13 +42,13 @@ public class DialogPageFrame {
 		prefs = Preferences.userNodeForPackage(getClass());
 
 		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Container pane = frame.getContentPane();
 
 		pane.add(DialogPageUtils.createStandardView(page, okCommand, cancelCommand));
 
 		ActionCommandInterceptor interceptor = new ActionCommandInterceptor() {
 			public void postExecution(ActionCommand command) {
-				actionPerformed = true;
 				synchronized (lock) {
 					lock.notify();
 				}
@@ -74,8 +72,8 @@ public class DialogPageFrame {
 		setFrameBounds();
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
-				if (!actionPerformed)
-					cancelCommand.execute();
+			    e.getWindow().removeWindowListener(this);
+				cancelCommand.execute();
 			}
 		});
 		frame.addComponentListener(new ComponentAdapter() {
