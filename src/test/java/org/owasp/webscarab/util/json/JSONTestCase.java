@@ -7,7 +7,7 @@ import java.text.ParseException;
 
 import junit.framework.TestCase;
 
-public class JSONTestCase extends TestCase {
+public abstract class JSONTestCase extends TestCase {
     JSONReader reader;
     Object obj;
     

@@ -116,7 +116,7 @@ public class JSONParserTest extends TestCase {
             Map<Object, Object> object = (Map<Object, Object>) new JSONReader(json).parse(JSONReader.STRICT);
             fail("Expected an exception, got " + object);
         } catch (Exception e) {
-            assertTrue(e.getCause() instanceof JSONComplianceException);
+            assertTrue(e instanceof JSONComplianceException);
         }
         try {
             String json = "  { false : null, \"b\" : false } ";
