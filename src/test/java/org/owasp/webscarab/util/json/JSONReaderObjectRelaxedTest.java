@@ -4,10 +4,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import org.stringtree.json.JSONValidatingReader;
-import org.stringtree.json.JSONValidatingWriter;
-import org.stringtree.json.JSONValidator;
-
 public class JSONReaderObjectRelaxedTest extends JSONTestCase {
 
     Map map;
