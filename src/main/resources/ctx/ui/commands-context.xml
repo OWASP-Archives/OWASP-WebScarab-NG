@@ -38,12 +38,17 @@
 		<property name="proxy" ref="proxy"/>
 	</bean>
 
+	<bean id="showTranscoderCommand"
+		class="org.owasp.webscarab.ui.rcp.ShowTranscoderCommand" singleton="false">
+	</bean>
+
 	<bean id="toolBar"
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
 				<ref bean="showProxyControlBarToggleCommand"/>
 				<value>manualRequestCommand</value>
+				<ref bean="showTranscoderCommand"/>
 			</list>
 		</property>
 	</bean>
@@ -124,6 +129,7 @@
 				<bean class="org.owasp.webscarab.util.httpclient.swing.UpstreamProxyConfigCommand">
 					<property name="proxyConfig" ref="proxyConfig"></property>
 				</bean>
+				<ref bean="showTranscoderCommand"/>
 			</list>
 		</property>
 	</bean>
