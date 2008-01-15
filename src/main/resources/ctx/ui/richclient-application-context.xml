@@ -88,6 +88,7 @@
 			<value>proxyPage</value>
 		</property>
 		<property name="registerableExceptionHandler" ref="exceptionHandler"/>
+		<property name="windowCommandManagerBeanName" value="windowCommandManager" />
 		<property name="menubarBeanName" value="menuBar" />
 		<property name="toolbarBeanName" value="toolBar" />
 
