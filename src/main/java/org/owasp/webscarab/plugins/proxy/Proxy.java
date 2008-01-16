@@ -316,7 +316,11 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                             return;
 
                         if (conversation.getRequestMethod().equals("CONNECT")) {
-                            if (getDefaultSslSocketFactory() == null) {
+                            String host = conversation.getRequestUri().getHost();
+                            int port = conversation.getRequestUri().getPort();
+                            if (port < 1)
+                                port = 443;
+                            if (getSslSocketFactory(host, port) == null) {
                                 os.write(NO_CERTIFICATE.getBytes());
                                 os.write(NO_CERTIFICATE_MESSAGE.getBytes());
                                 os.flush();
@@ -375,13 +379,18 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                             close = true;
                         }
                         if (getConversationService() != null) {
-                            conversation.setSource("Proxy");
-                            getConversationService().addConversation(
-                                    getSession(), conversation);
-                            if (!"".equals(annotation.getAnnotation())) {
-                                annotation.setId(conversation.getId());
-                                getConversationService().updateAnnotation(
-                                        annotation);
+                            boolean store = true;
+                            if (proxyInterceptor != null)
+                                store = proxyInterceptor.shouldRecordConversation(conversation);
+                            if (store) {
+                                conversation.setSource("Proxy");
+                                getConversationService().addConversation(
+                                        getSession(), conversation);
+                                if (!"".equals(annotation.getAnnotation())) {
+                                    annotation.setId(conversation.getId());
+                                    getConversationService().updateAnnotation(
+                                            annotation);
+                                }
                             }
                         }
                         String connection = conversation

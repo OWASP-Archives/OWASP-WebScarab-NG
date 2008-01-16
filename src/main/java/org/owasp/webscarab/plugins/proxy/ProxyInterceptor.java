@@ -18,4 +18,6 @@ public interface ProxyInterceptor {
 	
 	public void editResponse(Conversation conversation, Annotation annotation) throws IOException;
 	
+	public boolean shouldRecordConversation(Conversation conversation);
+	
 }

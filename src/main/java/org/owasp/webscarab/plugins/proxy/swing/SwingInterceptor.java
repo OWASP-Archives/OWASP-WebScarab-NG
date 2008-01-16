@@ -33,6 +33,16 @@ import org.springframework.richclient.form.FormModelHelper;
  */
 public class SwingInterceptor implements ProxyInterceptor {
 
+    public static final String PROPERTY_INTERCEPT_REQUEST_METHODS = "interceptRequestMethods";
+    
+    public static final String PROPERTY_INTERCEPT_RESPONSE_TYPES = "interceptResponseTypes";
+    
+    public static final String PROPERTY_SKIP_REQUEST_REGEX  = "skipRequestRegex";
+    
+    public static final String PROPERTY_INTERCEPT_RESPONSES = "interceptResponses";
+    
+    public static final String PROPERTY_DISCARD_SKIPPED_REQUESTS = "discardSkippedRequests";
+    
 	private List<String> interceptRequestMethods = null;
 
 	private List<Pattern> interceptResponseTypes = null;
@@ -43,6 +53,8 @@ public class SwingInterceptor implements ProxyInterceptor {
 
 	private boolean interceptAllResponses = false;
 
+	private boolean discardSkippedRequests = true;
+	
 	public SwingInterceptor() {
 	}
 
@@ -125,7 +137,14 @@ public class SwingInterceptor implements ProxyInterceptor {
 		frame.showAsDialog();
 	}
 
-	private class InterceptRequestDialogPage extends FormBackedDialogPage {
+	public boolean shouldRecordConversation(Conversation conversation) {
+	    String uri = conversation.getRequestUri().toASCIIString();
+        if (discardSkippedRequests && skipRequestRegex.matcher(uri).matches())
+            return false;
+        return true;
+    }
+
+    private class InterceptRequestDialogPage extends FormBackedDialogPage {
 		private Form requestForm;
 
 		private Form annotationForm;
@@ -220,5 +239,13 @@ public class SwingInterceptor implements ProxyInterceptor {
 	public void setInterceptResponses(boolean interceptResponses) {
 		this.interceptResponses = interceptResponses;
 	}
+
+    public boolean isDiscardSkippedRequests() {
+        return this.discardSkippedRequests;
+    }
+
+    public void setDiscardSkippedRequests(boolean discardSkippedRequests) {
+        this.discardSkippedRequests = discardSkippedRequests;
+    }
 
 }

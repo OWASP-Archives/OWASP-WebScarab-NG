@@ -113,11 +113,20 @@
 		class="org.springframework.richclient.command.CommandGroupFactoryBean">
 		<property name="members">
 			<list>
+				<ref bean="proxyMenu"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="proxyMenu"
+		class="org.springframework.richclient.command.CommandGroupFactoryBean">
+		<property name="members">
+			<list>
 				<ref bean="showProxyControlBarToggleCommand"/>
-				<ref bean="showProxyConfiguration"/>
 				<ref bean="proxyInterceptRequestGroup"/>
 				<ref bean="excludeRegexPatternCommand"/>
 				<ref bean="interceptResponseToggleCommand"/>
+				<ref bean="showProxyConfiguration"/>
 			</list>
 		</property>
 	</bean>
