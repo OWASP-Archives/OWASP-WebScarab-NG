@@ -70,6 +70,7 @@ public class ManualRequestView extends AbstractView {
             Conversation.PROPERTY_REQUEST_VERSION,
             Conversation.PROPERTY_REQUEST_HEADERS,
             Conversation.PROPERTY_REQUEST_CONTENT,
+            Conversation.PROPERTY_REQUEST_PROCESSED_CONTENT,
     };
 
     private String[] responseFields = new String[] {
