@@ -148,6 +148,8 @@ public class HexForm extends AbstractContentForm {
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			byte[] data = getContent();
+			if (data == null)
+			    return null;
 			if (columnIndex == 0) {
 				return pad(Integer.toHexString(rowIndex * columns)
 						.toUpperCase(), '0', 8);
