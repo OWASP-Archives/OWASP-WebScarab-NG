@@ -38,7 +38,7 @@ import java.util.zip.InflaterInputStream;
  * @author rdawes
  */
 
-public class Conversation extends BaseEntity implements Comparable {
+public class Conversation extends BaseEntity implements Comparable<Conversation> {
 
 	public static final String PROPERTY_CONVERSATION_DATE = "date";
 
@@ -457,8 +457,7 @@ public class Conversation extends BaseEntity implements Comparable {
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object o) {
-		Conversation that = (Conversation) o;
+	public int compareTo(Conversation that) {
         return this.getDate().compareTo(that.getDate());
 	}
 
