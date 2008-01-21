@@ -17,6 +17,7 @@ import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.ProtocolException;
+import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -37,6 +38,8 @@ public class HttpService {
 
     private ProxyChooser proxyChooser;
 
+    private CredentialsProvider credentialsProvider;
+    
 	private HttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
 
     public void setSslProtocolSocketFactory(ProtocolSocketFactory protocolSocketFactory) {
@@ -52,7 +55,9 @@ public class HttpService {
 	}
 
 	private HttpClient getClient() {
-		return new HttpClient(httpConnectionManager);
+		HttpClient client = new HttpClient(httpConnectionManager);
+		client.getParams().setParameter(CredentialsProvider.PROVIDER, credentialsProvider); 
+		return client;
 	}
 
     public void fetchResponse(Conversation conversation) throws IOException {
@@ -69,6 +74,8 @@ public class HttpService {
 
     private HttpMethod fetchResponseViaProxy(Conversation conversation) throws IOException {
         HttpMethod method = HttpMethodUtils.constructMethod(conversation);
+        if (credentialsProvider != null)
+            method.setDoAuthentication(true);
         HttpClient client = getClient();
         ProxyChooser pc = getProxyChooser();
         List<Proxy> proxies = null;
@@ -158,5 +165,9 @@ public class HttpService {
      */
     public void setProxyChooser(ProxyChooser proxyConfigurer) {
         this.proxyChooser = proxyConfigurer;
+    }
+
+    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
     }
 }
