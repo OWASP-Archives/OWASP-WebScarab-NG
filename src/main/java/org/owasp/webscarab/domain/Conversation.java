@@ -10,6 +10,8 @@
 
 package org.owasp.webscarab.domain;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -104,6 +106,8 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 
 	protected Logger logger = Logger.getLogger(getClass().getName());
 
+	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+	
 	/** Creates a new instance of DefaultConversation */
 	public Conversation() {
 	}
@@ -125,11 +129,19 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	 *            The date to set.
 	 */
 	public void setDate(Date date) {
+	    Date old = this.date;
+	    boolean changed = false;
 		if (date == null) {
 			this.date = null;
+			if (old != null)
+			    changed = true;
 		} else {
 			this.date = new Date(date.getTime());
+			if (old == null || date.getTime() != old.getTime())
+			    changed = true;
 		}
+		if (changed)
+		    changeSupport.firePropertyChange(PROPERTY_CONVERSATION_DATE, old, date);
 	}
 
     /**
@@ -144,7 +156,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
      *            The source to set.
      */
     public void setSource(String plugin) {
+        String old = this.source;
         this.source = plugin;
+        if (old != plugin && (old != null && !old.equals(plugin)))
+            changeSupport.firePropertyChange(PROPERTY_CONVERSATION_SOURCE, old, plugin);
     }
 
 	public String getRequestMethod() {
@@ -152,7 +167,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setRequestMethod(String method) {
+	    String old = this.requestMethod;
 		this.requestMethod = method;
+        if (old != method && (old != null && !old.equals(method)))
+                changeSupport.firePropertyChange(PROPERTY_REQUEST_METHOD, old, method);
 	}
 
 	public URI getRequestUri() {
@@ -160,7 +178,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setRequestUri(URI uri) {
+	    URI old = this.requestUri;
 		this.requestUri = uri;
+        if (old != uri && (old != null && !old.equals(uri)))
+                changeSupport.firePropertyChange(PROPERTY_REQUEST_URI, old, uri);
 	}
 
 	public String getRequestVersion() {
@@ -168,7 +189,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setRequestVersion(String version) {
+	    String old = this.requestVersion;
 		this.requestVersion = version;
+        if (old != version && (old != null && !old.equals(version)))
+                changeSupport.firePropertyChange(PROPERTY_REQUEST_VERSION, old, version);
 	}
 
 	public NamedValue[] getRequestHeaders() {
@@ -176,7 +200,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setRequestHeaders(final NamedValue[] headers) {
+	    NamedValue[] old = requestHeaders;
 		this.requestHeaders = NamedValue.copy(headers);
+		// fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_REQUEST_HEADERS, old, headers);
 	}
 
 	public NamedValue[] getRequestHeaders(final String name) {
@@ -226,7 +253,11 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setRequestContent(final byte[] content) {
+	    byte[] old = requestContent;
 		this.requestContent = copyContent(content);
+	      // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_REQUEST_CONTENT, old, requestContent);
+        updateRequestContentLength();
 	}
 
 	public byte[] getProcessedRequestContent() {
@@ -235,8 +266,20 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setProcessedRequestContent(final byte[] content) {
+	    byte[] old = this.requestContent;
 		this.requestContent = processContent(getRequestHeaders(ENCODING),
 				content, false);
+        // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_REQUEST_CONTENT, old, requestContent);
+        updateRequestContentLength();
+	}
+
+	private void updateRequestContentLength() {
+	    NamedValue[] contentLength = getRequestHeaders("Content-Length");
+	    if (contentLength != null && contentLength.length > 0) {
+	        String length = Integer.toString(requestContent == null ? 0 : requestContent.length);
+	        setRequestHeader(new NamedValue("Content-Length", length));
+	    }
 	}
 
 	public String getResponseVersion() {
@@ -244,7 +287,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setResponseVersion(final String version) {
+	    String old = this.responseVersion;
 		this.responseVersion = version;
+        if (old != version && (old != null && !old.equals(version)))
+                changeSupport.firePropertyChange(PROPERTY_RESPONSE_VERSION, old, version);
 	}
 
 	public String getResponseMessage() {
@@ -252,7 +298,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setResponseMessage(final String message) {
+	    String old = this.responseMessage;
 		this.responseMessage = message;
+        if (old != message && (old != null && !old.equals(message)))
+            changeSupport.firePropertyChange(PROPERTY_RESPONSE_MESSAGE, old, message);
 	}
 
 	public String getResponseStatus() {
@@ -260,7 +309,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setResponseStatus(final String status) {
+	    String old = this.responseStatus;
 		this.responseStatus = status;
+        if (old != status && (old != null && !old.equals(status)))
+            changeSupport.firePropertyChange(PROPERTY_RESPONSE_STATUS, old, status);
 	}
 
 	public NamedValue[] getResponseHeaders() {
@@ -268,7 +320,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setResponseHeaders(final NamedValue[] headers) {
+	    NamedValue[] old = this.responseHeaders;
 		this.responseHeaders = NamedValue.copy(headers);
+        // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_RESPONSE_HEADERS, old, headers);
 	}
 
 	public NamedValue[] getResponseHeaders(final String name) {
@@ -318,7 +373,11 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setResponseContent(final byte[] content) {
+	    byte[] old = responseContent;
 		responseContent = copyContent(content);
+        // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_RESPONSE_CONTENT, old, responseContent);
+        updateResponseContentLength();
 	}
 
 	public byte[] getProcessedResponseContent() {
@@ -327,10 +386,22 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	}
 
 	public void setProcessedResponseContent(final byte[] content) {
+	    byte[] old = this.responseContent;
 		byte[] processed = processContent(getResponseHeaders(ENCODING),
 				content, false);
 		setResponseContent(processed);
+        // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_RESPONSE_CONTENT, old, responseContent);
+        updateResponseContentLength();
 	}
+
+    private void updateResponseContentLength() {
+        NamedValue[] contentLength = getResponseHeaders("Content-Length");
+        if (contentLength != null) {
+            String length = Integer.toString(responseContent == null ? 0 : responseContent.length);
+            setResponseHeader(new NamedValue("Content-Length", length));
+        }
+    }
 
 	/**
 	 * @return Returns the responseFooters.
@@ -344,7 +415,10 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
 	 *            The responseFooters to set.
 	 */
 	public void setResponseFooters(final NamedValue[] responseFooters) {
+	    NamedValue[] old = this.responseFooters;
 		this.responseFooters = NamedValue.copy(responseFooters);
+        // fire unconditionally
+        changeSupport.firePropertyChange(PROPERTY_RESPONSE_FOOTERS, old, responseFooters);
 	}
 
 	public NamedValue[] getResponseFooters(final String name) {
@@ -477,4 +551,19 @@ public class Conversation extends BaseEntity implements Comparable<Conversation>
         return conversation;
     }
 
+//    public void addPropertyChangeListener(PropertyChangeListener listener) {
+//        changeSupport.addPropertyChangeListener(listener);
+//    }
+//    
+//    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+//        changeSupport.addPropertyChangeListener(propertyName, listener);
+//    }
+//    
+//    public void removePropertyChangeListener(PropertyChangeListener listener) {
+//        changeSupport.removePropertyChangeListener(listener);
+//    }
+//    
+//    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+//        changeSupport.removePropertyChangeListener(propertyName, listener);
+//    }
 }
