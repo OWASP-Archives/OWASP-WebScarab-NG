@@ -9,7 +9,6 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -46,6 +45,7 @@ public class JSONWriter {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public void write(Object object) throws IOException {
         if (object == null) {
             writer.write("null");
