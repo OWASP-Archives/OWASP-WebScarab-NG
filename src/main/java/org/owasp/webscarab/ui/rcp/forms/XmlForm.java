@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -16,18 +17,11 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.owasp.webscarab.util.DOMWriter;
 import org.springframework.binding.form.FormModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -85,6 +79,7 @@ public class XmlForm extends AbstractContentForm {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             builder.setEntityResolver(nullEntityResolver);
             document = builder.parse(getContentAsStream());
+            pruneEmptyTextElements(document);
             model.fireRootChanged();
             treeTable.expandAll();
             treeTable.setBackground(defaultBackground);
@@ -110,22 +105,43 @@ public class XmlForm extends AbstractContentForm {
 
     private void updateConversation() {
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    
-            //initialize StreamResult with File object to save to file
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Result result = new StreamResult(baos);
-            DOMSource source = new DOMSource(document);
-            transformer.transform(source, result);
+            OutputStreamWriter writer = new OutputStreamWriter(baos, "UTF-8");
+            new DOMWriter().write(writer, document);
+            writer.close();
             setContent(baos.toByteArray());
-        } catch (TransformerConfigurationException tce) {
-            logger.error("Error writing XML back to the conversation", tce);
-            updateContentFormControl();
-        } catch (TransformerException te) {
-            logger.error("Error writing XML back to the conversation", te);
+        } catch (IOException ioe) {
+            logger.error("Error writing XML back to the conversation", ioe);
             updateContentFormControl();
         }
+    }
+    
+    private void pruneEmptyTextElements(Node node) {
+        NodeList children = node.getChildNodes();
+        for (int i=children.getLength() - 1; i>=0; i--) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE ) {
+                String text = child.getTextContent();
+                if (isWhitespace(text))
+                    node.removeChild(child);
+            } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                pruneEmptyTextElements(child);
+            } else if (child.getNodeType() == Node.DOCUMENT_NODE) {
+                pruneEmptyTextElements(child);
+            }
+        }
+    }
+    
+    private boolean isWhitespace(String text) {
+        boolean whitespace = true;
+        if (text != null) {
+            for (int i=0; i<text.length(); i++)
+                if (!Character.isWhitespace(text.charAt(i))) {
+                    whitespace = false;
+                    break;
+                }
+        }
+        return whitespace;
     }
     
     private class XmlTreeTableModel extends AbstractTreeTableModel {
@@ -263,7 +279,7 @@ public class XmlForm extends AbstractContentForm {
         @Override
         public void setValueAt(Object value, Object node, int column) {
             Node n = (Node) node;
-            n.setNodeValue((String) value);
+            n.setTextContent((String) value);
             updateConversation();
         }
 

@@ -34,6 +34,16 @@ public class XmlFormTest extends WebScarabUITestCase {
 	
 	private String content = "<tns:body xmlns:tns=\"http://jroller.org\">Here is link to my <a href=\"http://www.jroller.com/page/santhosh\">weblog</a>it contains some cool swing stuff. </tns:body>";
 	
+	private String content1 = 
+	    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+			"<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+			"  <soap:Body soap:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n" +
+			"    <wsns0:getFirstName xmlns:wsns0=\"http://lessons.webgoat.owasp.org\">\n" +
+			"      <id xsi:type=\"xsd:int\">123</id>\n" +
+			"    </wsns0:getFirstName>\n" +
+			"  </soap:Body>\n" +
+			"</soap:Envelope>";
+
 	public static void main(String[] args) {
 		junit.textui.TestRunner.run(XmlFormTest.class);
 	}
@@ -50,7 +60,7 @@ public class XmlFormTest extends WebScarabUITestCase {
 		c.setResponseHeader(new NamedValue("Location",
 				"http://localhost/index.html"));
 		c.setResponseHeader(new NamedValue("Content-Type", "text/xml"));
-		c.setResponseContent(content.getBytes());
+		c.setResponseContent(content1.getBytes());
 	}
 
 	private void showDialog() {
