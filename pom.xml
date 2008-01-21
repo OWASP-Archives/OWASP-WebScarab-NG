@@ -267,6 +267,16 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>wsdl4j</groupId>
+      <artifactId>wsdl4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dynvocation</groupId>
+      <artifactId>xsd4j</artifactId>
+      <version>0.3</version>
+    </dependency>
 
   </dependencies>
 </project>

@@ -304,6 +304,33 @@
 		<property name="maximizeEnabled"><value>true</value></property>
 	</bean>
 
+	<bean id="webservice"
+		class="org.owasp.webscarab.plugins.webservices.Wsdl">
+		<property name="httpService"><ref bean="httpService"/></property>
+	</bean>
+	
+	<bean id="webservicesView"
+		class="org.springframework.richclient.application.vldocking.VLDockingViewDescriptor">
+		<property name="viewClass"><value>org.owasp.webscarab.plugins.webservices.swing.WebServicesView</value></property>
+		<property name="viewProperties">
+			<map>
+				<entry key="eventService">
+					<ref bean="eventService" />
+				</entry>
+				<entry key="httpService">
+					<ref bean="httpService" />
+				</entry>
+				<entry key="wsdl">
+					<ref bean="webservice" />
+				</entry>
+			</map>
+		</property>
+		<property name="autoHideEnabled"><value>true</value></property>
+		<property name="closeEnabled"><value>true</value></property>
+		<property name="floatEnabled"><value>true</value></property>
+		<property name="maximizeEnabled"><value>true</value></property>
+	</bean>
+
 	<bean id="trustManager" class="org.owasp.webscarab.util.httpclient.ConfigurableTrustManager"/>
 
 	<bean id="sslProtocolSocketFactory" class="org.owasp.webscarab.util.httpclient.ConfigurableSSLProtocolSocketFactory">
@@ -313,6 +340,9 @@
 	<bean id="httpService" class="org.owasp.webscarab.services.HttpService" lazy-init="default">
 		<property name="sslProtocolSocketFactory" ref="sslProtocolSocketFactory"/>
 		<property name="proxyChooser" ref="proxyChooser"/>
+		<property name="credentialsProvider">
+			<bean class="org.owasp.webscarab.util.httpclient.swing.SwingCredentialsProvider"/>
+		</property>
 	</bean>
 
 	<bean id="proxyChooser" class="org.owasp.webscarab.util.httpclient.ProxyChooser">
