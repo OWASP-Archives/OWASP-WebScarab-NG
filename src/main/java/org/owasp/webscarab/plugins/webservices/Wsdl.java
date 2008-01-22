@@ -84,7 +84,7 @@ public class Wsdl extends AbstractPlugin {
             conversation.setRequestMethod("GET");
             conversation.setRequestUri(uri);
             conversation.setRequestVersion("HTTP/1.0");
-            getHttpService().fetchResponse(conversation);
+            getHttpService().fetchResponse(conversation, true);
             byte[] content = conversation.getResponseContent();
             if (content != null) {
                 is = new ByteArrayInputStream(content);

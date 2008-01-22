@@ -60,22 +60,21 @@ public class HttpService {
 		return client;
 	}
 
-    public void fetchResponse(Conversation conversation) throws IOException {
-        HttpMethod method = fetchResponseViaProxy(conversation);
+    public void fetchResponse(Conversation conversation, boolean doAuthentication) throws IOException {
+        HttpMethod method = fetchResponseViaProxy(conversation, doAuthentication);
         HttpMethodUtils.fillResponse(conversation, method);
     }
 
-    public void fetchResponse(StreamingConversation conversation) throws IOException {
-        HttpMethod method = fetchResponseViaProxy(conversation);
+    public void fetchResponse(StreamingConversation conversation, boolean doAuthentication) throws IOException {
+        HttpMethod method = fetchResponseViaProxy(conversation, doAuthentication);
         // we have two identical methods, since HttpMethodUtils.fillResponse() behaves differently
         // for a StreamingConversation
 		HttpMethodUtils.fillResponse(conversation, method);
     }
 
-    private HttpMethod fetchResponseViaProxy(Conversation conversation) throws IOException {
+    private HttpMethod fetchResponseViaProxy(Conversation conversation, boolean doAuthentication) throws IOException {
         HttpMethod method = HttpMethodUtils.constructMethod(conversation);
-        if (credentialsProvider != null)
-            method.setDoAuthentication(true);
+        method.setDoAuthentication(doAuthentication);
         HttpClient client = getClient();
         ProxyChooser pc = getProxyChooser();
         List<Proxy> proxies = null;
@@ -125,9 +124,9 @@ public class HttpService {
         throw ioe;
     }
 
-    public void fetchResponses(ConversationGenerator generator, int threads) {
+    public void fetchResponses(ConversationGenerator generator, int threads, boolean doAuthentication) {
     	for (int i=0; i<threads; i++) {
-    		new FetcherThread(generator).start();
+    		new FetcherThread(generator, doAuthentication).start();
     	}
     }
 
@@ -135,15 +134,18 @@ public class HttpService {
 
     	private ConversationGenerator generator;
 
-    	public FetcherThread(ConversationGenerator generator) {
+    	private boolean doAuthentication;
+    	
+    	public FetcherThread(ConversationGenerator generator, boolean doAuthentication) {
     		this.generator = generator;
+    		this.doAuthentication = doAuthentication;
     	}
 
     	public void run() {
     		Conversation conversation;
     		while ((conversation = generator.getNextRequest()) != null) {
     			try {
-    				fetchResponse(conversation);
+    				fetchResponse(conversation, doAuthentication);
     				conversation.getResponseContent();
     				generator.responseReceived(conversation);
     			} catch (IOException ioe) {

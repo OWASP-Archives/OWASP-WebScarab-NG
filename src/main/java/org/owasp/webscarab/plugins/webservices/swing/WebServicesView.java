@@ -142,7 +142,7 @@ public class WebServicesView extends AbstractView {
     private void fetchConversation(Conversation request) {
         request.setDate(new Date());
         activeFetcher = new Fetcher(request);
-        httpService.fetchResponses(activeFetcher, 1);
+        httpService.fetchResponses(activeFetcher, 1, true);
     }
 
     private void error(Exception e) {

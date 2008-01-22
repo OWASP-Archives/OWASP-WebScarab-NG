@@ -355,7 +355,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                             proxyInterceptor.editRequest(conversation,
                                     annotation);
 
-                        httpService.fetchResponse(conversation);
+                        httpService.fetchResponse(conversation, false);
 
                         // we use a buffered conversation to record any changes
                         // made
