@@ -6,25 +6,26 @@ package org.owasp.webscarab.plugins.webservices.swing;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataEvent;
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceEvent;
-import org.jdesktop.swingworker.SwingWorker;
 import org.owasp.webscarab.domain.Annotation;
 import org.owasp.webscarab.domain.Conversation;
 import org.owasp.webscarab.domain.Session;
@@ -55,6 +56,7 @@ import org.springframework.richclient.form.FormModelHelper;
 import org.springframework.richclient.form.builder.GridBagLayoutFormBuilder;
 import org.springframework.richclient.layout.LabelOrientation;
 import org.springframework.richclient.list.DynamicComboBoxListModel;
+import org.xml.sax.SAXException;
 
 /**
  * @author rdawes
@@ -71,7 +73,7 @@ public class WebServicesView extends AbstractView {
 
     private Session session;
 
-    private Fetcher activeFetcher;
+    private ConversationGenerator activeFetcher;
 
     private Listener listener;
 
@@ -135,28 +137,18 @@ public class WebServicesView extends AbstractView {
         conversationFormModel.setFormObject(request);
     }
 
-    private boolean isActiveFetcher(Fetcher fetcher) {
+    private boolean isActiveFetcher(ConversationGenerator fetcher) {
         return activeFetcher == fetcher;
     }
 
     private void fetchConversation(Conversation request) {
         request.setDate(new Date());
-        activeFetcher = new Fetcher(request);
+        activeFetcher = new RequestFetcher(request);
         httpService.fetchResponses(activeFetcher, 1, true);
     }
 
     private void error(Exception e) {
         e.printStackTrace();
-    }
-
-    private void success(Conversation conversation) {
-        getConversationService().addConversation(session, conversation);
-        Annotation a = (Annotation) annotationFormModel.getFormObject();
-        Annotation annotation = new Annotation();
-        annotation.setAnnotation(a.getAnnotation());
-        annotation.setId(conversation.getId());
-        getConversationService().updateAnnotation(annotation);
-        displayConversation(conversation);
     }
 
     public Conversation getConversation() {
@@ -165,37 +157,23 @@ public class WebServicesView extends AbstractView {
         return conversation;
     }
 
-    private void updateOperations() {
+    private void fetchWsdl() {
         definition = null;
         wsdlUriForm.setOperations(null);
         try {
             final URI uri = new URI(wsdlParams.getWsdlUri());
-            new SwingWorker<Definition, Object>() {
-                @Override
-                protected Definition doInBackground() throws Exception {
-                    return wsdl.getWSDL(uri);
-                }
-                @Override
-                protected void done() {
-                    try {
-                        definition = get();
-                        if (definition != null) {
-                            String[] operations = wsdl.getOperations(definition);
-                            wsdlUriForm.setOperations(operations);
-                        }
-                    } catch (ExecutionException ee) {
-                        ee.getCause().printStackTrace();
-                    } catch (InterruptedException ie) {
-                        ie.printStackTrace();
-                    }
-                }
-            }.execute();
+            activeFetcher = new WsdlFetcher(uri);
+            httpService.fetchResponses(activeFetcher, 1, true);
         } catch (URISyntaxException use) {
-            use.printStackTrace();
+            error(use);
         }
     }
     
     private void constructConversation() {
+        if (definition == null || wsdlParams == null) {
+            displayConversation(new Conversation());
+            return;
+        }
         try {
             Conversation c = wsdl.constructRequest(definition, wsdlParams.getWsdlOperation());
             displayConversation(c);
@@ -320,14 +298,76 @@ public class WebServicesView extends AbstractView {
         }
     }
 
+    private class WsdlFetcher implements ConversationGenerator {
+        private Conversation request;
+        public WsdlFetcher(URI uri) {
+            this.request = new Conversation();
+            request.setRequestMethod("GET");
+            request.setRequestUri(uri);
+            request.setRequestVersion("HTTP/1.0");
+        }
+        
+        /* (non-Javadoc)
+         * @see org.owasp.webscarab.services.ConversationGenerator#errorFetchingResponse(org.owasp.webscarab.domain.Conversation, java.lang.Exception)
+         */
+        public void errorFetchingResponse(final Conversation request, final Exception e) {
+            if (!isActiveFetcher(this)) return;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    error(e);
+                }
+            });
+        }
 
-    private class Fetcher implements ConversationGenerator {
+        /* (non-Javadoc)
+         * @see org.owasp.webscarab.services.ConversationGenerator#getNextRequest()
+         */
+        public synchronized Conversation getNextRequest() {
+            if (!isActiveFetcher(this)) return null;
+            Conversation r = request;
+            request = null;
+            return r;
+        }
+
+        /* (non-Javadoc)
+         * @see org.owasp.webscarab.services.ConversationGenerator#responseReceived(org.owasp.webscarab.domain.Conversation)
+         */
+        public void responseReceived(final Conversation conversation) {
+            if (!isActiveFetcher(this)) return;
+            getConversationService().addConversation(session, conversation);
+            InputStream wsdlStream;
+            String contentType = conversation.getResponseHeader("Content-Type");
+            if (contentType != null && contentType.startsWith("text/xml")) {
+                wsdlStream = new ByteArrayInputStream(conversation.getResponseContent());
+            } else {
+                error(new IOException("Invalid Content-Type: " + contentType));
+                return;
+            }
+            try {
+                definition = wsdl.getWSDL(conversation.getRequestUri(), wsdlStream);
+                final String[] operations = wsdl.getOperations(definition);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        wsdlUriForm.setOperations(operations);
+                    }
+                });
+            } catch (IOException ioe) {
+                error(ioe);
+            } catch (SAXException saxe) {
+                error(saxe);
+            } catch (WSDLException we) {
+                error(we);
+            }
+        }
+    }
+    
+    private class RequestFetcher implements ConversationGenerator {
 
         private Conversation request;
 
         private boolean executed = false;
 
-        public Fetcher(Conversation request) {
+        public RequestFetcher(Conversation request) {
             this.request = request;
         }
 
@@ -360,7 +400,13 @@ public class WebServicesView extends AbstractView {
             if (!isActiveFetcher(this)) return;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    success(conversation);
+                    getConversationService().addConversation(session, conversation);
+                    Annotation a = (Annotation) annotationFormModel.getFormObject();
+                    Annotation annotation = new Annotation();
+                    annotation.setAnnotation(a.getAnnotation());
+                    annotation.setId(conversation.getId());
+                    getConversationService().updateAnnotation(annotation);
+                    displayConversation(conversation);
                 }
             });
         }
@@ -392,8 +438,8 @@ public class WebServicesView extends AbstractView {
                 list = Arrays.asList(operations);
             } else {
                 list = Collections.EMPTY_LIST;
+                getFormModel().getValueModel("wsdlOperation").setValue(null);
             }
-            System.out.println("Operations = " + list);
             operationsValueModel.setValue(list);
         }
         
@@ -430,7 +476,7 @@ public class WebServicesView extends AbstractView {
                 super("fetchCommand");
             }
             protected void doExecuteCommand() {
-                updateOperations();
+                fetchWsdl();
             }
         }
         
@@ -448,7 +494,7 @@ public class WebServicesView extends AbstractView {
     }
     
     private class WsdlParams {
-        private String WsdlUri;
+        private String WsdlUri = "http://localhost./WebGoat/services/SoapRequest?WSDL";
         private String wsdlOperation;
         
         public String getWsdlUri() {
