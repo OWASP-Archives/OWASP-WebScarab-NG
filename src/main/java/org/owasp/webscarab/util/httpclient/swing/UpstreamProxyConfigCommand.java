@@ -42,6 +42,7 @@ public class UpstreamProxyConfigCommand extends ApplicationWindowAwareCommand {
                 return true;
             }
         };
+        dialog.setCallingCommand(this);
         dialog.showDialog();
     }
 

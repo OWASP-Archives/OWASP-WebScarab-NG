@@ -12,7 +12,6 @@ import org.owasp.webscarab.jdbc.DataSourceFactory;
 import org.owasp.webscarab.util.JdbcConnectionDetails;
 import org.springframework.binding.form.ValidatingFormModel;
 import org.springframework.richclient.application.Application;
-import org.springframework.richclient.command.ActionCommand;
 import org.springframework.richclient.command.support.ApplicationWindowAwareCommand;
 import org.springframework.richclient.dialog.ApplicationDialog;
 import org.springframework.richclient.dialog.CompositeDialogPage;
@@ -49,18 +48,10 @@ import org.springframework.richclient.form.FormModelHelper;
  *            &lt;/bean&gt;
  * </pre>
  *
- * @author Ben Alex
- * @author Larry Streepy
- *
- * @see LoginForm
- * @see LoginDetails
- * @see ApplicationSecurityManager
  */
 public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 
 	private static final String ID = "selectDatabaseCommand";
-
-	private boolean displaySuccessMessage = true;
 
 	private boolean closeOnCancel = true;
 
@@ -75,18 +66,6 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 	 */
 	public SelectDatabaseCommand() {
 		super(ID);
-	}
-
-	/**
-	 * Indicates whether an information message is displayed to the user upon
-	 * successful authentication. Defaults to true.
-	 *
-	 * @param displaySuccessMessage
-	 *            displays an information message upon successful login if true,
-	 *            otherwise false
-	 */
-	public void setDisplaySuccessMessage(boolean displaySuccessMessage) {
-		this.displaySuccessMessage = displaySuccessMessage;
 	}
 
 	/**
@@ -134,15 +113,11 @@ public class SelectDatabaseCommand extends ApplicationWindowAwareCommand {
 				}
 			}
 
-			protected ActionCommand getCallingCommand() {
-				return SelectDatabaseCommand.this;
-			}
-
 			protected void onAboutToShow() {
 				jdbcDetailsForm.requestFocusInWindow();
 			}
 		};
-		dialog.setDisplayFinishSuccessMessage(displaySuccessMessage);
+		dialog.setCallingCommand(this);
 		dialog.showDialog();
 	}
 

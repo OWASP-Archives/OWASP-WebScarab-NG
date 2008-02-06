@@ -179,7 +179,6 @@
 		class="org.owasp.webscarab.util.swing.SelectDatabaseCommand">
 		<property name="dataSourceFactory" ref="&amp;dataSource"/>
 		<property name="eventService" ref="eventService"/>
-		<property name="displaySuccessMessage"><value>false</value></property>
 	</bean>
 
 	<bean id="excludeRegexPatternCommand" class="org.owasp.webscarab.plugins.proxy.swing.ExcludeRegexPatternCommand">

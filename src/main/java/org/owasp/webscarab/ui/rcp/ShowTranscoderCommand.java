@@ -45,7 +45,7 @@ public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
     private ApplicationDialog dialog;
     
     public ShowTranscoderCommand() {
-        super("showTranscoder");
+        super("showTranscoderCommand");
     }
     
     /* (non-Javadoc)
@@ -57,6 +57,7 @@ public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
             formModel = FormModelHelper.createFormModel(new TranscoderContents(), false);
             transcoderForm = new TranscoderForm();
             dialog = new TranscoderDialog();
+            dialog.setCallingCommand(this);
         }
         dialog.showDialog();
     }
