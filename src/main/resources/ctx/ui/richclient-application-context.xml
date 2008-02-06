@@ -205,6 +205,10 @@
 				<bean
 					class="org.springframework.richclient.text.TextComponentPopupInterceptorFactory" />
 				<bean
+					class="org.springframework.richclient.text.TextCaretFormComponentInterceptorFactory" />
+				<bean
+					class="org.springframework.richclient.text.SelectAllFormComponentInterceptorFactory" />
+				<bean
 					class="org.springframework.richclient.list.ComboBoxAutoCompletionInterceptorFactory"><!--
 					<property name="messageSource">
 						<ref bean="messageSource" />
