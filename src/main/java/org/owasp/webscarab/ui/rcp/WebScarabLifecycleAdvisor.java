@@ -5,6 +5,8 @@ package org.owasp.webscarab.ui.rcp;
 
 import java.awt.Dimension;
 
+import javax.swing.SwingUtilities;
+
 import org.springframework.richclient.application.config.ApplicationWindowConfigurer;
 import org.springframework.richclient.application.config.DefaultApplicationLifecycleAdvisor;
 import org.springframework.richclient.command.support.ApplicationWindowAwareCommand;
@@ -30,9 +32,13 @@ public class WebScarabLifecycleAdvisor extends
 	 */
 	@Override
 	public void onPostStartup() {
-        ApplicationWindowAwareCommand command = (ApplicationWindowAwareCommand) getCommandBarFactory().getBean("selectSessionCommand");
+        final ApplicationWindowAwareCommand command = (ApplicationWindowAwareCommand) getCommandBarFactory().getBean("selectSessionCommand");
         if (command != null)
-        	command.execute();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    command.execute();
+                }
+            });
 	}
 
 }
