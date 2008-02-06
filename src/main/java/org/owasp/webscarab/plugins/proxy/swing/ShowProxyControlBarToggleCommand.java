@@ -31,6 +31,7 @@ public class ShowProxyControlBarToggleCommand extends ToggleCommand {
 	 */
 	@Override
 	protected boolean onSelection(boolean selected) {
+	    proxyControlBar.setShowToolBarCommand(this);
 		JWindow window = proxyControlBar.getControl();
 		window.setVisible(selected);
 		return selected;

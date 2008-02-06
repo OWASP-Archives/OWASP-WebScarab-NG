@@ -3,7 +3,6 @@
  */
 package org.owasp.webscarab.plugins.proxy.swing;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -13,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.prefs.Preferences;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -44,6 +44,8 @@ public class ProxyControlBar implements Annotator {
 
 	private ToggleCommand interceptResponseCommand = null;
 
+	private ToggleCommand showToolBarCommand = null;
+	
 	private JWindow window;
 
 	public ProxyControlBar() {
@@ -63,16 +65,23 @@ public class ProxyControlBar implements Annotator {
 			window.setFocusableWindowState(true);
 			Container pane = window.getContentPane();
 			pane.setLayout(new FlowLayout());
-            JComboBox combo = interceptRequestCommandGroup.createComboBox();
-			pane.add(combo);
+			if (interceptRequestCommandGroup != null) {
+                JComboBox combo = interceptRequestCommandGroup.createComboBox();
+    			pane.add(combo);
+			}
 			if (interceptResponseCommand != null)
 				pane.add(interceptResponseCommand.createCheckBox());
 			JComponent component = annotationForm.getControl();
 			component.setPreferredSize(new Dimension(600, (int) component
 					.getPreferredSize().getHeight()));
 			component.setMinimumSize(component.getPreferredSize());
-			pane.add(component, BorderLayout.CENTER);
-			pane.add(new HeapMonitor(), BorderLayout.EAST);
+			pane.add(component);
+			pane.add(new HeapMonitor());
+			if (showToolBarCommand != null) {
+			    JCheckBox checkbox = showToolBarCommand.createCheckBox();
+			    checkbox.setText("");
+			    pane.add(checkbox);
+	         }
 			window.pack();
 			window.setSize(window.getSize().width, 28);
 
@@ -134,5 +143,9 @@ public class ProxyControlBar implements Annotator {
      */
     public void setInterceptResponseCommand(ToggleCommand interceptResponseCommand) {
         this.interceptResponseCommand = interceptResponseCommand;
+    }
+    
+    public void setShowToolBarCommand(ToggleCommand showToolBarCommand) {
+        this.showToolBarCommand = showToolBarCommand;
     }
 }
