@@ -25,12 +25,12 @@ public class UpstreamProxyConfigForm extends AbstractForm {
     protected JComponent createFormControl() {
         TableFormBuilder formBuilder = new TableFormBuilder( getBindingFactory() );
         formBuilder.add(ProxyConfig.PROPERTY_HTTP_PROXYHOST);
-        formBuilder.add(ProxyConfig.PROPERTY_HTTP_PROXYPORT);
+        formBuilder.add(ProxyConfig.PROPERTY_HTTP_PROXYPORT, "colSpec=2cm");
         formBuilder.row();
         formBuilder.add(ProxyConfig.PROPERTY_HTTPS_PROXYHOST);
-        formBuilder.add(ProxyConfig.PROPERTY_HTTPS_PROXYPORT);
+        formBuilder.add(ProxyConfig.PROPERTY_HTTPS_PROXYPORT, "colSpec=2cm");
         formBuilder.row();
-        formBuilder.addInScrollPane(ProxyConfig.PROPERTY_NO_PROXY);
+        formBuilder.addTextArea(ProxyConfig.PROPERTY_NO_PROXY);
         return formBuilder.getForm();
     }
 
