@@ -18,7 +18,11 @@ import org.springframework.richclient.application.ApplicationLauncher;
  */
 public class WebScarab {
 
+    public static String[] args;
+    
     public static void main(String[] args) {
+        WebScarab.args = args;
+        
         try {
             String rootContextDirectoryClassPath = "/ctx";
 

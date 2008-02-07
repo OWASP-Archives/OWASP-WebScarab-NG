@@ -91,7 +91,8 @@
 		<property name="windowCommandManagerBeanName" value="windowCommandManager" />
 		<property name="menubarBeanName" value="menuBar" />
 		<property name="toolbarBeanName" value="toolBar" />
-
+		<property name="dataSourceFactory" ref="&amp;dataSource"/>
+		<property name="eventService" ref="eventService"/>
 	</bean>
 
 	<bean id="exceptionHandler" class="org.springframework.richclient.exceptionhandling.MessagesDialogExceptionHandler">
