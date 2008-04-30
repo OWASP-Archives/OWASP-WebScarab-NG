@@ -369,12 +369,19 @@
 	<bean id="proxyControlBar" class="org.owasp.webscarab.plugins.proxy.swing.ProxyControlBar" singleton="true">
 		<property name="proxy" ref="proxy"/>
 		<property name="swingInterceptor" ref="proxyInterceptor"/>
-		<property name="interceptRequestCommandGroup" ref="proxyInterceptRequestGroup"/>
+		<!-- property name="interceptRequestCommandGroup" ref="proxyInterceptRequestGroup"/-->
+		<property name="interceptRequestCommand" ref="interceptRequestToggleCommand"/>
+		<property name="interceptResponseCommand" ref="interceptResponseToggleCommand"/>
 	</bean>
 
 	<bean id="showProxyControlBarToggleCommand"
 		class="org.owasp.webscarab.plugins.proxy.swing.ShowProxyControlBarToggleCommand" singleton="true">
 		<property name="proxyControlBar" ref="proxyControlBar"/>
+	</bean>
+
+	<bean id="interceptRequestToggleCommand"
+		class="org.owasp.webscarab.plugins.proxy.swing.InterceptRequestCommand" singleton="true">
+		<property name="swingInterceptor" ref="proxyInterceptor"/>
 	</bean>
 
 	<bean id="interceptResponseToggleCommand"
@@ -392,20 +399,11 @@
 				<ref bean="interceptRequestAll"/>
 				<ref bean="interceptRequestGet"/>
 				<ref bean="interceptRequestGetPost"/>
-				<ref bean="interceptRequestNone"/>
 				<ref bean="interceptRequestPost"/>
+				<ref bean="interceptRequestToggleCommand"/>
 				<ref bean="interceptResponseToggleCommand"/>
 			</list>
 		</property>
-	</bean>
-
-	<bean id="interceptRequestNone"
-		class="org.owasp.webscarab.plugins.proxy.swing.InterceptMethodsToggleCommand">
-		<property name="swingInterceptor" ref="proxyInterceptor"/>
-		<property name="interceptRequestMethods">
-			<null/>
-		</property>
-		<property name="selected"><value>true</value></property>
 	</bean>
 
 	<bean id="interceptRequestGet"
@@ -442,7 +440,6 @@
 		<property name="exclusive"><value>true</value></property>
 		<property name="members">
 			<list>
-				<ref bean="interceptRequestNone"/>
 				<ref bean="interceptRequestGet"/>
 				<ref bean="interceptRequestPost"/>
 				<ref bean="interceptRequestGetPost"/>

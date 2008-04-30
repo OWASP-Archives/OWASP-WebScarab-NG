@@ -43,6 +43,8 @@ public class SwingInterceptor implements ProxyInterceptor {
     
     public static final String PROPERTY_DISCARD_SKIPPED_REQUESTS = "discardSkippedRequests";
     
+    private boolean interceptRequests = false;
+    
 	private List<String> interceptRequestMethods = null;
 
 	private List<Pattern> interceptResponseTypes = null;
@@ -63,6 +65,8 @@ public class SwingInterceptor implements ProxyInterceptor {
 		String method = conversation.getRequestMethod();
 		String uri = conversation.getRequestUri().toASCIIString();
 
+		if (!interceptRequests)
+		    return;
 		if (interceptRequestMethods == null || !interceptRequestMethods.contains(method))
 			return;
 		if (skipRequestRegex.matcher(uri).matches())
@@ -208,7 +212,21 @@ public class SwingInterceptor implements ProxyInterceptor {
 		this.skipRequestRegex = interceptRequestRegex;
 	}
 
-	public boolean isInterceptAllResponses() {
+	/**
+     * @return the interceptRequests
+     */
+    public boolean isInterceptRequests() {
+        return this.interceptRequests;
+    }
+
+    /**
+     * @param interceptRequests the interceptRequests to set
+     */
+    public void setInterceptRequests(boolean interceptRequests) {
+        this.interceptRequests = interceptRequests;
+    }
+
+    public boolean isInterceptAllResponses() {
 		return this.interceptAllResponses;
 	}
 

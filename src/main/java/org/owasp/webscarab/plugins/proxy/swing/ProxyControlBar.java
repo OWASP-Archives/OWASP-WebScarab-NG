@@ -3,7 +3,7 @@
  */
 package org.owasp.webscarab.plugins.proxy.swing;
 
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -12,10 +12,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 import org.owasp.webscarab.domain.Annotation;
@@ -42,7 +44,9 @@ public class ProxyControlBar implements Annotator {
 
     private ExclusiveCommandGroup interceptRequestCommandGroup;
 
-	private ToggleCommand interceptResponseCommand = null;
+    private ToggleCommand interceptRequestCommand = null;
+
+    private ToggleCommand interceptResponseCommand = null;
 
 	private ToggleCommand showToolBarCommand = null;
 	
@@ -63,14 +67,16 @@ public class ProxyControlBar implements Annotator {
 			});
 			window.setAlwaysOnTop(true);
 			window.setFocusableWindowState(true);
-			Container pane = window.getContentPane();
-			pane.setLayout(new FlowLayout());
+			JPanel pane = new JPanel();
+          pane.setBorder(BorderFactory.createMatteBorder(0,8,0,0, Color.BLUE));
+			if (interceptRequestCommand != null)
+			    pane.add(interceptRequestCommand.createButton());
 			if (interceptRequestCommandGroup != null) {
                 JComboBox combo = interceptRequestCommandGroup.createComboBox();
     			pane.add(combo);
 			}
 			if (interceptResponseCommand != null)
-				pane.add(interceptResponseCommand.createCheckBox());
+				pane.add(interceptResponseCommand.createButton());
 			JComponent component = annotationForm.getControl();
 			component.setPreferredSize(new Dimension(600, (int) component
 					.getPreferredSize().getHeight()));
@@ -78,12 +84,10 @@ public class ProxyControlBar implements Annotator {
 			pane.add(component);
 			pane.add(new HeapMonitor());
 			if (showToolBarCommand != null) {
-			    JCheckBox checkbox = showToolBarCommand.createCheckBox();
-			    checkbox.setText("");
-			    pane.add(checkbox);
+			    pane.add(showToolBarCommand.createButton());
 	         }
+            window.getContentPane().add(pane);
 			window.pack();
-			window.setSize(window.getSize().width, 28);
 
 			final Point origin = new Point();
 			window.addMouseListener(new MouseAdapter() {
@@ -129,6 +133,13 @@ public class ProxyControlBar implements Annotator {
 	public void setSwingInterceptor(SwingInterceptor swingInterceptor) {
 		this.swingInterceptor = swingInterceptor;
 	}
+
+    /**
+     * @param interceptRequestCommand the interceptRequestCommand to set
+     */
+    public void setInterceptRequestCommand(ToggleCommand interceptRequestCommand) {
+        this.interceptRequestCommand = interceptRequestCommand;
+    }
 
     /**
      * @param interceptRequestCommandGroup the interceptRequestCommandGroup to set
