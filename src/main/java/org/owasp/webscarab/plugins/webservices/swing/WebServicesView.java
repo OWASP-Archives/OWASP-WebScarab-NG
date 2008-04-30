@@ -494,7 +494,7 @@ public class WebServicesView extends AbstractView {
     }
     
     private class WsdlParams {
-        private String WsdlUri = "http://localhost./WebGoat/services/SoapRequest?WSDL";
+        private String WsdlUri = "http://localhost./WebGoat/services/SoapRequest?wsdl";
         private String wsdlOperation;
         
         public String getWsdlUri() {
