@@ -10,7 +10,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import org.springframework.richclient.application.Application;
 import org.springframework.richclient.command.ActionCommand;
+import org.springframework.richclient.core.DefaultMessage;
+import org.springframework.richclient.core.Severity;
+import org.springframework.richclient.dialog.Messagable;
 
 /**
  * @author rdawes
@@ -20,9 +24,12 @@ public abstract class AbstractTranscoderCommand extends ActionCommand implements
 
     private JTextComponent textComponent = null;
     
-    public AbstractTranscoderCommand(String id, JTextComponent textComponent) {
+    private Messagable messagable;
+    
+    public AbstractTranscoderCommand(String id, JTextComponent textComponent, Messagable messagable) {
         super(id);
         this.textComponent = textComponent;
+        this.messagable = messagable;
         if (textComponent != null) {
             textComponent.addCaretListener(this);
             textComponent.getDocument().addDocumentListener(this);
@@ -52,15 +59,35 @@ public abstract class AbstractTranscoderCommand extends ActionCommand implements
         if (text == null)
             return;
         try {
-            text = getCodedText(text);
-            if (text == null)
+            String newText = getCodedText(text);
+            if (newText == null)
                 return;
+            if (newText.equals(text)) {
+                info("No change");
+                return;
+            }
             textComponent.replaceSelection(text);
         } catch (Exception e) {
             logger.error("Unexpected exception", e);
         }
     }
 
+    protected void info(String message) {
+        if (messagable == null) {
+            Application.instance().getActiveWindow().getStatusBar().setMessage(message);
+        } else { 
+            messagable.setMessage(new DefaultMessage(message));
+        }
+    }
+    
+    protected void warning(String message) {
+        if (messagable == null) {
+            Application.instance().getActiveWindow().getStatusBar().setMessage(message);
+        } else { 
+            messagable.setMessage(new DefaultMessage(message, Severity.WARNING));
+        }
+    }
+    
     private void guard() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

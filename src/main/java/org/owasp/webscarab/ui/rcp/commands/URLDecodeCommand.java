@@ -9,6 +9,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
+import org.springframework.richclient.dialog.Messagable;
 
 /**
  * @author rdawes
@@ -17,7 +18,11 @@ import org.apache.commons.codec.net.URLCodec;
 public class URLDecodeCommand extends AbstractTranscoderCommand {
 
     public URLDecodeCommand(JTextComponent textComponent) {
-        super("urlDecode", textComponent);
+        this(textComponent, null);
+    }
+    
+    public URLDecodeCommand(JTextComponent textComponent, Messagable messagable) {
+        super("urlDecode", textComponent, messagable);
     }
     
     public String getCodedText(String text) {

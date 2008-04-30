@@ -10,7 +10,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.text.JTextComponent;
 
 import org.owasp.webscarab.ui.rcp.commands.Base64DecodeCommand;
 import org.owasp.webscarab.ui.rcp.commands.Base64EncodeCommand;
@@ -22,6 +21,7 @@ import org.springframework.binding.form.FormModel;
 import org.springframework.richclient.command.AbstractCommand;
 import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.command.support.ApplicationWindowAwareCommand;
+import org.springframework.richclient.core.Message;
 import org.springframework.richclient.dialog.ApplicationDialog;
 import org.springframework.richclient.dialog.CloseAction;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
@@ -42,7 +42,7 @@ public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
     
     private TranscoderForm transcoderForm;
     
-    private ApplicationDialog dialog;
+    private TranscoderDialog dialog;
     
     public ShowTranscoderCommand() {
         super("showTranscoderCommand");
@@ -80,7 +80,9 @@ public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
         protected Object[] getCommandGroupMembers() {
             return new AbstractCommand[] {getCancelCommand()};
         }
-
+        public void setMessage(Message message) {
+            getDialogPage().setMessage(message);
+        }
     }
     
     private class TranscoderForm extends AbstractForm {
@@ -109,12 +111,12 @@ public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
         }
         
         private Object[] getTranscodeCommands() {
-            Base64EncodeCommand b64Encode = new Base64EncodeCommand(textArea);
-            Base64DecodeCommand b64Decode = new Base64DecodeCommand(textArea);
-            URLEncodeCommand uEncode = new URLEncodeCommand(textArea);
-            URLDecodeCommand uDecode = new URLDecodeCommand(textArea);
-            HTMLEntityEncodeCommand heEncode = new HTMLEntityEncodeCommand(textArea);
-            HTMLEntityDecodeCommand heDecode = new HTMLEntityDecodeCommand(textArea);
+            Base64EncodeCommand b64Encode = new Base64EncodeCommand(textArea, dialog);
+            Base64DecodeCommand b64Decode = new Base64DecodeCommand(textArea, dialog);
+            URLEncodeCommand uEncode = new URLEncodeCommand(textArea, dialog);
+            URLDecodeCommand uDecode = new URLDecodeCommand(textArea, dialog);
+            HTMLEntityEncodeCommand heEncode = new HTMLEntityEncodeCommand(textArea, dialog);
+            HTMLEntityDecodeCommand heDecode = new HTMLEntityDecodeCommand(textArea, dialog);
             return new AbstractCommand[] {b64Encode, b64Decode, uEncode, uDecode, heEncode, heDecode};
         }
     }

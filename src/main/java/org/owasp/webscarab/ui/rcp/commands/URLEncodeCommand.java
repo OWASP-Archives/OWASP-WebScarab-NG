@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.codec.net.URLCodec;
+import org.springframework.richclient.dialog.Messagable;
 
 /**
  * @author rdawes
@@ -16,7 +17,11 @@ import org.apache.commons.codec.net.URLCodec;
 public class URLEncodeCommand extends AbstractTranscoderCommand {
 
     public URLEncodeCommand(JTextComponent textComponent) {
-        super("urlEncode", textComponent);
+        this(textComponent, null);
+    }
+    
+    public URLEncodeCommand(JTextComponent textComponent, Messagable messagable) {
+        super("urlEncode", textComponent, messagable);
     }
     
     public String getCodedText(String text) {
