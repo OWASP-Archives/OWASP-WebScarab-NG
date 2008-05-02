@@ -119,6 +119,8 @@ public class NamedValue extends BaseEntity {
 
 	public static NamedValue[] parse(String string, String pairSeparator,
 			String nvSeparator) {
+		if (string == null)
+			return null;
 		String[] pairs = string.split(pairSeparator);
 		NamedValue[] values = new NamedValue[pairs.length];
 		for (int i = 0; i < pairs.length; i++) {

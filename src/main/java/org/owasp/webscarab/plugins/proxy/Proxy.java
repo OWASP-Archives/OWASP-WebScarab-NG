@@ -43,6 +43,7 @@ import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.domain.StreamingConversation;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.services.HttpService;
+import org.owasp.webscarab.util.HtmlEncoder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -309,7 +310,7 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                     boolean close;
                     do {
                         close = false;
-                        StreamingConversation conversation = readRequest(is);
+                        Conversation conversation = readRequest(is);
 
                         // empty request line, connection closed?
                         if (conversation == null)
@@ -355,25 +356,27 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                             proxyInterceptor.editRequest(conversation,
                                     annotation);
 
-                        httpService.fetchResponse(conversation, false);
+                        try {
+                        	httpService.fetchResponse(conversation, false);
 
-                        // we use a buffered conversation to record any changes
-                        // made
-                        // to the response during editing since we want to save
-                        // the
-                        // original response as sent by the server in the
-                        // archive
-                        BufferedConversation bc = null;
-                        if (proxyInterceptor != null) {
-                            bc = new BufferedConversation(conversation);
-                            proxyInterceptor.editResponse(bc, annotation);
+                            // we use a buffered conversation to record any changes
+                            // made
+                            // to the response during editing since we want to save
+                            // the
+                            // original response as sent by the server in the
+                            // archive
+                            if (proxyInterceptor != null) {
+                                conversation = new BufferedConversation(conversation);
+                                proxyInterceptor.editResponse(conversation, annotation);
+                            }
+                        } catch (IOException ioe) {
+                        	if (conversation instanceof StreamingConversation)
+                        		conversation = new BufferedConversation(conversation);
+                        	fillErrorResponse(conversation, ioe);
+                        	close = true;
                         }
                         try {
-                            if (bc != null) {
-                                writeConversationToBrowser(bc, os);
-                            } else {
-                                writeConversationToBrowser(conversation, os);
-                            }
+                            writeConversationToBrowser(conversation, os);
                         } catch (SocketException se) {
                             conversation.getResponseContent();
                             close = true;
@@ -592,6 +595,47 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                         socket.getPort(), true);
                 sslsock.setUseClientMode(false);
                 return sslsock;
+            }
+            
+            private void fillErrorResponse(Conversation conversation, Exception e) {
+            	conversation.setResponseVersion("HTTP/1.0");
+            	conversation.setResponseStatus("500");
+            	conversation.setResponseMessage("WebScarab error");
+            	conversation.setResponseHeader(new NamedValue("Content-Type", "text/html"));
+            	conversation.setResponseHeader(new NamedValue("Connection", "close"));
+                StringBuilder template = new StringBuilder("<HTML><HEAD><TITLE>WebScarab Error</TITLE></HEAD>");
+                template.append("<BODY>WebScarab encountered an error trying to retrieve <P><pre>");
+                template.append(HtmlEncoder.encode(conversation.getRequestMethod())).append(" ");
+                template.append(HtmlEncoder.encode(conversation.getRequestUri().toString())).append(" ");
+                template.append(HtmlEncoder.encode(conversation.getRequestVersion())).append("\n");
+                NamedValue[] headers = conversation.getRequestHeaders();
+                if (headers != null && headers.length > 0)
+                	for (int i=0; i<headers.length; i++) {
+                		template.append(HtmlEncoder.encode(headers[i].getName())).append(": ");
+                		template.append(HtmlEncoder.encode(headers[i].getValue())).append("\n");
+                	}
+                template.append("\n");
+                byte[] content = conversation.getRequestContent();
+                if (content != null)
+                	template.append(HtmlEncoder.encode(new String(content)));
+                template.append("</pre><P>");
+                template.append("The error was : <P><pre>").append(HtmlEncoder.encode(e.getLocalizedMessage())).append("\n");
+                StackTraceElement[] trace = e.getStackTrace();
+                if (trace != null) {
+                    for (int i=0; i<trace.length; i++) {
+                        template.append("\tat ").append(trace[i].getClassName()).append(".").append(trace[i].getMethodName()).append("(");
+                        if (trace[i].getLineNumber() == -2) {
+                            template.append("Native Method");
+                        } else if (trace[i].getLineNumber() == -1) {
+                            template.append("Unknown Source");
+                        } else {
+                            template.append(trace[i].getFileName()).append(":").append(trace[i].getLineNumber());
+                        }
+                        template.append(")\n");
+                    }
+                }
+                template.append("</pre><P></HTML>");
+                conversation.setResponseContent(template.toString().getBytes());
             }
 
         }

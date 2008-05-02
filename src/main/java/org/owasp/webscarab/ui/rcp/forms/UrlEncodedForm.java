@@ -75,8 +75,10 @@ public class UrlEncodedForm extends AbstractContentForm {
         this.values.clear();
 	    try {
     	    String content = getContentAsString();
-    	    NamedValue[] values = NamedValue.parse(content, "&", "=");
-    	    this.values.addAll(Arrays.asList(values));
+    	    if (content != null) {
+        	    NamedValue[] values = NamedValue.parse(content, "&", "=");
+        	    this.values.addAll(Arrays.asList(values));
+    	    }
     	    model.fireTableDataChanged();
 	    } catch (UnsupportedEncodingException uee) {
 	        // do nothing? Ideally we should show some kind of error condition?
@@ -115,6 +117,8 @@ public class UrlEncodedForm extends AbstractContentForm {
             NamedValue value = values.get(rowIndex);
             if (columnIndex == 0)
                 return value.getName();
+            if (value.getValue() == null)
+            	return null;
             try {
                 return URLDecoder.decode(value.getValue(), "ISO-8859-1");
             } catch (UnsupportedEncodingException uee) {

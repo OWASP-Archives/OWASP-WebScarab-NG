@@ -26,11 +26,13 @@ import org.owasp.webscarab.ui.rcp.forms.AnnotationForm;
 import org.owasp.webscarab.ui.rcp.forms.RequestForm;
 import org.owasp.webscarab.ui.rcp.forms.ResponseForm;
 import org.owasp.webscarab.ui.rcp.forms.support.ConversationFormSupport;
+import org.owasp.webscarab.util.TransformRequestCommand;
 import org.springframework.binding.form.FormModel;
 import org.springframework.binding.value.ValueModel;
 import org.springframework.richclient.application.PageComponent;
 import org.springframework.richclient.application.support.AbstractView;
 import org.springframework.richclient.command.ActionCommand;
+import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
 import org.springframework.richclient.dialog.support.DialogPageUtils;
@@ -63,7 +65,7 @@ public class ManualRequestView extends AbstractView {
     private FetchCommand fetchCommand;
 
     private RevertCommand revertCommand;
-
+    
     private String[] requestFields = new String[] {
             Conversation.PROPERTY_REQUEST_METHOD,
             Conversation.PROPERTY_REQUEST_URI,
@@ -326,7 +328,16 @@ public class ManualRequestView extends AbstractView {
                     .createPanel(new BorderLayout());
             JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
             splitPane.setResizeWeight(0.5);
-            splitPane.setLeftComponent(requestForm.getControl());
+            JPanel requestPanel = new JPanel(new BorderLayout());
+            requestPanel.add(requestForm.getControl(), BorderLayout.CENTER);
+            CommandGroup  transformCommands = getWindowCommandManager().createCommandGroup("transformRequest", 
+            		new Object[] {
+            		TransformRequestCommand.createGetToPost(conversationFormModel),
+            		TransformRequestCommand.createPostToMultipartPost(conversationFormModel),
+            		TransformRequestCommand.createPostToGet(conversationFormModel),
+            });
+            requestPanel.add(transformCommands.createButtonBar(), BorderLayout.SOUTH);
+            splitPane.setLeftComponent(requestPanel);
             splitPane.setRightComponent(responseForm.getControl());
             panel.add(splitPane, BorderLayout.CENTER);
             panel.add(annotationForm.getControl(), BorderLayout.SOUTH);

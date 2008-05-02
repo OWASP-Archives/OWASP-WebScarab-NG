@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -20,8 +22,10 @@ import org.owasp.webscarab.ui.rcp.forms.AnnotationForm;
 import org.owasp.webscarab.ui.rcp.forms.RequestForm;
 import org.owasp.webscarab.ui.rcp.forms.ResponseForm;
 import org.owasp.webscarab.ui.rcp.forms.support.ConversationFormSupport;
+import org.owasp.webscarab.util.TransformRequestCommand;
 import org.springframework.binding.form.FormModel;
 import org.springframework.richclient.command.ActionCommand;
+import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.dialog.DialogPage;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
 import org.springframework.richclient.form.Form;
@@ -161,13 +165,19 @@ public class SwingInterceptor implements ProxyInterceptor {
 
 		@Override
 		protected JComponent createControl() {
-			JPanel panel = getComponentFactory()
-					.createPanel(new BorderLayout());
-			panel.add(requestForm.getControl(), BorderLayout.CENTER);
-			panel.add(annotationForm.getControl(), BorderLayout.SOUTH);
+			Box box = new Box(BoxLayout.Y_AXIS);
+			box.add(requestForm.getControl());
+            CommandGroup  transformCommands = getActiveWindow().getCommandManager().createCommandGroup("transformRequest", 
+            		new Object[] {
+            		TransformRequestCommand.createGetToPost(requestForm.getFormModel()),
+            		TransformRequestCommand.createPostToMultipartPost(requestForm.getFormModel()),
+            		TransformRequestCommand.createPostToGet(requestForm.getFormModel()),
+            });
+            box.add(transformCommands.createButtonBar());
+			box.add(annotationForm.getControl());
 			initPageValidationReporter();
 			requestForm.getFormModel().validate();
-			return panel;
+			return box;
 		}
 
 	}

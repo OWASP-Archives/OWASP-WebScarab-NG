@@ -87,7 +87,6 @@ public class ContentTabbedPane extends JTabbedPane {
     }
     
     private void showForms(String contentType) {
-    	removeAll();
     	Iterator<ContentForm> it = forms.iterator();
     	while (it.hasNext()) {
     		ContentForm contentForm = it.next();
