@@ -84,8 +84,10 @@ public class ProxyControlBar implements Annotator {
 			pane.add(component);
 			pane.add(new HeapMonitor());
 			if (showToolBarCommand != null) {
-			    pane.add(showToolBarCommand.createButton());
-	         }
+				JCheckBox close = showToolBarCommand.createCheckBox();
+				close.setText(null);
+			    pane.add(close);
+	        }
             window.getContentPane().add(pane);
 			window.pack();
 
