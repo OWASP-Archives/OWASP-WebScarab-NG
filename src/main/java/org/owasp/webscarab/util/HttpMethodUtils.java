@@ -84,18 +84,6 @@ public class HttpMethodUtils {
 		return httpMethod;
 	}
 
-	public static void fillResponse(StreamingConversation conversation,
-			HttpMethod httpMethod) throws IOException {
-		conversation.setResponseVersion(httpMethod.getStatusLine()
-				.getHttpVersion());
-		conversation.setResponseStatus(Integer.toString(httpMethod
-				.getStatusCode()));
-        conversation.setResponseMessage(httpMethod.getStatusLine().getReasonPhrase());
-        Header[] headers = httpMethod.getResponseHeaders();
-        conversation.setResponseHeaders(convert(headers));
-    	conversation.setResponseContentStream(httpMethod.getResponseBodyAsStream());
-	}
-
 	public static void fillResponse(Conversation conversation,
 			HttpMethod httpMethod) throws IOException {
 		conversation.setResponseVersion(httpMethod.getStatusLine()
@@ -105,7 +93,12 @@ public class HttpMethodUtils {
         conversation.setResponseMessage(httpMethod.getStatusLine().getReasonPhrase());
         Header[] headers = httpMethod.getResponseHeaders();
         conversation.setResponseHeaders(convert(headers));
-    	conversation.setResponseContent(httpMethod.getResponseBody());
+        if (conversation instanceof StreamingConversation) {
+        	StreamingConversation sc = (StreamingConversation) conversation;
+        	sc.setResponseContentStream(httpMethod.getResponseBodyAsStream());
+        } else {
+        	conversation.setResponseContent(httpMethod.getResponseBody());
+        }
 	}
 
 	public static void fillFooters(Conversation conversation, HttpMethod httpMethod) {
