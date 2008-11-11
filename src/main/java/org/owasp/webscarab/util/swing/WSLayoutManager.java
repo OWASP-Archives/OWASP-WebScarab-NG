@@ -5,7 +5,7 @@ package org.owasp.webscarab.util.swing;
 
 import java.awt.Dimension;
 
-import org.springframework.richclient.application.vldocking.VLDockingLayoutManager;
+import org.springframework.richclient.application.docking.vldocking.VLDockingLayoutManager;
 
 import com.vlsolutions.swing.docking.Dockable;
 import com.vlsolutions.swing.docking.DockableState;

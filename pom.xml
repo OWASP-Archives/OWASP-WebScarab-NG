@@ -36,7 +36,15 @@
     <name>The OWASP Foundation</name>
     <url>http://www.owasp.org</url>
   </organization>
+  <properties>
+    <springRichclient.version>1.0.0</springRichclient.version>
+  </properties>
   <repositories>
+    <repository>
+        <id>springRichclientRepository</id>
+        <name>Spring rich client repository</name>
+        <url>http://spring-rich-c.sourceforge.net/maven2repository</url>
+    </repository>
     <repository>
       <snapshots>
         <enabled>true</enabled>
@@ -201,8 +209,8 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.richclient</groupId>
-      <artifactId>spring-richclient-tiger</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <artifactId>spring-richclient-jdk5</artifactId>
+      <version>${springRichclient.version}</version>
       <exclusions>
 		<exclusion>
 		  <groupId>ognl</groupId>
@@ -241,8 +249,8 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.richclient</groupId>
-      <artifactId>spring-richclient-vldocking</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <artifactId>spring-richclient-docking</artifactId>
+      <version>${springRichclient.version}</version>
       <exclusions>
 		<exclusion>
 		  <groupId>ognl</groupId>
@@ -256,8 +264,13 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.richclient</groupId>
+      <artifactId>spring-richclient-sandbox</artifactId>
+      <version>${springRichclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.richclient</groupId>
       <artifactId>spring-richclient-resources</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>${springRichclient.version}</version>
     </dependency>
     <dependency>
       <groupId>com.jgoodies</groupId>
@@ -289,6 +302,11 @@
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vlsolutions</groupId>
+      <artifactId>vldocking</artifactId>
+      <version>2.1.4</version>
     </dependency>
     <dependency>
       <groupId>wsdl4j</groupId>

@@ -5,16 +5,14 @@ package org.owasp.webscarab.plugins.proxy.swing;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -71,10 +69,11 @@ public class ProxyControlBar implements Annotator {
           pane.setBorder(BorderFactory.createMatteBorder(0,8,0,0, Color.BLUE));
 			if (interceptRequestCommand != null)
 			    pane.add(interceptRequestCommand.createButton());
-			if (interceptRequestCommandGroup != null) {
-                JComboBox combo = interceptRequestCommandGroup.createComboBox();
-    			pane.add(combo);
-			}
+			// Disabled until the code for createComboBox is added to upstream
+//			if (interceptRequestCommandGroup != null) {
+//                JComboBox combo = interceptRequestCommandGroup.createComboBox();
+//    			pane.add(combo);
+//			}
 			if (interceptResponseCommand != null)
 				pane.add(interceptResponseCommand.createButton());
 			JComponent component = annotationForm.getControl();
@@ -84,7 +83,7 @@ public class ProxyControlBar implements Annotator {
 			pane.add(component);
 			pane.add(new HeapMonitor());
 			if (showToolBarCommand != null) {
-				JCheckBox close = showToolBarCommand.createCheckBox();
+				AbstractButton close = showToolBarCommand.createCheckBox();
 				close.setText(null);
 			    pane.add(close);
 	        }
