@@ -23,6 +23,7 @@ public class DataSourceFactory implements FactoryBean, DisposableBean {
 
     private JdbcConnectionDetails jdbcConnectionDetails = null;
 
+	@SuppressWarnings("unchecked")
 	public Class getObjectType() {
 		return DataSource.class;
 	}

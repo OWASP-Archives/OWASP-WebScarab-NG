@@ -86,8 +86,7 @@ public class JdbcSessionDao extends PropertiesJdbcDaoSupport implements
 			return execute();
 		}
 
-		protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-		int rownum) throws SQLException {
+		protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
 			Session session = new Session();
 			Integer id = new Integer(rs.getInt("id"));
 			session.setId(id);

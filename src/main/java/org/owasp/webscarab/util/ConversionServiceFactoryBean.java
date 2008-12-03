@@ -30,15 +30,16 @@ public class ConversionServiceFactoryBean extends DefaultConversionServiceFactor
 
     public static class PatternToText extends AbstractConverter {
 
-        public Class[] getSourceClasses() {
+        public Class<?>[] getSourceClasses() {
             return (new Class[] {Pattern.class });
         }
 
-        public Class[] getTargetClasses() {
+        public Class<?>[] getTargetClasses() {
             return (new Class[] { String.class });
         }
 
-        protected Object doConvert(Object source, Class targetClass,
+        @SuppressWarnings("unchecked")
+		protected Object doConvert(Object source, Class targetClass,
                 ConversionContext context) throws Exception {
             return ((Pattern)source).pattern();
         }
@@ -47,15 +48,16 @@ public class ConversionServiceFactoryBean extends DefaultConversionServiceFactor
 
     public static class TextToPattern extends AbstractConverter {
 
-        public Class[] getSourceClasses() {
+        public Class<?>[] getSourceClasses() {
             return (new Class[] { java.lang.String.class });
         }
 
-        public Class[] getTargetClasses() {
+        public Class<?>[] getTargetClasses() {
             return (new Class[] { Pattern.class });
         }
 
-        protected Object doConvert(Object source, Class targetClass,
+        @SuppressWarnings("unchecked")
+		protected Object doConvert(Object source, Class targetClass,
                 ConversionContext context) throws Exception {
             return Pattern.compile((String) source);
         }

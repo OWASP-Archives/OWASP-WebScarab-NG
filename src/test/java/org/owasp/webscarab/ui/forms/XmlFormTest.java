@@ -32,8 +32,6 @@ public class XmlFormTest extends WebScarabUITestCase {
 	
 	private TitledPageApplicationDialog dialog;
 	
-	private String content = "<tns:body xmlns:tns=\"http://jroller.org\">Here is link to my <a href=\"http://www.jroller.com/page/santhosh\">weblog</a>it contains some cool swing stuff. </tns:body>";
-	
 	private String content1 = 
 	    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +

@@ -13,6 +13,7 @@ import junit.framework.TestCase;
  * @author rdawes
  *
  */
+@SuppressWarnings("unchecked")
 public class JSONParserTest extends TestCase {
 
     /**

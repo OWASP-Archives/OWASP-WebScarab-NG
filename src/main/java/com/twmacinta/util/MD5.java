@@ -222,9 +222,9 @@ public class MD5 {
       ((buffer[shift + 63]) << 24);
   }
 
-  private native void Transform_native (@SuppressWarnings("hiding") int[] state, byte buffer[], int shift, int length);
+  private native void Transform_native (int[] state, byte buffer[], int shift, int length);
 
-  private void Transform (@SuppressWarnings("hiding") MD5State state, byte buffer[], int shift, int[] decode_buf) {
+  private void Transform (MD5State state, byte buffer[], int shift, int[] decode_buf) {
     int	
       a = state.state[0],
       b = state.state[1],

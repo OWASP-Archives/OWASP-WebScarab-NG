@@ -13,7 +13,8 @@ public class SessionFactory implements FactoryBean {
 
     private Session session;
 
-    public Class getObjectType() {
+    @SuppressWarnings("unchecked")
+	public Class getObjectType() {
         return Session.class;
     }
 

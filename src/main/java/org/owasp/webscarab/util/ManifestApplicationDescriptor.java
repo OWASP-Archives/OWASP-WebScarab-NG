@@ -14,7 +14,7 @@ public class ManifestApplicationDescriptor extends LabeledObjectSupport implemen
 
 	private String version;
 	
-	public ManifestApplicationDescriptor(Class target) {
+	public ManifestApplicationDescriptor(Class<?> target) {
 		super();
 		this.version = target.getPackage().getImplementationVersion();
 		if (this.version == null) 

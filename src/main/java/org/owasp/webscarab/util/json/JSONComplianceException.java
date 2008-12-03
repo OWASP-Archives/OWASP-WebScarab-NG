@@ -9,7 +9,12 @@ package org.owasp.webscarab.util.json;
  */
 public class JSONComplianceException extends java.text.ParseException {
 
-    public JSONComplianceException(String message, int location) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public JSONComplianceException(String message, int location) {
         super(message, location);
     }
     

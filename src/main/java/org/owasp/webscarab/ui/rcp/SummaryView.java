@@ -101,7 +101,6 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		context.register(GlobalCommandIds.PROPERTIES, showConversationExecutor);
 	}
 
-	@SuppressWarnings("unchecked")
 	private TableModel getTableModel() {
 		if (tableModel == null) {
 			if (getConversationList() == null) {
@@ -114,7 +113,6 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return tableModel;
 	}
 
-	@SuppressWarnings("unchecked")
 	private TreeModel getTreeModel() {
 		if (treeModel == null) {
 			if (getConversationList() == null) {
@@ -247,7 +245,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		return group.createPopupMenu();
 	}
 
-	private class ConversationTableFormat implements TableFormat {
+	private class ConversationTableFormat implements TableFormat<Conversation> {
 
 		private String[] columnNames = new String[]{"Id", "Date", "Method",
 				"Host", "Path", "Parameters", "Status", "Annotation"};
@@ -275,8 +273,7 @@ public class SummaryView extends AbstractView implements ApplicationListener {
 		 *
 		 * @see ca.odell.glazedlists.gui.TableFormat#getColumnValue(E, int)
 		 */
-		public Object getColumnValue(Object object, int column) {
-			Conversation conversation = (Conversation) object;
+		public Object getColumnValue(Conversation conversation, int column) {
 			if (conversation == null)
 				return "NULL!";
 			switch (column) {

@@ -36,7 +36,12 @@ public class JdbcHeadersDao extends
         this.namedValueDao = namedValueDao;
         cache = new LinkedHashMap<Key, WeakReference<NamedValue[]>>(40, 0.75f, true) {
 
-            /* (non-Javadoc)
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			/* (non-Javadoc)
              * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
              */
             @Override
@@ -134,8 +139,7 @@ public class JdbcHeadersDao extends
          *      int)
          */
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return new Integer(rs.getInt("named_value"));
         }
     }

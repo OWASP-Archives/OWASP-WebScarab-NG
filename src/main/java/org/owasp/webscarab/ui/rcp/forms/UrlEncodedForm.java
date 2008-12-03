@@ -99,7 +99,12 @@ public class UrlEncodedForm extends AbstractContentForm {
 	
 	private class NamedValueTableModel extends AbstractTableModel {
 
-        /* (non-Javadoc)
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/* (non-Javadoc)
          * @see javax.swing.table.TableModel#getColumnCount()
          */
         public int getColumnCount() {

@@ -29,9 +29,7 @@ public class NamedValue extends BaseEntity {
 	private String value;
 
 	/** Creates a new instance of NamedValue */
-	public NamedValue(@SuppressWarnings("hiding")
-	String name, @SuppressWarnings("hiding")
-	String value) {
+	public NamedValue(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

@@ -69,7 +69,6 @@ public class ConversationView extends AbstractView {
 	 *
 	 * @see org.springframework.richclient.application.support.AbstractView#createControl()
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected JComponent createControl() {
 		Conversation conversation = new Conversation();

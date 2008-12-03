@@ -120,8 +120,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
          *      int)
          */
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             String uri = rs.getString("uri");
             try {
                 return new URI(uri);
@@ -138,11 +137,12 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
             compile();
         }
 
-        public Integer query(URI uri) {
-            List results = execute(new Object[] { uri.toString() });
+        @SuppressWarnings("unchecked")
+		public Integer query(URI uri) {
+            List<Integer> results = execute(new Object[] { uri.toString() });
             if (results.size() == 0)
                 return null;
-            return (Integer) results.get(0);
+            return results.get(0);
         }
 
         /*
@@ -152,8 +152,7 @@ public class JdbcUriDao extends PropertiesJdbcDaoSupport implements
          *      int)
          */
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return new Integer(rs.getInt("id"));
         }
     }

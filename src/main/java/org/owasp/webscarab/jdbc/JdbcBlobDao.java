@@ -33,8 +33,9 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
 
     public JdbcBlobDao() {
         cache = new LinkedHashMap<String, WeakReference<byte[]>>(40, 0.75f, true) {
+			private static final long serialVersionUID = 1L;
 
-            /* (non-Javadoc)
+			/* (non-Javadoc)
              * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
              */
             @Override
@@ -120,8 +121,7 @@ public class JdbcBlobDao extends PropertiesJdbcDaoSupport implements BlobDao {
             return (byte[]) findObject(key);
         }
 
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return rs.getBytes("blob_content");
         }
     }

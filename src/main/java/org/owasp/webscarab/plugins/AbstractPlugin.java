@@ -27,7 +27,7 @@ public abstract class AbstractPlugin implements ApplicationContextAware, EventSu
     
     private Session session;
     
-    protected abstract Class[] getSubscribedEvents();
+    protected abstract Class<?>[] getSubscribedEvents();
     
     public void setConversationService(ConversationService conversationService) {
         this.conversationService = conversationService;
@@ -53,7 +53,7 @@ public abstract class AbstractPlugin implements ApplicationContextAware, EventSu
     }
 
     public void setEventService(EventService eventService) {
-        Class[] events = getSubscribedEvents();
+        Class<?>[] events = getSubscribedEvents();
         if (getEventService() != null && events != null) {
             for (int i=0; i<events.length; i++)
                 getEventService().unsubscribe(events[i], this);

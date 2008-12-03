@@ -77,7 +77,7 @@ public class SwingCredentialsProvider implements CredentialsProvider {
     private class UsernamePasswordCredentialsForm extends AbstractCredentialsForm {
 
         public UsernamePasswordCredentialsForm() {
-            super(new UsernamePasswordCredentials(), "usernamePasswordCredentialsForm");
+            super(new UsernamePasswordCredentials(""), "usernamePasswordCredentialsForm");
         }
         
         @Override
@@ -95,7 +95,7 @@ public class SwingCredentialsProvider implements CredentialsProvider {
     private class NTCredentialsForm extends AbstractCredentialsForm {
         
         public NTCredentialsForm() {
-            super(new NTCredentials(), "ntCredentialsForm");
+            super(new NTCredentials("","","", ""), "ntCredentialsForm");
         }
         
         @Override

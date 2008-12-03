@@ -130,7 +130,8 @@ public class JsonForm extends AbstractContentForm {
         throw new RuntimeException("Should not happen!");
     }
 
-    private MutableTreeTableNode constructNodes(Object obj) {
+    @SuppressWarnings("unchecked")
+	private MutableTreeTableNode constructNodes(Object obj) {
         DefaultMutableTreeTableNode node;
         if (obj instanceof Map) {
             Map<Object, Object> map = (Map<Object, Object>) obj;
@@ -244,7 +245,8 @@ public class JsonForm extends AbstractContentForm {
          * @see org.jdesktop.swingx.treetable.DefaultTreeTableModel#setValueAt(java.lang.Object,
          *      java.lang.Object, int)
          */
-        @Override
+        @SuppressWarnings("unchecked")
+		@Override
         public void setValueAt(Object value, Object node, int column) {
             DefaultMutableTreeTableNode ttNode = null;
             if (node instanceof DefaultMutableTreeTableNode)
@@ -292,7 +294,12 @@ public class JsonForm extends AbstractContentForm {
     }
 
     public class JsonTreeTableCellRenderer extends DefaultTreeCellRenderer {
-        boolean once = false;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		boolean once = false;
 
         Color elementColor = new Color(0, 0, 128);
 

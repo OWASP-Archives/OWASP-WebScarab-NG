@@ -35,8 +35,6 @@ import org.springframework.richclient.util.GuiStandardUtils;
  */
 public class ShowTranscoderCommand extends ApplicationWindowAwareCommand {
 
-    private JTextArea textArea;
-    
     private FormModel formModel;
     
     private TranscoderForm transcoderForm;

@@ -70,7 +70,7 @@ public class ConversationService {
         }
     }
 
-    public Collection getConversationIds(Session session) {
+    public Collection<Integer> getConversationIds(Session session) {
         Lock readLock = lock.readLock();
         readLock.lock();
         try {

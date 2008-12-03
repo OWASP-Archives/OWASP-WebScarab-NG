@@ -42,7 +42,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 
 	public ConversationTableFactory() {
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
@@ -53,7 +53,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return Date.class;
 			}
 			public String getAttributeId() {
@@ -64,7 +64,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -75,7 +75,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -86,7 +86,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -97,7 +97,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -108,7 +108,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -119,7 +119,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
@@ -132,7 +132,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return Integer.class;
 			}
 			public String getAttributeId() {
@@ -145,7 +145,7 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			}
 		});
 		tableFormat.addColumn(new ObjectAttribute<Conversation>() {
-			public Class getAttributeClass() {
+			public Class<?> getAttributeClass() {
 				return String.class;
 			}
 			public String getAttributeId() {
@@ -171,11 +171,11 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 	}
 
 	private void registerRenderersForTable(JTable table, TableColorProvider colorProvider) {
-		Set<Class> columnClasses = new HashSet<Class>();
+		Set<Class<?>> columnClasses = new HashSet<Class<?>>();
 		for (int i=0; i<table.getColumnCount(); i++) {
 			columnClasses.add(table.getColumnClass(i));
 		}
-		for (Class klass: columnClasses) {
+		for (Class<?> klass: columnClasses) {
 			TableCellRenderer delegate = table.getDefaultRenderer(klass);
 			TableCellRenderer renderer = new TableColorRenderer(delegate, colorProvider);
 			table.setDefaultRenderer(klass, renderer);
@@ -206,11 +206,11 @@ public class ConversationTableFactory extends ApplicationServicesAccessor {
 			columns.add(column);
 		}
 
-		public Class getColumnClass(int column) {
+		public Class<?> getColumnClass(int column) {
 			return columns.get(column).getAttributeClass();
 		}
 
-		public Comparator getColumnComparator(int column) {
+		public Comparator<?> getColumnComparator(int column) {
 			return columns.get(column).getComparator();
 		}
 

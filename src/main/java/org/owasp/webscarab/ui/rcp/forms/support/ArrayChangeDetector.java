@@ -22,6 +22,7 @@ public class ArrayChangeDetector extends DefaultValueChangeDetector {
 		getClassesWithSafeEquals().add(URI.class);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean hasValueChanged(Object oldValue, Object newValue) {
 		if (oldValue == newValue) 
 			return false;

@@ -18,13 +18,13 @@ public abstract class ObjectAttribute<T> {
 	
 	public abstract String getAttributeId ();
 	
-	public Comparator getComparator() {
+	public Comparator<?> getComparator() {
 		if (Comparable.class.isAssignableFrom(getAttributeClass()))
 			return new NullSafeComparator(new ComparableComparator(), true);
 		return null;
 	}
 	
-	public Class getAttributeClass() {
+	public Class<?> getAttributeClass() {
 		return Object.class;
 	}
 	

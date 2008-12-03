@@ -2,6 +2,7 @@ package org.owasp.webscarab.util.json;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class JSONReaderOverallTest extends JSONTestCase {
 
     List list;

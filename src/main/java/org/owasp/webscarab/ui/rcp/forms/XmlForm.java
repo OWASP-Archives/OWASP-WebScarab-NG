@@ -286,7 +286,12 @@ public class XmlForm extends AbstractContentForm {
     }
 
     public class XMLTreeTableCellRenderer extends DefaultTreeCellRenderer {
-        Color elementColor = new Color(0, 0, 128);
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		Color elementColor = new Color(0, 0, 128);
 
         Color attributeColor = new Color(0, 128, 0);
 

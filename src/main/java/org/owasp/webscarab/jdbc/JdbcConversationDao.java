@@ -168,8 +168,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             return execute(session.getId());
         }
 
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return new Integer(rs.getInt("id"));
         }
     }
@@ -202,8 +201,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
          *      int)
          */
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             JdbcConversation conversation = new JdbcConversation(headersDao, blobDao);
             conversation.setId(new Integer(rs.getInt("id")));
             conversation.setDate(rs.getTimestamp("request_date"));

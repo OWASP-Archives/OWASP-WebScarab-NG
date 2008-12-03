@@ -9,6 +9,11 @@ package org.owasp.webscarab.util.httpclient;
  */
 public class SSLProtocolInitializationError extends Error {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new SSLProtocolInitializationError.
      */
     public SSLProtocolInitializationError() {

@@ -19,7 +19,11 @@ public class SwingxTableFactory implements TableFactory {
 	 */
 	public JTable createTable() {
 		JXTable table = new JXTable() {
-            // overridden to make the height of scroll match viewport height if smaller
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			// overridden to make the height of scroll match viewport height if smaller
             public boolean getScrollableTracksViewportHeight() {
                 return getPreferredSize().height < getParent().getHeight();
             }
@@ -37,7 +41,11 @@ public class SwingxTableFactory implements TableFactory {
 	 */
 	public JTable createTable(TableModel model) {
         JXTable table = new JXTable(model) {
-            // overridden to make the height of scroll match viewport height if smaller
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			// overridden to make the height of scroll match viewport height if smaller
             public boolean getScrollableTracksViewportHeight() {
                 return getPreferredSize().height < getParent().getHeight();
             }

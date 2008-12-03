@@ -93,8 +93,7 @@ public class JdbcNamedValueDao extends
          */
 
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return new Integer(rs.getInt("id"));
         }
     }
@@ -123,8 +122,7 @@ public class JdbcNamedValueDao extends
          */
 
         @Override
-        protected Object mapRow(ResultSet rs, @SuppressWarnings("unused")
-        int rownum) throws SQLException {
+        protected Object mapRow(ResultSet rs, int rownum) throws SQLException {
             return new NamedValue(rs.getString("name"), rs.getString("value"));
         }
     }

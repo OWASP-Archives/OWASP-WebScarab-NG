@@ -51,7 +51,6 @@ public class JdbcFindingDao extends PropertiesJdbcDaoSupport implements
 	 *
 	 * @see org.owasp.webscarab.dao.FindingDao#get(java.lang.Integer)
 	 */
-	@SuppressWarnings("unchecked")
 	public Finding get(Integer id) {
 		JdbcTemplate jt = getJdbcTemplate();
 		String query = "SELECT id, finding FROM findings WHERE id = ?";

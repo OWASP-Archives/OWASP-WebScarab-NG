@@ -64,10 +64,10 @@ public class ConversationListFactory extends SwingEventSubscriber
 	private void updateSummaryList(Session session) {
 		getConversationList().getReadWriteLock().writeLock().lock();
 		getConversationList().clear();
-		Collection ids = getConversationService().getConversationIds(session);
-		Iterator it = ids.iterator();
+		Collection<Integer> ids = getConversationService().getConversationIds(session);
+		Iterator<Integer> it = ids.iterator();
 		while (it.hasNext()) {
-			Integer id = (Integer) it.next();
+			Integer id = it.next();
 			Conversation conversation = getConversationService()
 					.getConversation(id);
 			getConversationList().add(conversation);
@@ -153,6 +153,7 @@ public class ConversationListFactory extends SwingEventSubscriber
 		return conversationList;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Class getObjectType() {
 		return EventList.class;
 	}

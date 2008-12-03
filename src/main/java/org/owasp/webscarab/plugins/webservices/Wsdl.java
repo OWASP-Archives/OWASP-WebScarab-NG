@@ -447,7 +447,7 @@ public class Wsdl extends AbstractPlugin {
         return schema;
     }
         
-    protected Class[] getSubscribedEvents() {
+    protected Class<?>[] getSubscribedEvents() {
         return new Class[] { SessionEvent.class };
     }
     

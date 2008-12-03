@@ -104,12 +104,12 @@ public class DOMWriter {
             }
 //            writer.write(pad(depth));
         }
-        Map namespaces = nsstack.getNamespaces();
+        Map<String, String> namespaces = nsstack.getNamespaces();
         if (namespaces != null) {
-            Iterator nsit = namespaces.keySet().iterator();
+            Iterator<String> nsit = namespaces.keySet().iterator();
             while (nsit.hasNext()) {
-                String prefix = (String) nsit.next();
-                String nsuri = (String) namespaces.get(prefix);
+                String prefix = nsit.next();
+                String nsuri = namespaces.get(prefix);
                 Attr attr = (Attr) node.getAttributes().getNamedItem("xmlns:"+prefix);
                 if (attr == null) {
 //                    writer.write(pad(depth+1));
@@ -144,7 +144,7 @@ public class DOMWriter {
     
     private class NSStack {
         
-        private Map namespaces = null;
+        private Map<String, String> namespaces = null;
         private NSStack parent = null;
         
         public NSStack() {
@@ -154,13 +154,13 @@ public class DOMWriter {
             this.parent = parent;
         }
         
-        public Map getNamespaces() {
+        public Map<String, String> getNamespaces() {
             return namespaces;
         }
         
         public void addNamespace(String prefix, String nsuri) {
             if (namespaces == null)
-                namespaces = new HashMap();
+                namespaces = new HashMap<String, String>();
             namespaces.put(prefix, nsuri);
         }
         
