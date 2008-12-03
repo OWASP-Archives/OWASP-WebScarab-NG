@@ -3,6 +3,7 @@ package org.owasp.webscarab.util.json;
 import java.text.ParseException;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class JSONReaderArrayTest extends JSONTestCase {
 
     List array;

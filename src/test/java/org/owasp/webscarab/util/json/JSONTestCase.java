@@ -2,7 +2,6 @@ package org.owasp.webscarab.util.json;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.text.ParseException;
 
 import junit.framework.TestCase;

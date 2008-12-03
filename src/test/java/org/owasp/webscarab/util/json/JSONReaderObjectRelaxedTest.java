@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class JSONReaderObjectRelaxedTest extends JSONTestCase {
 
     Map map;

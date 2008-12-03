@@ -4,10 +4,8 @@
 package org.owasp.webscarab.plugins;
 
 import org.bushe.swing.event.EventService;
-import org.bushe.swing.event.EventServiceEvent;
 import org.bushe.swing.event.EventSubscriber;
 import org.owasp.webscarab.domain.Session;
-import org.owasp.webscarab.domain.SessionEvent;
 import org.owasp.webscarab.services.ConversationService;
 import org.owasp.webscarab.services.HttpService;
 import org.springframework.context.ApplicationContext;

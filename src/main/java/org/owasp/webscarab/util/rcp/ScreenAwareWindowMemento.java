@@ -38,7 +38,7 @@ public class ScreenAwareWindowMemento extends WindowMemento {
         restoreMaximizedState(settings);
     }
 
-    void restoreMaximizedState(Settings settings) {
+    public void restoreMaximizedState(Settings settings) {
         Window window = getWindow();
         String key = getKey();
         if (window instanceof Frame) {

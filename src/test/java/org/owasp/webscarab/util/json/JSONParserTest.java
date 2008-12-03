@@ -7,8 +7,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import org.omg.PortableInterceptor.SUCCESSFUL;
-
 import junit.framework.TestCase;
 
 /**

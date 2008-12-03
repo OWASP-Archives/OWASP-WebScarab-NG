@@ -1,8 +1,8 @@
 package org.owasp.webscarab.util.json;
 
-import java.text.ParseException;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class JSONReaderDirectTest extends JSONTestCase {
 
     public void testAll() {

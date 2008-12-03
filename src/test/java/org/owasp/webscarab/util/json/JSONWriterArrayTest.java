@@ -3,6 +3,7 @@ package org.owasp.webscarab.util.json;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class JSONWriterArrayTest extends JSONTestCase {
 
     public void testEmpty() {
@@ -10,7 +11,7 @@ public class JSONWriterArrayTest extends JSONTestCase {
         assertEquals("[]", write(list));
     }
 
-    public void testSingle() {
+	public void testSingle() {
         List list = new ArrayList();
         list.add("hello");
         assertEquals("[\"hello\"]", write(list));

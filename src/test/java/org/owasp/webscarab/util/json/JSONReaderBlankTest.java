@@ -1,7 +1,5 @@
 package org.owasp.webscarab.util.json;
 
-import java.text.ParseException;
-
 public class JSONReaderBlankTest extends JSONTestCase {
 
     public void testEmpty() {

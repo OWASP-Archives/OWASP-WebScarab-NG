@@ -3,6 +3,7 @@ package org.owasp.webscarab.util.json;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class JSONReaderObjectTest extends JSONTestCase {
 
     Map map;

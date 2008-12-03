@@ -22,7 +22,6 @@ import org.springframework.richclient.command.AbstractCommand;
 import org.springframework.richclient.command.CommandGroup;
 import org.springframework.richclient.command.support.ApplicationWindowAwareCommand;
 import org.springframework.richclient.core.Message;
-import org.springframework.richclient.dialog.ApplicationDialog;
 import org.springframework.richclient.dialog.CloseAction;
 import org.springframework.richclient.dialog.FormBackedDialogPage;
 import org.springframework.richclient.dialog.TitledPageApplicationDialog;

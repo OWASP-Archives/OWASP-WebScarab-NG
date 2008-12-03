@@ -3,12 +3,8 @@
  */
 package org.owasp.webscarab.domain;
 
-import java.net.URI;
-
 import org.owasp.webscarab.util.HttpMethodUtils;
-import org.springframework.core.closure.Constraint;
 import org.springframework.rules.Rules;
-import org.springframework.rules.constraint.property.PropertyConstraint;
 import org.springframework.rules.support.DefaultRulesSource;
 
 /**
