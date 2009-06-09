@@ -124,7 +124,7 @@ public class JdbcSessionDao extends PropertiesJdbcDaoSupport implements
 
         protected SessionUpdate() {
             super(getDataSource(),
-                    "UPDATE sessions SET (description, date) VALUES(?,?) WHERE id = ?");
+                    "UPDATE sessions SET description = ?, date = ? WHERE id = ?");
             declareParameter(new SqlParameter(Types.VARCHAR));
             declareParameter(new SqlParameter(Types.TIMESTAMP));
             declareParameter(new SqlParameter(Types.INTEGER));
