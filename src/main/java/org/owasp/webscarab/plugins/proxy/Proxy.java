@@ -573,10 +573,12 @@ public class Proxy implements ApplicationContextAware, EventSubscriber {
                 if (conversation instanceof StreamingConversation) {
                     StreamingConversation sc = (StreamingConversation) conversation;
                     InputStream cs = sc.getResponseContentStream();
-                    byte[] buff = new byte[4096];
-                    int got;
-                    while ((got = cs.read(buff)) > -1)
-                        os.write(buff, 0, got);
+                    if (cs != null) {
+	                    byte[] buff = new byte[4096];
+	                    int got;
+	                    while ((got = cs.read(buff)) > -1)
+	                        os.write(buff, 0, got);
+                    }
                 } else {
                     byte[] content = conversation.getResponseContent();
                     if (content != null)
