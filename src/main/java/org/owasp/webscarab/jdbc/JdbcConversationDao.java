@@ -179,7 +179,7 @@ public class JdbcConversationDao extends PropertiesJdbcDaoSupport implements
             super(
                     getDataSource(),
                     "SELECT "
-                            + "id, request_date, source_id, methods.method as request_method, request_uri_id, request_version_id, "
+                            + "conversations.id, request_date, source_id, methods.method as request_method, request_uri_id, request_version_id, "
                             + "request_content_id, response_version_id, response_status, "
                             + "messages.message as response_message, response_content_id "
                             + "FROM conversations, methods, messages "
